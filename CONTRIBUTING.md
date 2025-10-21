@@ -1,0 +1,4 @@
+- Use Conventional Commits.
+- One PR per component.
+- Add/extend tests and docs with each change.
+- Keep CI < 60 seconds where possible.
