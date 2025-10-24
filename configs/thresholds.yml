@@ -1,0 +1,20 @@
+vol_target_annual: 0.11
+tau:
+  IR_view: 0.15        # fallback BL se IR(view) < 0.15
+  sigma_rel: 0.20      # soglia Frobenius relativa su Σ
+  delta_rho: 0.15      # max variazione |Δρ_ij|
+  beta_CI_width: 0.25  # cap mapping se CI80(β) troppo ampia
+  rc_tol: 0.02         # tolleranza ERC per cluster
+execution:
+  turnover_cap: 0.40
+  gross_leverage_cap: 1.75
+  TE_max_factor: 0.02
+  adv_cap_ratio: 0.05
+regime:
+  on: 0.65
+  off: 0.45
+  dwell_days: 20
+  cooldown_days: 10
+drift:
+  weight_tol: 0.02
+  rc_tol: 0.02

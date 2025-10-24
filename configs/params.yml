@@ -1,0 +1,13 @@
+currency_base: EUR
+household:
+  age: 32
+  contrib_monthly: 500
+  horizon_years: 30
+  cvar_cap_1m: 0.10
+  edar_cap_3y: 0.20
+filters:
+  esg_exclusions: []
+  allowed_instruments: ["UCITS_ETF","FUT","CASH","BOND_IDX"]
+rebalancing:
+  frequency_days: 30
+  no_trade_bands: 0.02
