@@ -10,7 +10,7 @@
 
 Ogni fetcher registra nel log la licenza e l'URL utilizzato per ogni simbolo, fornendo evidenze per l'audit.
 
-Dal 1º ottobre 2025 i reindirizzamenti dal vecchio SDW API sono terminati; aggiornare al dominio data-api.ecb.europa.eu.
+Dal 1º ottobre 2025 i redirect SDW sono terminati; usare data-api.ecb.europa.eu.
 
 ## Layout directory raw
 ```
