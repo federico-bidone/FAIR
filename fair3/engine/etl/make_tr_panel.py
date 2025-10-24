@@ -12,7 +12,7 @@ from fair3.engine.etl.fx import FXFrame, convert_to_base, load_fx_rates
 from fair3.engine.etl.qa import QARecord, QAReport, write_qa_log
 from fair3.engine.utils.io import ensure_dir
 
-__all__ = ["TRPanelArtifacts", "TRPanelBuilder", "build_tr_panel"]
+__all__ = ["TRPanelArtifacts", "TRPanelBuilder", "PanelBuilder", "build_tr_panel"]
 
 
 @dataclass(slots=True)
@@ -51,7 +51,7 @@ class TRPanelBuilder:
         fx_frame = self._build_fx_frame(raw_records)
 
         prices, qa_report = self._prepare_prices(raw_records, calendar, fx_frame)
-        returns = self._compute_returns(prices)
+        returns = self._compute_returns(prices, trace=trace)
         features = self._compute_features(returns, seed=seed)
 
         prices_path = self._write_parquet(prices, "prices.parquet")
@@ -154,11 +154,11 @@ class TRPanelBuilder:
         prices = prices.sort_values(["date", "symbol"]).set_index(["date", "symbol"])
         return prices, qa_report
 
-    def _compute_returns(self, prices: pd.DataFrame) -> pd.DataFrame:
+    def _compute_returns(self, prices: pd.DataFrame, *, trace: bool = False) -> pd.DataFrame:
         returns = (
             prices[["price"]]
             .groupby(level="symbol")
-            .pct_change()
+            .pct_change(fill_method=None)
             .replace([np.inf, -np.inf], np.nan)
         )
         returns = returns.fillna(0.0)
@@ -167,9 +167,23 @@ class TRPanelBuilder:
         simple_ret = returns["price"]
         log_ret = log_returns["price"]
 
+        dup_mask = simple_ret.index.duplicated(keep="last")
+        dropped_simple = int(dup_mask.sum())
+        if dropped_simple:
+            if trace:
+                print(f"[fair3.etl] duplicate return rows dropped={dropped_simple}")
+            simple_ret = simple_ret[~dup_mask]
+            log_ret = log_ret[~dup_mask]
+
         estimation = log_ret.groupby(level="symbol").apply(prepare_estimation_copy)
         if isinstance(estimation.index, pd.MultiIndex) and estimation.index.nlevels > 2:
             estimation.index = estimation.index.droplevel(0)
+        dup_estimation = estimation.index.duplicated(keep="last")
+        dropped_estimation = int(dup_estimation.sum())
+        if dropped_estimation:
+            if trace:
+                print(f"[fair3.etl] duplicate estimation rows dropped={dropped_estimation}")
+            estimation = estimation[~dup_estimation]
         estimation = estimation.reindex(simple_ret.index)
 
         out = pd.DataFrame(
@@ -218,3 +232,6 @@ class TRPanelBuilder:
 def build_tr_panel(**kwargs: object) -> TRPanelArtifacts:
     builder = TRPanelBuilder(**kwargs)
     return builder.build()
+
+
+PanelBuilder = TRPanelBuilder
