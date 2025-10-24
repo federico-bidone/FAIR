@@ -70,8 +70,12 @@ def test_ecb_fetcher(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
 
 def test_fred_fetcher_filters_start(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
     logger = RecordingLogger()
+    monkeypatch.setenv("FRED_API_KEY", "D" * 32)
     fetcher = FREDFetcher(raw_root=tmp_path, logger=logger)
-    sample = "DATE,VALUE\n2023-12-31,0.5\n2024-01-05,1.0\n"
+    sample = """{"observations": [
+        {"date": "2023-12-31", "value": "0.5"},
+        {"date": "2024-01-05", "value": "1.0"}
+    ]}"""
     monkeypatch.setattr(fetcher, "_download", lambda url, session=None: sample)
     result = fetcher.fetch(symbols=["DGS10"], start=date(2024, 1, 1), as_of=TIMESTAMP)
     assert len(result.data) == 1
@@ -83,7 +87,7 @@ def test_fred_fetcher_filters_start(tmp_path: Path, monkeypatch: MonkeyPatch) ->
 def test_boe_fetcher(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
     logger = RecordingLogger()
     fetcher = BOEFetcher(raw_root=tmp_path, logger=logger)
-    sample = "DATE,VALUE\n2024-01-01,3.5\n"
+    sample = "01/01/2024,3.5\n"
     monkeypatch.setattr(fetcher, "_download", lambda url, session=None: sample)
     result = fetcher.fetch(symbols=["IUMGBP"], as_of=TIMESTAMP)
     frame = _write_and_validate(result.path, 1)
