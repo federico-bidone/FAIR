@@ -101,7 +101,7 @@ class FactorLibrary:
         if panel.empty:
             raise ValueError("Panel is empty; run ETL before computing factors")
 
-        lag_vol = panel["lag_vol_21"].replace(0.0, np.nan).fillna(method="ffill")
+        lag_vol = panel["lag_vol_21"].replace(0.0, np.nan).ffill()
         inv_vol = 1.0 / (lag_vol.replace(0.0, np.nan))
         inv_vol = inv_vol.replace([np.inf, -np.inf], np.nan).fillna(0.0)
         diff_ma = panel["lag_ma_5"] - panel["lag_ma_21"]
@@ -189,7 +189,7 @@ class FactorLibrary:
                 "rates_beta": zero.rename("rates_beta"),
             }
 
-        macro = self._macro.reindex(index, method="ffill").fillna(method="bfill").fillna(0.0)
+        macro = self._macro.reindex(index).ffill().bfill().fillna(0.0)
         inflation = macro.get("inflation", pd.Series(0.0, index=index))
         policy_rate = macro.get("policy_rate", pd.Series(0.0, index=index))
 

@@ -13,7 +13,7 @@ from fair3.engine.utils import rand as rand_utils
 
 def _write_clean_panel(root: Path) -> None:
     root.mkdir(parents=True, exist_ok=True)
-    dates = pd.date_range("2020-01-31", periods=36, freq="M")
+    dates = pd.date_range("2020-01-31", periods=36, freq="ME")
     symbols = ["EQT", "BND", "ALT"]
     index = pd.MultiIndex.from_product([dates, symbols], names=["date", "symbol"])
     rng = np.random.default_rng(42)

@@ -13,7 +13,7 @@ from fair3.engine.reporting import (
 
 
 def _sample_inputs() -> MonthlyReportInputs:
-    index = pd.date_range("2024-01-31", periods=6, freq="M")
+    index = pd.date_range("2024-01-31", periods=6, freq="ME")
     returns = pd.Series([0.01, -0.005, 0.007, 0.012, -0.004, 0.009], index=index)
     weights = pd.DataFrame(
         [

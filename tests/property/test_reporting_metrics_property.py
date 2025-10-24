@@ -22,14 +22,14 @@ RETURNS_STRATEGY = st.lists(
 
 @given(returns=RETURNS_STRATEGY)
 def test_max_drawdown_is_non_positive(returns: list[float]) -> None:
-    index = pd.date_range("2020-01-31", periods=len(returns), freq="M")
+    index = pd.date_range("2020-01-31", periods=len(returns), freq="ME")
     series = pd.Series(returns, index=index)
     metrics = compute_monthly_metrics(series)
     assert metrics["max_drawdown"] <= 1e-9
 
 
 def test_zero_turnover_zero_costs(tmp_path: Path) -> None:
-    index = pd.date_range("2024-01-31", periods=3, freq="M")
+    index = pd.date_range("2024-01-31", periods=3, freq="ME")
     zeros = pd.Series(0.0, index=index)
     inputs = MonthlyReportInputs(
         returns=zeros,

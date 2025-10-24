@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 from collections.abc import Iterable
 from datetime import UTC, datetime
@@ -13,6 +14,7 @@ ARTIFACTS_ROOT = Path("artifacts")
 __all__ = [
     "ARTIFACTS_ROOT",
     "ensure_dir",
+    "safe_path_segment",
     "artifact_path",
     "read_yaml",
     "write_yaml",
@@ -23,12 +25,22 @@ __all__ = [
 ]
 
 
+INVALID_FS_CHARS = r'[<>:"/\\|?*\x00-\x1F]'
+
+
 def ensure_dir(path: Path | str) -> Path:
     """Ensure ``path`` exists and return it as a :class:`Path`."""
 
     path_obj = Path(path)
     path_obj.mkdir(parents=True, exist_ok=True)
     return path_obj
+
+
+def safe_path_segment(name: str) -> str:
+    """Return ``name`` sanitized for use as a filesystem path segment."""
+
+    safe = re.sub(INVALID_FS_CHARS, "-", str(name))
+    return safe.rstrip(" .")
 
 
 def artifact_path(

@@ -109,7 +109,7 @@ def run_mapping_pipeline(
     factors = _load_factors(artifacts_root)
     sign_map = _load_metadata(artifacts_root)
 
-    aligned_factors = factors.reindex(instrument_returns.index).fillna(method="ffill").fillna(0.0)
+    aligned_factors = factors.reindex(instrument_returns.index).ffill().fillna(0.0)
     n_obs = len(aligned_factors)
     if n_obs < 2:
         raise ValueError("Not enough observations for beta mapping")

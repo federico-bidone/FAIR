@@ -1,8 +1,7 @@
-from __future__ import annotations
-
 from pathlib import Path
 
 from fair3.engine.utils import artifact_path, compute_checksums, sha256_file, write_yaml
+from fair3.engine.utils.io import ensure_dir, safe_path_segment
 
 
 def test_artifact_path_creates_directory(tmp_path: Path) -> None:
@@ -27,3 +26,20 @@ def test_compute_checksums_skips_missing(tmp_path: Path) -> None:
     checksums = compute_checksums([existing, missing])
     assert str(existing) in checksums
     assert str(missing) not in checksums
+
+
+def test_safe_path_segment_replaces_invalid_characters(tmp_path: Path) -> None:
+    unsafe = "2024-01:2024-03"
+    safe = safe_path_segment(unsafe)
+    assert ":" not in safe
+    assert safe == "2024-01-2024-03"
+
+    created = ensure_dir(tmp_path / safe)
+    assert created.exists()
+    assert created.name == safe
+
+
+def test_safe_path_segment_strips_trailing_dots_and_spaces() -> None:
+    unsafe = "report ."
+    safe = safe_path_segment(unsafe)
+    assert safe == "report"
