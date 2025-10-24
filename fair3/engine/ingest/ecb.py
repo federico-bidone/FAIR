@@ -12,7 +12,7 @@ class ECBFetcher(BaseCSVFetcher):
 
     SOURCE = "ecb"
     LICENSE = "European Central Bank (ECB) Statistical Data Warehouse Terms of Use"
-    BASE_URL = "https://sdw-wsrest.ecb.europa.eu/service/data/EXR"
+    BASE_URL = "https://data-api.ecb.europa.eu/service/data/EXR"
     DEFAULT_SYMBOLS = ("USD", "GBP")
 
     def build_url(self, symbol: str, start: pd.Timestamp | None) -> str:
