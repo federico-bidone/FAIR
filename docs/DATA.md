@@ -3,12 +3,14 @@
 ## Fonti pubbliche supportate
 | Codice | Fonte | Endpoint principale | Licenza sintetica |
 | ------ | ----- | ------------------ | ----------------- |
-| `ecb`  | European Central Bank (SDW) | `https://sdw-wsrest.ecb.europa.eu/service/data/EXR` | Uso conforme ai [Terms of Use ECB SDW](https://www.ecb.europa.eu/stats/ecb_statistics/governance/shared_data/en.html) |
+| `ecb`  | European Central Bank (ECB Data Portal) | `https://data-api.ecb.europa.eu/service/data/EXR` | Uso conforme ai [Terms of Use ECB SDW](https://www.ecb.europa.eu/stats/ecb_statistics/governance/shared_data/en.html) |
 | `fred` | Federal Reserve Economic Data | `https://fred.stlouisfed.org/graph/fredgraph.csv` | [FRED Terms of Use](https://fredhelp.stlouisfed.org/fred/terms-of-use/) |
 | `boe`  | Bank of England Data Services | `https://www.bankofengland.co.uk/boeapps/database/_iadb-getTDDownloadCSV` | [BoE Data Terms](https://www.bankofengland.co.uk/terms-and-conditions) |
 | `stooq` | Stooq.com EOD | `https://stooq.com/q/d/l/` | [Stooq data policy](https://stooq.com/db/en/) |
 
 Ogni fetcher registra nel log la licenza e l'URL utilizzato per ogni simbolo, fornendo evidenze per l'audit.
+
+Dal 1º ottobre 2025 i reindirizzamenti dal vecchio SDW API sono terminati; aggiornare al dominio data-api.ecb.europa.eu.
 
 ## Layout directory raw
 ```
