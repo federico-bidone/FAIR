@@ -7,7 +7,7 @@ from fair3.engine.estimates import blend_mu, estimate_mu_ensemble, reverse_opt_m
 
 def make_sample_frames(seed: int = 0) -> tuple[pd.DataFrame, pd.DataFrame]:
     rng = np.random.default_rng(seed)
-    idx = pd.date_range("2015-01-01", periods=60, freq="M")
+    idx = pd.date_range("2015-01-01", periods=60, freq="ME")
     returns = pd.DataFrame(rng.normal(scale=0.02, size=(60, 3)), index=idx, columns=["A", "B", "C"])
     macro = pd.DataFrame(rng.normal(size=(60, 2)), index=idx, columns=["macro1", "macro2"])
     return returns, macro

@@ -12,7 +12,7 @@ from fair3.engine.reporting.plots import (
     plot_fan_chart,
     plot_turnover_costs,
 )
-from fair3.engine.utils.io import artifact_path, ensure_dir, write_json
+from fair3.engine.utils.io import artifact_path, ensure_dir, safe_path_segment, write_json
 from fair3.engine.utils.rand import generator_from_seed
 
 __all__ = [
@@ -126,7 +126,7 @@ def _aggregate_monthly(series: pd.Series, method: str) -> pd.Series:
     if series.empty:
         return series
     series = series.sort_index()
-    resampled = series.resample("M")
+    resampled = series.resample("ME")
     if method == "sum":
         return resampled.sum()
     if method == "product":
@@ -177,7 +177,8 @@ def generate_monthly_report(
     """Generate the monthly performance report and return produced artefacts."""
 
     base_dir = ensure_dir(output_dir or artifact_path("reports", create=True))
-    report_root = ensure_dir(base_dir / period_label)
+    safe_label = safe_path_segment(period_label)
+    report_root = ensure_dir(base_dir / safe_label)
 
     returns_monthly = _aggregate_monthly(inputs.returns, method="product")
     metrics = compute_monthly_metrics(returns_monthly)
@@ -188,8 +189,8 @@ def generate_monthly_report(
     metrics_json = report_root / "metrics.json"
     write_json(metrics, metrics_json)
 
-    attribution = inputs.factor_contributions.sort_index().resample("M").sum()
-    instr_attr = inputs.instrument_contributions.sort_index().resample("M").sum()
+    attribution = inputs.factor_contributions.sort_index().resample("ME").sum()
+    instr_attr = inputs.instrument_contributions.sort_index().resample("ME").sum()
     attribution_df = pd.concat({"factors": attribution, "instruments": instr_attr}, axis=1)
     attribution_csv = report_root / "attribution.csv"
     attribution_df.to_csv(attribution_csv)
@@ -223,7 +224,7 @@ def generate_monthly_report(
     )
 
     cluster_weights = _cluster_weights(
-        inputs.weights.sort_index().resample("M").mean(), inputs.cluster_map
+        inputs.weights.sort_index().resample("ME").mean(), inputs.cluster_map
     )
     cluster_csv = report_root / "erc_clusters.csv"
     cluster_weights.to_csv(cluster_csv)

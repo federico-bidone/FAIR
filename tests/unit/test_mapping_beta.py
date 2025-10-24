@@ -7,7 +7,7 @@ from fair3.engine.mapping import beta_ci_bootstrap, rolling_beta_ridge
 
 
 def _toy_data(n_obs: int = 12) -> tuple[pd.DataFrame, pd.DataFrame, np.ndarray]:
-    idx = pd.date_range("2020-01-01", periods=n_obs, freq="M")
+    idx = pd.date_range("2020-01-01", periods=n_obs, freq="ME")
     rng = np.random.default_rng(123)
     factors = pd.DataFrame(rng.normal(size=(n_obs, 2)), index=idx, columns=["carry", "value"])
     beta = np.array([[0.4, -0.2, 0.1], [0.3, 0.1, -0.4]])

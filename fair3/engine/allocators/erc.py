@@ -6,7 +6,7 @@ import numpy as np
 
 
 def risk_contributions(w: np.ndarray, Sigma: np.ndarray) -> np.ndarray:  # noqa: N803
-    """Return marginal contribution of each asset to portfolio risk.
+    r"""Return marginal contribution of each asset to portfolio risk.
 
     The calculation follows the standard ERC definition ``RC_i = w_i (\Sigma w)_i``
     with a small epsilon in the denominator to guard against division by zero.
