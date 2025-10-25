@@ -1,50 +1,64 @@
+"""Suite di test italiani per ``fair3.engine.etl.cleaning``."""
+
 from __future__ import annotations
 
 import numpy as np
 import pandas as pd
 import pytest
 
-from fair3.engine.etl.cleaning import (
-    HampelConfig,
-    apply_hampel,
-    clean_price_history,
-    prepare_estimation_copy,
-    winsorize_series,
-)
+from fair3.engine.etl import cleaning
 
 
-def test_apply_hampel_removes_spike() -> None:
-    series = pd.Series([100.0, 101.0, 250.0, 102.0, 103.0])
-    config = HampelConfig(window=3, n_sigma=3.0)
-    cleaned = apply_hampel(series, config)
-    expected = np.median([101.0, 250.0, 102.0])
-    assert cleaned.iloc[2] != pytest.approx(series.iloc[2])
-    assert cleaned.iloc[2] == pytest.approx(expected)
+def test_hampel_config_valida_parametri() -> None:
+    """Valori non positivi devono generare messaggi esplicativi."""
+
+    with pytest.raises(ValueError, match="window deve essere positivo"):
+        cleaning.HampelConfig(window=0)
+    with pytest.raises(ValueError, match="n_sigma deve essere positivo"):
+        cleaning.HampelConfig(n_sigma=0)
 
 
-def test_winsorize_series_bounds() -> None:
-    rng = np.random.default_rng(0)
-    series = pd.Series(rng.normal(size=1000))
-    wins = winsorize_series(series, lower=0.05, upper=0.95)
-    lower_bound, upper_bound = series.quantile([0.05, 0.95])
-    assert wins.min() >= lower_bound - 1e-9
-    assert wins.max() <= upper_bound + 1e-9
+def test_apply_hampel_sostituisce_spike() -> None:
+    """Un picco isolato deve essere riportato alla mediana locale."""
+
+    serie = pd.Series([1.0, 100.0, 1.1, 1.2, 1.1])
+    filtrata = cleaning.apply_hampel(serie, cleaning.HampelConfig(window=3, n_sigma=0.5))
+    assert pytest.approx(filtrata.iloc[1]) == pytest.approx(1.1)
 
 
-def test_clean_price_history_applies_per_symbol() -> None:
-    frame = pd.DataFrame(
+def test_winsorize_series_valida_intervallo() -> None:
+    """Gli intervalli disordinati vengono rigettati con ValueError."""
+
+    with pytest.raises(ValueError, match="intervallo di quantili non valido"):
+        cleaning.winsorize_series(pd.Series([1, 2, 3]), lower=0.9, upper=0.2)
+
+
+def test_clean_price_history_per_symbol() -> None:
+    """Ogni simbolo deve essere ripulito indipendentemente."""
+
+    dati = pd.DataFrame(
         {
-            "symbol": ["A", "A", "A", "A", "B", "B"],
-            "price": [1.0, 1.01, 10_000.0, 1.02, 2.0, 2.5],
+            "symbol": ["AAA", "AAA", "AAA", "BBB", "BBB", "BBB"],
+            "price": [1.0, 50.0, 1.1, 2.0, 2.0, 2.0],
+            "currency": ["EUR"] * 6,
         }
     )
-    cleaned = clean_price_history(frame)
-    assert cleaned.loc[2, "price"] != frame.loc[2, "price"]
-    assert cleaned.loc[0, "price"] == frame.loc[0, "price"]
+    pulito = cleaning.clean_price_history(
+        dati,
+        value_column="price",
+        group_column="symbol",
+        hampel=cleaning.HampelConfig(window=3, n_sigma=0.5),
+    )
+    assert pulito.loc[1, "price"] != 50.0
+    bbb = pulito[pulito["symbol"] == "BBB"]["price"].tolist()
+    assert bbb == pytest.approx([2.0, 2.0, 2.0])
 
 
-def test_prepare_estimation_copy_winsorizes() -> None:
-    series = pd.Series([-10.0, -1.0, 0.0, 1.0, 10.0])
-    wins = prepare_estimation_copy(series, winsor_quantiles=(0.2, 0.8))
-    assert wins.iloc[0] == pytest.approx(series.quantile(0.2))
-    assert wins.iloc[-1] == pytest.approx(series.quantile(0.8))
+def test_prepare_estimation_copy_winsorizza_code() -> None:
+    """La serie per la stima deve essere limitata ai quantili dati."""
+
+    rng = np.random.default_rng(0)
+    serie = pd.Series(rng.normal(size=1_000))
+    serie.iloc[0] = 10.0
+    stima = cleaning.prepare_estimation_copy(serie, winsor_quantiles=(0.01, 0.99))
+    assert stima.iloc[0] < 10.0

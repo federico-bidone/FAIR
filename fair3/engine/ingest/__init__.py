@@ -1,4 +1,4 @@
-"""Ingest orchestration for FAIR-III."""
+"""Orchestrazione dell'ingest per FAIR-III."""
 
 from .boe import BOEFetcher
 from .ecb import ECBFetcher

@@ -1,64 +1,75 @@
-# Robustness Module
+# Modulo Robustezza
 
-The robustness package stress-tests FAIR-III allocations using deterministic
-block bootstraps, stylised historical shocks, and governance ablations. Outputs
-feed the acceptance gates that guard retail suitability.
+Questa sottocartella raccoglie gli strumenti che mettono alla prova le
+allocazioni FAIR-III con analisi "what-if" e backtest sintetici. Tutte le
+funzioni espongono docstring e logging in italiano per agevolare il debugging
+operativo.
 
-## Public API
+## API Pubblica
 
 ### `fair3.engine.robustness.bootstrap`
-- `block_bootstrap_metrics(returns, block_size=60, draws=1000, periods_per_year=252, ...)`
-- `RobustnessGates`
+- `block_bootstrap_metrics(...)`: esegue un bootstrap a blocchi sui rendimenti
+  e restituisce le statistiche campionate insieme alle soglie di accettazione.
+- `RobustnessGates`: dataclass che incapsula le soglie di superamento dei test.
 
 ### `fair3.engine.robustness.scenarios`
-- `ShockScenario`
-- `default_shock_scenarios()`
-- `replay_shocks(base_returns, scenarios=None, scale_to_base_vol=True, periods_per_year=252)`
+- `ShockScenario`: rappresenta uno shock stilizzato con rendimenti precalcolati.
+- `default_shock_scenarios()`: fornisce gli shock storici inclusi di default.
+- `replay_shocks(...)`: riapplica gli shock sui rendimenti osservati
+  calcolando drawdown e CAGR.
 
 ### `fair3.engine.robustness.ablation`
-- `DEFAULT_FEATURES`
-- `run_ablation_study(runner, features=None, base_flags=None)`
-- `AblationOutcome`
+- `run_ablation_study(...)`: valuta la sensibilità delle metriche disattivando
+  una feature per volta.
+- `AblationOutcome`: ritorna la tabella riassuntiva delle prove.
+- `DEFAULT_FEATURES`: elenco ordinato delle feature governative di riferimento.
 
 ### `fair3.engine.robustness.lab`
-- `RobustnessConfig`
-- `RobustnessArtifacts`
-- `run_robustness_lab(returns, config=None, seed=None, scenarios=None, ablation_runner=None, base_flags=None)`
+- `RobustnessConfig`: configura la dimensione dei blocchi, il numero di
+  estrazioni e le soglie di accettazione.
+- `RobustnessArtifacts`: descrive i file generati dal laboratorio di robustezza.
+- `run_robustness_lab(...)`: orquestra bootstrap, scenari e (facoltativamente)
+  ablation, producendo CSV, JSON e un PDF riassuntivo.
 
-## CLI / Pipeline Usage
+## Utilizzo da Pipeline/CLI
 
-The orchestration layer will call `run_robustness_lab` after monthly reporting to
-produce CSV diagnostics and a compact PDF in `artifacts/robustness/`. Pass an
-`ablation_runner` callback that toggles features (e.g., BL fallback, PSD
-projection) and returns metrics such as Sharpe, TE, or drawdown.
+L'orchestratore invoca `run_robustness_lab` dopo il reporting mensile per
+produrre diagnostiche in `artifacts/robustness/`. È possibile passare una
+callback `ablation_runner` che riceve i flag di governance e ritorna metriche
+(Sharpe, tracking error, drawdown). Il laboratorio crea automaticamente una
+cartella dedicata e popola i file in modo deterministico se si fornisce un
+`seed`.
 
 ```python
 from fair3.engine.robustness import RobustnessConfig, run_robustness_lab
 
-def evaluate(flags):
-    # Invoke downstream pipeline with the provided governance flags.
-    return {"sharpe": 0.85, "max_drawdown": -0.22}
+
+def valuta_assetto(flag_set: dict[str, bool]) -> dict[str, float]:
+    """Simula un punteggio di robustezza in base ai flag governativi."""
+    # Qui andrebbe invocata la pipeline principale in modalità analisi.
+    return {"sharpe": 0.84, "max_drawdown": -0.23}
+
 
 artifacts, gates = run_robustness_lab(
-    returns=portfolio_returns,
+    returns=serie_rendimenti,
     config=RobustnessConfig(draws=256, block_size=60),
     seed=42,
-    ablation_runner=evaluate,
+    ablation_runner=valuta_assetto,
 )
-print("Gates satisfied:", gates.passes())
+print("Gates superati:", gates.passes())
 ```
 
-## Common Errors & Troubleshooting
+## Errori Comuni e Troubleshooting
 
-| Symptom | Likely Cause | Resolution |
+| Sintomo | Possibile causa | Risoluzione |
 | --- | --- | --- |
-| ValueError about block size | Requested block size larger than data sample | Use the available length or pass aggregated returns |
-| Empty ablation table | Callback returned no metrics | Ensure the ablation runner maps flags to metric dicts |
-| Missing PDF outputs | Matplotlib backend not available | The module enforces `Agg`; install matplotlib on the target machine |
+| `ValueError` sulla dimensione del blocco | Il blocco richiesto è più grande del campione | Ridurre `block_size` o aggregare i rendimenti |
+| Tabella di ablation vuota | La callback non restituisce metriche | Verificare che il runner ritorni un dict di float |
+| PDF mancante | Backend Matplotlib non disponibile | Installare `matplotlib` e lasciare attivo il backend `Agg` |
 
-## Trace Hooks
+## Tracciamento e Audit
 
-Supply a deterministic `seed` or rely on `audit/seeds.yml` so bootstrap and
-scenario outputs are reproducible. Downstream orchestration should log the
-returned artefact paths via `fair3.engine.utils.log.get_logger` when `--trace`
-flags are active.
+Impostando `seed` o affidandosi a `audit/seeds.yml` si ottengono risultati
+riproducibili per bootstrap e scenari. Le pipeline dovrebbero loggare i path
+prodotti tramite `fair3.engine.utils.logging.get_logger` quando è attiva la
+modalità `--trace`.

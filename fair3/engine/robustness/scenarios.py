@@ -16,13 +16,15 @@ __all__ = [
 
 @dataclass(frozen=True)
 class ShockScenario:
-    """Container for stylised historical shock return paths."""
+    """Rappresenta un percorso di rendimenti stilizzato per gli stress test."""
 
     name: str
     returns: np.ndarray
 
 
 def _scenario_max_drawdown(path: np.ndarray) -> float:
+    """Calcola il drawdown massimo cumulato di uno scenario."""
+
     wealth = np.cumprod(1.0 + path)
     if np.any(wealth <= 0):
         return -1.0
@@ -32,6 +34,8 @@ def _scenario_max_drawdown(path: np.ndarray) -> float:
 
 
 def _scenario_cagr(path: np.ndarray, *, periods_per_year: int) -> float:
+    """Deriva il CAGR annualizzato del percorso fornito."""
+
     total_return = float(np.prod(1.0 + path))
     n_obs = path.shape[0]
     if n_obs == 0 or total_return <= 0:
@@ -127,12 +131,14 @@ DEFAULT_SHOCKS: tuple[ShockScenario, ...] = (
 
 
 def default_shock_scenarios() -> tuple[ShockScenario, ...]:
-    """Return the packaged historical shock scenarios."""
+    """Restituisce gli shock storici forniti di default."""
 
     return DEFAULT_SHOCKS
 
 
 def _scale_scenario(returns: np.ndarray, target_vol: float) -> np.ndarray:
+    """Scala lo scenario per pareggiare la volatilità dei rendimenti base."""
+
     scenario_vol = float(np.std(returns, ddof=0))
     if scenario_vol == 0 or target_vol == 0:
         return np.zeros_like(returns)
@@ -147,11 +153,11 @@ def replay_shocks(
     scale_to_base_vol: bool = True,
     periods_per_year: int = 252,
 ) -> pd.DataFrame:
-    """Replay stylised shock scenarios using the volatility of ``base_returns``."""
+    """Rigioca gli shock storici sui rendimenti osservati e riporta le metriche."""
 
     base_series = pd.Series(base_returns, dtype="float64")
     if base_series.empty:
-        raise ValueError("base_returns must contain observations")
+        raise ValueError("base_returns deve contenere almeno un valore")
     scenarios = tuple(scenarios or DEFAULT_SHOCKS)
     target_vol = float(base_series.std(ddof=0)) if scale_to_base_vol else 1.0
 

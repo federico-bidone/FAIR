@@ -149,7 +149,39 @@ fair3/
     utils/
 tests/
 ```
-Each engine submodule will ship with its own README detailing APIs, CLI usage, common errors, and tracing flags as functionality lands in later milestones.
+Each engine submodule will ship with its own README detailing APIs, CLI usage, common errors, and tracing flags as functionality lands in later milestones. Il piano dettagliato degli interventi è consultabile in [`docs/roadmap.md`](docs/roadmap.md).
+
+### Module Guide
+The following table summarises the most important packages so that new contributors can orient themselves quickly:
+
+| Package | Purpose | Key Entry Points |
+| --- | --- | --- |
+| `fair3.cli` | Command line interface definitions and argument parsing. | `fair3/cli/main.py` orchestrates sub-commands such as `fair3 factors` or `fair3 optimize`. |
+| `fair3.engine.ingest` | Downloaders for ECB, FRED, BoE, and Stooq data sources with offline fixtures. | `run_ingest` pipeline, fetcher classes like `FREDFetcher`. |
+| `fair3.engine.etl` | Point-in-time panel construction and TR cleaning utilities. | `TRPanelBuilder`, ETL CLI invoked via `fair3 etl`. |
+| `fair3.engine.factors` | Factor library, orthogonalisation, validation harness. | `FactorLibrary`, `run_factor_pipeline`, CLI `fair3 factors`. |
+| `fair3.engine.estimates` | Mean/variance estimation stack, Black–Litterman blending, drift diagnostics. | `run_estimate_pipeline`, `estimate_mu_ensemble`. |
+| `fair3.engine.allocators` | Allocation generators, meta-blender, and optimisation pipeline. | `run_optimization_pipeline`, generator modules `gen_a.py`–`gen_d_cvar_erc.py`. |
+| `fair3.engine.mapping` | Factor-to-instrument betas, liquidity budgets, HRP intra-factor distribution. | `run_mapping_pipeline` and associated validators. |
+| `fair3.engine.execution` | Trade sizing, cost/tax modelling, and summarised decisions. | `summarise_decision`, execution primitives. |
+| `fair3.engine.reporting` | Monthly reporting, audit snapshots, plotting utilities. | `generate_monthly_report`, `run_audit_snapshot`. |
+| `fair3.engine.robustness` | Bootstrap lab, replay experiments, ablation toggles. | `run_robustness_lab`, `RobustnessConfig`. |
+| `fair3.engine.utils` | Shared helpers (I/O, logging, seeds, PSD projection). | `artifact_path`, `get_stream_logger`, `generator_from_seed`. |
+
+### Testing & Quality Assurance
+- **Pytest harness:** The default entry point is `pytest -q`. The new `tests/conftest.py` ensures the repository root is always on `PYTHONPATH`, prints the active log level in the test header, and enables INFO-level pipeline logs so failing tests surface the last executed step.
+- **Property-based tests:** Hypothesis-based suites live under `tests/property/`. Install the optional dependency via `pip install hypothesis` (already listed in `pyproject.toml` extras) to enable them locally.
+- **Verbosity controls:** Pipelines log via `fair3.engine.utils.logging.get_stream_logger`. Tweak verbosity with `FAIR_LOG_LEVEL=DEBUG` or customise formatting using `FAIR_LOG_FORMAT`. These variables are honoured both by the CLI and under pytest thanks to an autouse fixture.
+- **Focused smoke tests:** `tests/unit/test_pipeline_verbosity.py` exercises the factor, estimate, and optimiser pipelines with lightweight fixtures. The suite stubs expensive I/O and still asserts that artefacts are produced and log statements include the expected context, making regressions easier to diagnose.
+- **Audit snapshots:** Audit routines run automatically; in tests they are monkeypatched for performance. When running end-to-end, verify `artifacts/audit/` contains `seeds.yml`, `checksums.json`, and change logs for compliance review.
+
+For deterministic reproduction ensure you export `FAIR_LOG_LEVEL` and `FAIR_LOG_FORMAT` before invoking the CLI or tests. Example:
+
+```bash
+export FAIR_LOG_LEVEL=DEBUG
+export FAIR_LOG_FORMAT='[%(asctime)s] %(levelname)s %(name)s - %(message)s'
+pytest tests/unit/test_pipeline_verbosity.py -vv
+```
 
 ## Troubleshooting (Windows)
 - **Build tools:** Install the "Desktop development with C++" workload (Visual Studio Build Tools) if `cvxpy` requires compilation.

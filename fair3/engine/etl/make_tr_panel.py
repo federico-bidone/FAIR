@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+"""Costruzione del pannello prezzi-rendimenti con pipeline tracciata."""
+
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -17,6 +19,8 @@ __all__ = ["TRPanelArtifacts", "TRPanelBuilder", "PanelBuilder", "build_tr_panel
 
 @dataclass(slots=True)
 class TRPanelArtifacts:
+    """Percorsi degli artefatti generati dall'ETL e metadati di riepilogo."""
+
     prices_path: Path
     returns_path: Path
     features_path: Path
@@ -26,6 +30,13 @@ class TRPanelArtifacts:
 
 
 class TRPanelBuilder:
+    """Orchestratore dell'ETL che produce il pannello prezzi/rendimenti.
+
+    La classe incapsula path di lavoro e valuta base per favorire test
+    end-to-end; ogni step intermedio è reso metodico così da poter essere
+    verificato e riutilizzato in contesti batch o notebook.
+    """
+
     def __init__(
         self,
         *,
@@ -41,12 +52,16 @@ class TRPanelBuilder:
 
     # ------------------------------------------------------------------
     def build(self, *, seed: int | None = None, trace: bool = False) -> TRPanelArtifacts:
+        """Esegue l'intera pipeline e ritorna i percorsi degli output."""
+
         raw_records = self._load_raw_records()
         if not raw_records:
-            raise FileNotFoundError("No raw ingest files found. Run `fair3 ingest` first.")
+            raise FileNotFoundError(
+                "Nessun file raw trovato. Eseguire prima `fair3 ingest` per popolare i dati."
+            )
 
         if trace:
-            print(f"[fair3.etl] raw_files={len(raw_records)}")
+            print(f"[fair3.etl] file_raw={len(raw_records)}")
         calendar = self._build_calendar(raw_records)
         fx_frame = self._build_fx_frame(raw_records)
 
@@ -70,13 +85,15 @@ class TRPanelBuilder:
 
     # ------------------------------------------------------------------
     def _load_raw_records(self) -> list[pd.DataFrame]:
+        """Carica i CSV raw e li normalizza in un formato uniforme."""
+
         records: list[pd.DataFrame] = []
         for path in sorted(self.raw_root.glob("*/*.csv")):
             frame = pd.read_csv(path)
             if frame.empty:
                 continue
             if {"date", "value", "symbol"} - set(frame.columns):
-                msg = f"raw file {path} missing date/value/symbol columns"
+                msg = f"il file raw {path} non contiene le colonne date/value/symbol"
                 raise ValueError(msg)
             frame["date"] = pd.to_datetime(frame["date"], errors="coerce").dt.tz_localize(None)
             frame = frame.dropna(subset=["date"]).reset_index(drop=True)
@@ -84,10 +101,13 @@ class TRPanelBuilder:
             if "currency" not in frame.columns:
                 frame["currency"] = self.base_currency
             frame = frame.rename(columns={"value": "price"})
+            # Annotiamo la sorgente per alimentare i log QA e permettere audit.
             records.append(frame)
         return records
 
     def _build_calendar(self, records: list[pd.DataFrame]) -> TradingCalendar:
+        """Aggrega tutte le date disponibili per definire il calendario PIT."""
+
         by_symbol: dict[str, pd.DataFrame] = {}
         for frame in records:
             for symbol, sub in frame.groupby("symbol"):
@@ -100,7 +120,12 @@ class TRPanelBuilder:
         return build_calendar(by_symbol, name="raw_union")
 
     def _build_fx_frame(self, records: list[pd.DataFrame]) -> FXFrame:
-        fx_candidates = [frame for frame in records if frame["symbol"].str.contains("/").any()]
+        """Estrarre eventuali serie FX dai record raw e costruire `FXFrame`."""
+
+        fx_candidates: list[pd.DataFrame] = []
+        for frame in records:
+            if frame["symbol"].str.contains("/").any():
+                fx_candidates.append(frame.rename(columns={"price": "value"}))
         if not fx_candidates:
             return FXFrame(base_currency=self.base_currency, rates=pd.DataFrame())
         return load_fx_rates(fx_candidates, self.base_currency)
@@ -111,11 +136,17 @@ class TRPanelBuilder:
         calendar: TradingCalendar,
         fx_frame: FXFrame,
     ) -> tuple[pd.DataFrame, QAReport]:
+        """Pulizia, riallineamento e conversione FX dei prezzi raw."""
+
         combined: list[pd.DataFrame] = []
         qa_report = QAReport(records=[])
         for frame in records:
             source = frame["source"].iat[0]
             for symbol, sub in frame.groupby("symbol"):
+                if "/" in symbol:
+                    # I file FX vengono gestiti separatamente e non partecipano
+                    # al pannello prezzi diretto.
+                    continue
                 working = sub[["date", "price", "currency"]].copy()
                 working["symbol"] = symbol
                 working = reindex_frame(
@@ -149,12 +180,13 @@ class TRPanelBuilder:
                 qa_report.append(qa_record)
                 combined.append(working)
         if not combined:
-            raise RuntimeError("No price data available after processing")
+            raise RuntimeError("Nessun dato prezzo disponibile dopo la pulizia")
         prices = pd.concat(combined, ignore_index=True)
         prices = prices.sort_values(["date", "symbol"]).set_index(["date", "symbol"])
         return prices, qa_report
 
     def _compute_returns(self, prices: pd.DataFrame, *, trace: bool = False) -> pd.DataFrame:
+        # Calcoliamo rendimenti semplici/log per simbolo e sanifichiamo inf/nan.
         returns = (
             prices[["price"]]
             .groupby(level="symbol")
@@ -171,10 +203,11 @@ class TRPanelBuilder:
         dropped_simple = int(dup_mask.sum())
         if dropped_simple:
             if trace:
-                print(f"[fair3.etl] duplicate return rows dropped={dropped_simple}")
+                print(f"[fair3.etl] righe_duplicate_rendimenti={dropped_simple}")
             simple_ret = simple_ret[~dup_mask]
             log_ret = log_ret[~dup_mask]
 
+        # La copia per stima viene winsorizzata per proteggere i modelli da code.
         estimation = log_ret.groupby(level="symbol").apply(prepare_estimation_copy)
         if isinstance(estimation.index, pd.MultiIndex) and estimation.index.nlevels > 2:
             estimation.index = estimation.index.droplevel(0)
@@ -182,7 +215,7 @@ class TRPanelBuilder:
         dropped_estimation = int(dup_estimation.sum())
         if dropped_estimation:
             if trace:
-                print(f"[fair3.etl] duplicate estimation rows dropped={dropped_estimation}")
+                print(f"[fair3.etl] righe_duplicate_stima={dropped_estimation}")
             estimation = estimation[~dup_estimation]
         estimation = estimation.reindex(simple_ret.index)
 
@@ -200,15 +233,20 @@ class TRPanelBuilder:
         group = returns.groupby(level="symbol")
 
         def _lagged_mean(series: pd.Series, window: int, min_periods: int) -> pd.Series:
+            """Media mobile ritardata di una finestra specifica."""
+
             return series.shift(1).rolling(window, min_periods=min_periods).mean()
 
         def _lagged_std(series: pd.Series, window: int, min_periods: int) -> pd.Series:
+            """Deviazione standard mobile ritardata, robusta ai buchi iniziali."""
+
             return series.shift(1).rolling(window, min_periods=min_periods).std()
 
         ma_5 = group["log_ret"].transform(lambda s: _lagged_mean(s, 5, 1))
         ma_21 = group["log_ret"].transform(lambda s: _lagged_mean(s, 21, 1))
         vol_21 = group["log_ret"].transform(lambda s: _lagged_std(s, 21, 5))
         vol_floor = rng.uniform(1e-8, 1e-6)
+        # Il floor evita volatilità nulla che rompenderebbe successive divisioni.
         vol_21 = vol_21.fillna(vol_floor)
         features = pd.DataFrame(
             {
@@ -220,6 +258,8 @@ class TRPanelBuilder:
         return features
 
     def _write_parquet(self, frame: pd.DataFrame, name: str) -> Path:
+        """Serializza il `DataFrame` su parquet con indice normalizzato."""
+
         ensure_dir(self.clean_root)
         path = self.clean_root / name
         frame = frame.copy()

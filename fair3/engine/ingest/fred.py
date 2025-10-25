@@ -16,7 +16,7 @@ __all__ = ["FREDFetcher"]
 
 
 class FREDFetcher(BaseCSVFetcher):
-    """Download FRED series using the official observations API."""
+    """Scarica serie FRED tramite l'API ufficiale delle osservazioni."""
 
     SOURCE = "fred"
     LICENSE = "Federal Reserve Economic Data (FRED) Terms of Use"
@@ -35,6 +35,7 @@ class FREDFetcher(BaseCSVFetcher):
         logger: logging.Logger | None = None,
         session: requests.Session | None = None,
     ) -> None:
+        """Valida le credenziali e il formato di esportazione preferito."""
         api_key = os.environ.get("FRED_API_KEY")
         if not api_key:
             raise RuntimeError("FRED_API_KEY environment variable is required")
@@ -48,6 +49,7 @@ class FREDFetcher(BaseCSVFetcher):
         super().__init__(raw_root=raw_root, logger=logger, session=session)
 
     def build_url(self, symbol: str, start: pd.Timestamp | None) -> str:
+        """Mappa simbolo + finestra temporale in una query `series/observations`."""
         params = {
             "series_id": symbol,
             "api_key": self.api_key,
@@ -58,6 +60,7 @@ class FREDFetcher(BaseCSVFetcher):
         return f"{self.BASE_URL}?{urlencode(params)}"
 
     def _download(self, url: str, *, session: requests.Session | None = None) -> str | bytes:
+        """Scarica il payload scegliendo testo o bytes a seconda del `file_type`."""
         active_session = session or self.session
         close_session = False
         if active_session is None:
@@ -82,6 +85,7 @@ class FREDFetcher(BaseCSVFetcher):
         raise RuntimeError(f"Unable to download from {url}")
 
     def parse(self, payload: str | bytes, symbol: str) -> pd.DataFrame:
+        """Converte JSON o ZIP CSV FRED nel formato tabellare FAIR."""
         if self.file_type == "json":
             text = payload.decode("utf-8") if isinstance(payload, bytes | bytearray) else payload
             if text.lstrip().startswith("<"):

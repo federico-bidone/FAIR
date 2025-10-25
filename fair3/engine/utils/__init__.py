@@ -13,6 +13,7 @@ from .io import (
     write_yaml,
 )
 from .log import default_log_dir, get_logger, setup_logger
+from .logging import get_stream_logger
 from .psd import project_to_psd
 from .rand import (
     DEFAULT_SEED,
@@ -40,6 +41,7 @@ __all__ = [
     "default_log_dir",
     "get_logger",
     "setup_logger",
+    "get_stream_logger",
     "DEFAULT_SEED",
     "DEFAULT_SEED_PATH",
     "DEFAULT_STREAM",

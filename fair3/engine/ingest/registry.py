@@ -26,7 +26,7 @@ __all__ = [
 
 @dataclass(slots=True)
 class IngestArtifact:
-    """Metadata bundle returned after an ingest run."""
+    """Contenitore immutabile con dati e metadati prodotti da una run di ingest."""
 
     source: str
     path: Path
@@ -35,7 +35,7 @@ class IngestArtifact:
 
 
 class BaseCSVFetcher:
-    """Minimal HTTP CSV fetcher with retry/backoff and CSV normalization."""
+    """Fetcher HTTP minimale per CSV con retry/backoff e normalizzazione coerente."""
 
     SOURCE: str = ""
     LICENSE: str = ""
@@ -52,6 +52,7 @@ class BaseCSVFetcher:
         logger: logging.Logger | None = None,
         session: requests.Session | None = None,
     ) -> None:
+        # Valida le costanti dichiarative: ogni fetcher deve identificare sorgente e licenza.
         if not self.SOURCE:
             raise ValueError("SOURCE must be defined on subclasses")
         if not self.LICENSE:
@@ -69,6 +70,7 @@ class BaseCSVFetcher:
         as_of: datetime | None = None,
         session: requests.Session | None = None,
     ) -> IngestArtifact:
+        """Scarica i simboli richiesti restituendo dati normalizzati e log auditabili."""
         if symbols is None:
             symbol_list = list(self.DEFAULT_SYMBOLS)
         else:
@@ -81,6 +83,8 @@ class BaseCSVFetcher:
         requests_meta: list[dict[str, Any]] = []
         start_ts = pd.to_datetime(start) if start is not None else None
 
+        # Per ogni simbolo ripetiamo download → parsing → filtro → log, mantenendo
+        # un tracking puntuale dei metadati da restituire alla fine.
         for symbol in symbol_list:
             url = self.build_url(symbol, start_ts)
             payload = self._download(url, session=session)
@@ -105,6 +109,7 @@ class BaseCSVFetcher:
             data = pd.DataFrame(columns=["date", "value", "symbol"])
 
         path = self._write_csv(data, timestamp)
+        # I metadati conservano licenza, timestamp e richieste effettuate per audit trail.
         metadata = {
             "license": self.LICENSE,
             "as_of": timestamp.isoformat(),
@@ -121,9 +126,11 @@ class BaseCSVFetcher:
 
     # --- subclass hooks -------------------------------------------------
     def build_url(self, symbol: str, start: pd.Timestamp | None) -> str:
+        """Hook di estensione: restituisce l'URL completo per un simbolo specifico."""
         raise NotImplementedError
 
     def parse(self, payload: str, symbol: str) -> pd.DataFrame:
+        """Hook di estensione: interpreta il payload in un DataFrame conforme."""
         raise NotImplementedError
 
     # --- helpers --------------------------------------------------------
@@ -133,6 +140,7 @@ class BaseCSVFetcher:
         *,
         session: requests.Session | None = None,
     ) -> str:
+        """Scarica il payload come stringa gestendo retry incrementale e chiusura sessione."""
         active_session = session or self.session
         close_session = False
         if active_session is None:
@@ -161,6 +169,7 @@ class BaseCSVFetcher:
         value_column: str,
         rename: Mapping[str, str] | None = None,
     ) -> pd.DataFrame:
+        """Normalizza un CSV in un DataFrame canonico (date, valore, simbolo)."""
         csv = pd.read_csv(StringIO(payload))
         if rename:
             csv = csv.rename(columns=rename)
@@ -178,6 +187,7 @@ class BaseCSVFetcher:
         return frame
 
     def _write_csv(self, data: pd.DataFrame, timestamp: datetime) -> Path:
+        """Serializza i dati normalizzati su disco garantendo naming deterministico."""
         target_dir = ensure_dir(self.raw_root / self.SOURCE)
         file_name = f"{self.SOURCE}_{timestamp.strftime('%Y%m%dT%H%M%SZ')}.csv"
         target_path = target_dir / file_name
@@ -203,12 +213,13 @@ def _fetcher_map() -> Mapping[str, type[BaseCSVFetcher]]:
 
 
 def available_sources() -> Sequence[str]:
-    """Return the list of supported ingest sources."""
+    """Restituisce l'elenco alfabetico delle sorgenti disponibili per l'ingest."""
 
     return tuple(sorted(_fetcher_map().keys()))
 
 
 def create_fetcher(source: str, **kwargs: object) -> BaseCSVFetcher:
+    """Istanzia il fetcher corretto verificando che la sorgente sia supportata."""
     try:
         fetcher_cls = _fetcher_map()[source]
     except KeyError as exc:  # pragma: no cover - defensive
@@ -224,5 +235,6 @@ def run_ingest(
     raw_root: Path | str | None = None,
     as_of: datetime | None = None,
 ) -> IngestArtifact:
+    """Convenienza per eseguire l'ingest end-to-end senza toccare le classi."""
     fetcher = create_fetcher(source, raw_root=raw_root)
     return fetcher.fetch(symbols=symbols, start=start, as_of=as_of)

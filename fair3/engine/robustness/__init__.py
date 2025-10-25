@@ -1,4 +1,4 @@
-"""Robustness laboratory for FAIR-III."""
+"""Laboratorio di robustezza per FAIR-III con API commentate in italiano."""
 
 from .ablation import DEFAULT_FEATURES, AblationOutcome, run_ablation_study
 from .bootstrap import RobustnessGates, block_bootstrap_metrics

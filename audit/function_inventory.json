@@ -1,0 +1,4159 @@
+[
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_parse_date",
+    "tipo": "sync",
+    "linea": 28,
+    "argomenti": [
+      "value"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_add_ingest_subparser",
+    "tipo": "sync",
+    "linea": 35,
+    "argomenti": [
+      "subparsers"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_add_etl_subparser",
+    "tipo": "sync",
+    "linea": 58,
+    "argomenti": [
+      "subparsers"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_add_factors_subparser",
+    "tipo": "sync",
+    "linea": 71,
+    "argomenti": [
+      "subparsers"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_add_estimate_subparser",
+    "tipo": "sync",
+    "linea": 94,
+    "argomenti": [
+      "subparsers"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_add_optimize_subparser",
+    "tipo": "sync",
+    "linea": 115,
+    "argomenti": [
+      "subparsers"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_add_map_subparser",
+    "tipo": "sync",
+    "linea": 141,
+    "argomenti": [
+      "subparsers"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_add_report_subparser",
+    "tipo": "sync",
+    "linea": 176,
+    "argomenti": [
+      "subparsers"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_add_goals_subparser",
+    "tipo": "sync",
+    "linea": 203,
+    "argomenti": [
+      "subparsers"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_add_execute_subparser",
+    "tipo": "sync",
+    "linea": 243,
+    "argomenti": [
+      "subparsers"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "build_parser",
+    "tipo": "sync",
+    "linea": 261,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_handle_ingest",
+    "tipo": "sync",
+    "linea": 276,
+    "argomenti": [
+      "args"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_handle_etl",
+    "tipo": "sync",
+    "linea": 287,
+    "argomenti": [
+      "args"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_parse_period",
+    "tipo": "sync",
+    "linea": 305,
+    "argomenti": [
+      "value"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_synthetic_monthly_inputs",
+    "tipo": "sync",
+    "linea": 320,
+    "argomenti": [
+      "start",
+      "end",
+      "seed"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_handle_factors",
+    "tipo": "sync",
+    "linea": 369,
+    "argomenti": [
+      "args"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_handle_estimate",
+    "tipo": "sync",
+    "linea": 385,
+    "argomenti": [
+      "args"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_handle_optimize",
+    "tipo": "sync",
+    "linea": 399,
+    "argomenti": [
+      "args"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_handle_map",
+    "tipo": "sync",
+    "linea": 416,
+    "argomenti": [
+      "args"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_handle_report",
+    "tipo": "sync",
+    "linea": 434,
+    "argomenti": [
+      "args"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_handle_execute",
+    "tipo": "sync",
+    "linea": 453,
+    "argomenti": [
+      "args"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_handle_goals",
+    "tipo": "sync",
+    "linea": 475,
+    "argomenti": [
+      "args"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "main",
+    "tipo": "sync",
+    "linea": 515,
+    "argomenti": [
+      "argv"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/allocators/constraints.py",
+    "qualifica": "erc_cluster_violation",
+    "tipo": "sync",
+    "linea": 10,
+    "argomenti": [
+      "w",
+      "Sigma",
+      "clusters",
+      "tol"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/allocators/erc.py",
+    "qualifica": "risk_contributions",
+    "tipo": "sync",
+    "linea": 8,
+    "argomenti": [
+      "w",
+      "Sigma"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/allocators/erc.py",
+    "qualifica": "_cluster_totals",
+    "tipo": "sync",
+    "linea": 22,
+    "argomenti": [
+      "rc",
+      "clusters"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/allocators/erc.py",
+    "qualifica": "balance_clusters",
+    "tipo": "sync",
+    "linea": 33,
+    "argomenti": [
+      "w",
+      "Sigma",
+      "clusters",
+      "tol",
+      "max_iter"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/allocators/gen_a.py",
+    "qualifica": "_solve_problem",
+    "tipo": "sync",
+    "linea": 14,
+    "argomenti": [
+      "mu",
+      "Sigma",
+      "constraints"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/allocators/gen_a.py",
+    "qualifica": "generator_A",
+    "tipo": "sync",
+    "linea": 75,
+    "argomenti": [
+      "mu",
+      "Sigma",
+      "constraints"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/allocators/gen_b_hrp.py",
+    "qualifica": "_corr_from_cov",
+    "tipo": "sync",
+    "linea": 9,
+    "argomenti": [
+      "Sigma"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/allocators/gen_b_hrp.py",
+    "qualifica": "_cluster_variance",
+    "tipo": "sync",
+    "linea": 18,
+    "argomenti": [
+      "cov",
+      "indices"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/allocators/gen_b_hrp.py",
+    "qualifica": "_allocate",
+    "tipo": "sync",
+    "linea": 25,
+    "argomenti": [
+      "cov",
+      "order"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/allocators/gen_b_hrp.py",
+    "qualifica": "generator_B_hrp",
+    "tipo": "sync",
+    "linea": 53,
+    "argomenti": [
+      "Sigma"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/allocators/gen_c_dro.py",
+    "qualifica": "_regularised_inverse",
+    "tipo": "sync",
+    "linea": 8,
+    "argomenti": [
+      "Sigma",
+      "rho"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/allocators/gen_c_dro.py",
+    "qualifica": "generator_C_dro_closed",
+    "tipo": "sync",
+    "linea": 15,
+    "argomenti": [
+      "mu",
+      "Sigma",
+      "gamma",
+      "rho"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/allocators/gen_d_cvar_erc.py",
+    "qualifica": "generator_D_cvar_erc",
+    "tipo": "sync",
+    "linea": 13,
+    "argomenti": [
+      "mu",
+      "Sigma",
+      "constraints"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/allocators/meta.py",
+    "qualifica": "fit_meta_weights",
+    "tipo": "sync",
+    "linea": 11,
+    "argomenti": [
+      "returns_by_gen",
+      "sigma_matrix",
+      "j_max",
+      "penalty_to",
+      "penalty_te",
+      "baseline_idx"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/allocators/objectives.py",
+    "qualifica": "sharpe_objective",
+    "tipo": "sync",
+    "linea": 8,
+    "argomenti": [
+      "w",
+      "mu",
+      "Sigma"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/allocators/objectives.py",
+    "qualifica": "dro_penalty",
+    "tipo": "sync",
+    "linea": 25,
+    "argomenti": [
+      "w",
+      "rho"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/allocators/pipeline.py",
+    "qualifica": "_load_mu_sigma",
+    "tipo": "sync",
+    "linea": 38,
+    "argomenti": [
+      "artifacts_root"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/allocators/pipeline.py",
+    "qualifica": "_load_factors",
+    "tipo": "sync",
+    "linea": 56,
+    "argomenti": [
+      "artifacts_root"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/allocators/pipeline.py",
+    "qualifica": "_load_configs",
+    "tipo": "sync",
+    "linea": 71,
+    "argomenti": [
+      "params_path",
+      "thresholds_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/allocators/pipeline.py",
+    "qualifica": "_cluster_indices",
+    "tipo": "sync",
+    "linea": 82,
+    "argomenti": [
+      "n_assets",
+      "n_clusters"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/allocators/pipeline.py",
+    "qualifica": "_run_generator",
+    "tipo": "sync",
+    "linea": 92,
+    "argomenti": [
+      "name",
+      "mu_vec",
+      "sigma",
+      "constraints"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/allocators/pipeline.py",
+    "qualifica": "run_optimization_pipeline",
+    "tipo": "sync",
+    "linea": 120,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/estimates/bl.py",
+    "qualifica": "reverse_opt_mu_eq",
+    "tipo": "sync",
+    "linea": 11,
+    "argomenti": [
+      "sigma",
+      "w_mkt",
+      "vol_target"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/bl.py",
+    "qualifica": "blend_mu",
+    "tipo": "sync",
+    "linea": 38,
+    "argomenti": [
+      "mu_eq",
+      "mu_star",
+      "ir_view",
+      "tau_ir"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/drift.py",
+    "qualifica": "frobenius_relative_drift",
+    "tipo": "sync",
+    "linea": 9,
+    "argomenti": [
+      "sigma_t",
+      "sigma_tm1"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/estimates/drift.py",
+    "qualifica": "max_corr_drift",
+    "tipo": "sync",
+    "linea": 19,
+    "argomenti": [
+      "corr_t",
+      "corr_tm1"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/estimates/mu.py",
+    "qualifica": "_lag_features",
+    "tipo": "sync",
+    "linea": 26,
+    "argomenti": [
+      "frame"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/mu.py",
+    "qualifica": "_prepare_feature_matrix",
+    "tipo": "sync",
+    "linea": 33,
+    "argomenti": [
+      "returns",
+      "macro"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/mu.py",
+    "qualifica": "_bagging_linear_predict",
+    "tipo": "sync",
+    "linea": 50,
+    "argomenti": [
+      "x_train",
+      "y_train",
+      "x_eval",
+      "rng",
+      "n_bags",
+      "sample_frac"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/mu.py",
+    "qualifica": "_gbt_predict",
+    "tipo": "sync",
+    "linea": 71,
+    "argomenti": [
+      "x_train",
+      "y_train",
+      "x_eval",
+      "seed"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/mu.py",
+    "qualifica": "_stack_weights",
+    "tipo": "sync",
+    "linea": 93,
+    "argomenti": [
+      "base_preds",
+      "target"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/mu.py",
+    "qualifica": "estimate_mu_ensemble",
+    "tipo": "sync",
+    "linea": 110,
+    "argomenti": [
+      "returns_frame",
+      "macro",
+      "cv_splits",
+      "seed"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/pipeline.py",
+    "qualifica": "_load_factors",
+    "tipo": "sync",
+    "linea": 42,
+    "argomenti": [
+      "artifacts_root"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/estimates/pipeline.py",
+    "qualifica": "_load_thresholds",
+    "tipo": "sync",
+    "linea": 57,
+    "argomenti": [
+      "config_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/estimates/pipeline.py",
+    "qualifica": "_to_correlation",
+    "tipo": "sync",
+    "linea": 68,
+    "argomenti": [
+      "matrix"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/estimates/pipeline.py",
+    "qualifica": "_write_series",
+    "tipo": "sync",
+    "linea": 81,
+    "argomenti": [
+      "series"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/estimates/pipeline.py",
+    "qualifica": "_append_drift_log",
+    "tipo": "sync",
+    "linea": 91,
+    "argomenti": [
+      "path",
+      "frob",
+      "corr"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/estimates/pipeline.py",
+    "qualifica": "run_estimate_pipeline",
+    "tipo": "sync",
+    "linea": 106,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/estimates/sigma.py",
+    "qualifica": "_validate_frame",
+    "tipo": "sync",
+    "linea": 26,
+    "argomenti": [
+      "frame"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/sigma.py",
+    "qualifica": "ledoit_wolf",
+    "tipo": "sync",
+    "linea": 34,
+    "argomenti": [
+      "frame"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/estimates/sigma.py",
+    "qualifica": "_graphical_lasso_path",
+    "tipo": "sync",
+    "linea": 45,
+    "argomenti": [
+      "emp_cov",
+      "lambdas",
+      "n_samples"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/sigma.py",
+    "qualifica": "graphical_lasso_bic",
+    "tipo": "sync",
+    "linea": 74,
+    "argomenti": [
+      "frame",
+      "lambdas",
+      "cv_split_id",
+      "random_state"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/estimates/sigma.py",
+    "qualifica": "factor_shrink",
+    "tipo": "sync",
+    "linea": 107,
+    "argomenti": [
+      "frame",
+      "n_factors"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/estimates/sigma.py",
+    "qualifica": "median_of_covariances",
+    "tipo": "sync",
+    "linea": 132,
+    "argomenti": [
+      "covs"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/estimates/sigma.py",
+    "qualifica": "ewma_regime",
+    "tipo": "sync",
+    "linea": 144,
+    "argomenti": [
+      "sigma_prev",
+      "sigma_star_psd",
+      "lambda_r"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/etl/calendar.py",
+    "qualifica": "TradingCalendar.to_frame",
+    "tipo": "sync",
+    "linea": 22,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/calendar.py",
+    "qualifica": "TradingCalendar.save",
+    "tipo": "sync",
+    "linea": 25,
+    "argomenti": [
+      "self",
+      "path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/calendar.py",
+    "qualifica": "build_calendar",
+    "tipo": "sync",
+    "linea": 33,
+    "argomenti": [
+      "frames"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/etl/calendar.py",
+    "qualifica": "reindex_frame",
+    "tipo": "sync",
+    "linea": 67,
+    "argomenti": [
+      "frame"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/etl/cleaning.py",
+    "qualifica": "HampelConfig.__post_init__",
+    "tipo": "sync",
+    "linea": 22,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/cleaning.py",
+    "qualifica": "apply_hampel",
+    "tipo": "sync",
+    "linea": 29,
+    "argomenti": [
+      "series",
+      "config"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/etl/cleaning.py",
+    "qualifica": "winsorize_series",
+    "tipo": "sync",
+    "linea": 48,
+    "argomenti": [
+      "series"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/etl/cleaning.py",
+    "qualifica": "clean_price_history",
+    "tipo": "sync",
+    "linea": 64,
+    "argomenti": [
+      "frame"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/etl/cleaning.py",
+    "qualifica": "prepare_estimation_copy",
+    "tipo": "sync",
+    "linea": 85,
+    "argomenti": [
+      "returns"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/etl/fx.py",
+    "qualifica": "FXFrame.lookup",
+    "tipo": "sync",
+    "linea": 21,
+    "argomenti": [
+      "self",
+      "currency"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/fx.py",
+    "qualifica": "FXFrame.save",
+    "tipo": "sync",
+    "linea": 29,
+    "argomenti": [
+      "self",
+      "path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/fx.py",
+    "qualifica": "load_fx_rates",
+    "tipo": "sync",
+    "linea": 37,
+    "argomenti": [
+      "records",
+      "base_currency"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/etl/fx.py",
+    "qualifica": "convert_to_base",
+    "tipo": "sync",
+    "linea": 62,
+    "argomenti": [
+      "frame"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/etl/make_tr_panel.py",
+    "qualifica": "TRPanelBuilder.__init__",
+    "tipo": "sync",
+    "linea": 29,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/make_tr_panel.py",
+    "qualifica": "TRPanelBuilder.build",
+    "tipo": "sync",
+    "linea": 43,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/make_tr_panel.py",
+    "qualifica": "TRPanelBuilder._load_raw_records",
+    "tipo": "sync",
+    "linea": 72,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/make_tr_panel.py",
+    "qualifica": "TRPanelBuilder._build_calendar",
+    "tipo": "sync",
+    "linea": 90,
+    "argomenti": [
+      "self",
+      "records"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/make_tr_panel.py",
+    "qualifica": "TRPanelBuilder._build_fx_frame",
+    "tipo": "sync",
+    "linea": 102,
+    "argomenti": [
+      "self",
+      "records"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/make_tr_panel.py",
+    "qualifica": "TRPanelBuilder._prepare_prices",
+    "tipo": "sync",
+    "linea": 108,
+    "argomenti": [
+      "self",
+      "records",
+      "calendar",
+      "fx_frame"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/make_tr_panel.py",
+    "qualifica": "TRPanelBuilder._compute_returns",
+    "tipo": "sync",
+    "linea": 157,
+    "argomenti": [
+      "self",
+      "prices"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/make_tr_panel.py",
+    "qualifica": "TRPanelBuilder._compute_features",
+    "tipo": "sync",
+    "linea": 198,
+    "argomenti": [
+      "self",
+      "returns"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/make_tr_panel.py",
+    "qualifica": "TRPanelBuilder._lagged_mean",
+    "tipo": "sync",
+    "linea": 202,
+    "argomenti": [
+      "series",
+      "window",
+      "min_periods"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/make_tr_panel.py",
+    "qualifica": "TRPanelBuilder._lagged_std",
+    "tipo": "sync",
+    "linea": 205,
+    "argomenti": [
+      "series",
+      "window",
+      "min_periods"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/make_tr_panel.py",
+    "qualifica": "TRPanelBuilder._write_parquet",
+    "tipo": "sync",
+    "linea": 222,
+    "argomenti": [
+      "self",
+      "frame",
+      "name"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/make_tr_panel.py",
+    "qualifica": "build_tr_panel",
+    "tipo": "sync",
+    "linea": 232,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/qa.py",
+    "qualifica": "QAReport.to_frame",
+    "tipo": "sync",
+    "linea": 30,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/qa.py",
+    "qualifica": "QAReport.append",
+    "tipo": "sync",
+    "linea": 33,
+    "argomenti": [
+      "self",
+      "record"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/etl/qa.py",
+    "qualifica": "write_qa_log",
+    "tipo": "sync",
+    "linea": 37,
+    "argomenti": [
+      "report",
+      "path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/execution/costs.py",
+    "qualifica": "trading_costs",
+    "tipo": "sync",
+    "linea": 8,
+    "argomenti": [
+      "prices",
+      "spreads",
+      "q",
+      "fees",
+      "adv",
+      "eta"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/execution/decide.py",
+    "qualifica": "DecisionBreakdown.net_benefit",
+    "tipo": "sync",
+    "linea": 20,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/execution/decide.py",
+    "qualifica": "should_trade",
+    "tipo": "sync",
+    "linea": 24,
+    "argomenti": [
+      "drift_ok",
+      "eb_lb",
+      "cost",
+      "tax",
+      "turnover_ok"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/execution/decide.py",
+    "qualifica": "summarise_decision",
+    "tipo": "sync",
+    "linea": 34,
+    "argomenti": [
+      "drift_ok",
+      "eb_lb",
+      "cost",
+      "tax",
+      "turnover_ok"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/execution/lotting.py",
+    "qualifica": "target_to_lots",
+    "tipo": "sync",
+    "linea": 8,
+    "argomenti": [
+      "delta_w",
+      "portfolio_value",
+      "prices",
+      "lot_sizes"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/execution/taxes_it.py",
+    "qualifica": "tax_penalty_it",
+    "tipo": "sync",
+    "linea": 8,
+    "argomenti": [
+      "realized_pnl",
+      "govies_ratio",
+      "stamp_duty_rate"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/execution/trade_rules.py",
+    "qualifica": "drift_bands_exceeded",
+    "tipo": "sync",
+    "linea": 8,
+    "argomenti": [
+      "w_old",
+      "w_new",
+      "rc_old",
+      "rc_new",
+      "band"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/execution/trade_rules.py",
+    "qualifica": "expected_benefit",
+    "tipo": "sync",
+    "linea": 33,
+    "argomenti": [
+      "delta_w",
+      "mu_instr",
+      "sigma_instr",
+      "w_old",
+      "w_new"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/factors/core.py",
+    "qualifica": "FactorDefinition.__post_init__",
+    "tipo": "sync",
+    "linea": 26,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/core.py",
+    "qualifica": "FactorLibrary.__init__",
+    "tipo": "sync",
+    "linea": 37,
+    "argomenti": [
+      "self",
+      "returns",
+      "features"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/core.py",
+    "qualifica": "FactorLibrary._prepare_returns",
+    "tipo": "sync",
+    "linea": 65,
+    "argomenti": [
+      "frame"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/core.py",
+    "qualifica": "FactorLibrary._prepare_features",
+    "tipo": "sync",
+    "linea": 73,
+    "argomenti": [
+      "cls",
+      "frame"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/core.py",
+    "qualifica": "FactorLibrary._prepare_macro",
+    "tipo": "sync",
+    "linea": 83,
+    "argomenti": [
+      "frame"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/core.py",
+    "qualifica": "FactorLibrary.definitions",
+    "tipo": "sync",
+    "linea": 93,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/core.py",
+    "qualifica": "FactorLibrary.compute",
+    "tipo": "sync",
+    "linea": 97,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/core.py",
+    "qualifica": "FactorLibrary._equal_weight_market",
+    "tipo": "sync",
+    "linea": 149,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/core.py",
+    "qualifica": "FactorLibrary._quantile_spread",
+    "tipo": "sync",
+    "linea": 154,
+    "argomenti": [
+      "self",
+      "signal",
+      "returns"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/core.py",
+    "qualifica": "FactorLibrary._macro_overlays",
+    "tipo": "sync",
+    "linea": 183,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/core.py",
+    "qualifica": "FactorLibrary._align_columns",
+    "tipo": "sync",
+    "linea": 205,
+    "argomenti": [
+      "factors",
+      "order"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/core.py",
+    "qualifica": "compute_macro_factors",
+    "tipo": "sync",
+    "linea": 217,
+    "argomenti": [
+      "returns",
+      "features"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/factors/core.py",
+    "qualifica": "_build_definitions",
+    "tipo": "sync",
+    "linea": 231,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/orthogonality.py",
+    "qualifica": "condition_number",
+    "tipo": "sync",
+    "linea": 24,
+    "argomenti": [
+      "frame"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/orthogonality.py",
+    "qualifica": "merge_correlated_factors",
+    "tipo": "sync",
+    "linea": 30,
+    "argomenti": [
+      "factors"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/orthogonality.py",
+    "qualifica": "_corr",
+    "tipo": "sync",
+    "linea": 41,
+    "argomenti": [
+      "df"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/orthogonality.py",
+    "qualifica": "enforce_orthogonality",
+    "tipo": "sync",
+    "linea": 59,
+    "argomenti": [
+      "factors"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/pipeline.py",
+    "qualifica": "_multiindex_to_datetime",
+    "tipo": "sync",
+    "linea": 33,
+    "argomenti": [
+      "index"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/factors/pipeline.py",
+    "qualifica": "_load_panel",
+    "tipo": "sync",
+    "linea": 43,
+    "argomenti": [
+      "clean_root"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/factors/pipeline.py",
+    "qualifica": "_write_metadata",
+    "tipo": "sync",
+    "linea": 60,
+    "argomenti": [
+      "library",
+      "merged",
+      "loadings",
+      "condition_number"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/pipeline.py",
+    "qualifica": "_write_validation",
+    "tipo": "sync",
+    "linea": 83,
+    "argomenti": [
+      "factors",
+      "returns"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/pipeline.py",
+    "qualifica": "run_factor_pipeline",
+    "tipo": "sync",
+    "linea": 113,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/factors/validation.py",
+    "qualifica": "cross_purged_splits",
+    "tipo": "sync",
+    "linea": 32,
+    "argomenti": [
+      "dates"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/factors/validation.py",
+    "qualifica": "_sharpe",
+    "tipo": "sync",
+    "linea": 65,
+    "argomenti": [
+      "series"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/validation.py",
+    "qualifica": "deflated_sharpe_ratio",
+    "tipo": "sync",
+    "linea": 76,
+    "argomenti": [
+      "series"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/factors/validation.py",
+    "qualifica": "white_reality_check_pvalue",
+    "tipo": "sync",
+    "linea": 92,
+    "argomenti": [
+      "series"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/factors/validation.py",
+    "qualifica": "fdr_bh",
+    "tipo": "sync",
+    "linea": 115,
+    "argomenti": [
+      "p_values",
+      "alpha"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/factors/validation.py",
+    "qualifica": "validate_factor_set",
+    "tipo": "sync",
+    "linea": 134,
+    "argomenti": [
+      "factors",
+      "asset_returns"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/factors/validation.py",
+    "qualifica": "_prepare_asset_returns",
+    "tipo": "sync",
+    "linea": 199,
+    "argomenti": [
+      "asset_returns",
+      "index"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/goals/mc.py",
+    "qualifica": "GoalConfig.from_mapping",
+    "tipo": "sync",
+    "linea": 41,
+    "argomenti": [
+      "cls",
+      "payload"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/goals/mc.py",
+    "qualifica": "RegimeCurves.slice",
+    "tipo": "sync",
+    "linea": 63,
+    "argomenti": [
+      "self",
+      "periods"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/goals/mc.py",
+    "qualifica": "load_goal_configs",
+    "tipo": "sync",
+    "linea": 95,
+    "argomenti": [
+      "payload"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/goals/mc.py",
+    "qualifica": "generate_regime_curves",
+    "tipo": "sync",
+    "linea": 103,
+    "argomenti": [
+      "periods",
+      "seed"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/goals/mc.py",
+    "qualifica": "build_contribution_schedule",
+    "tipo": "sync",
+    "linea": 121,
+    "argomenti": [
+      "periods",
+      "monthly_contribution",
+      "growth_rate"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/goals/mc.py",
+    "qualifica": "build_glidepath",
+    "tipo": "sync",
+    "linea": 135,
+    "argomenti": [
+      "horizon_years",
+      "start_risk",
+      "end_risk"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/goals/mc.py",
+    "qualifica": "_sample_returns",
+    "tipo": "sync",
+    "linea": 149,
+    "argomenti": [
+      "curves",
+      "rng",
+      "draws"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/goals/mc.py",
+    "qualifica": "_simulate_goal",
+    "tipo": "sync",
+    "linea": 165,
+    "argomenti": [
+      "goal",
+      "curves",
+      "rng",
+      "draws",
+      "initial_wealth",
+      "monthly_contribution",
+      "contribution_growth"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/goals/mc.py",
+    "qualifica": "simulate_goals",
+    "tipo": "sync",
+    "linea": 200,
+    "argomenti": [
+      "goals"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/goals/mc.py",
+    "qualifica": "_render_goal_pdf",
+    "tipo": "sync",
+    "linea": 274,
+    "argomenti": [
+      "summary",
+      "path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/goals/mc.py",
+    "qualifica": "write_goal_artifacts",
+    "tipo": "sync",
+    "linea": 325,
+    "argomenti": [
+      "summary"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/goals/mc.py",
+    "qualifica": "run_goal_monte_carlo",
+    "tipo": "sync",
+    "linea": 350,
+    "argomenti": [
+      "goals"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/goals/mc.py",
+    "qualifica": "load_goal_configs_from_yaml",
+    "tipo": "sync",
+    "linea": 374,
+    "argomenti": [
+      "path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/goals/mc.py",
+    "qualifica": "load_goal_parameters",
+    "tipo": "sync",
+    "linea": 389,
+    "argomenti": [
+      "path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/ingest/boe.py",
+    "qualifica": "BOEFetcher.build_url",
+    "tipo": "sync",
+    "linea": 22,
+    "argomenti": [
+      "self",
+      "symbol",
+      "start"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/boe.py",
+    "qualifica": "BOEFetcher._validate_payload",
+    "tipo": "sync",
+    "linea": 41,
+    "argomenti": [
+      "self",
+      "payload"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/boe.py",
+    "qualifica": "BOEFetcher.parse",
+    "tipo": "sync",
+    "linea": 47,
+    "argomenti": [
+      "self",
+      "payload",
+      "symbol"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/ecb.py",
+    "qualifica": "ECBFetcher.build_url",
+    "tipo": "sync",
+    "linea": 18,
+    "argomenti": [
+      "self",
+      "symbol",
+      "start"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/ecb.py",
+    "qualifica": "ECBFetcher.parse",
+    "tipo": "sync",
+    "linea": 26,
+    "argomenti": [
+      "self",
+      "payload",
+      "symbol"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/fred.py",
+    "qualifica": "FREDFetcher.__init__",
+    "tipo": "sync",
+    "linea": 30,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/fred.py",
+    "qualifica": "FREDFetcher.build_url",
+    "tipo": "sync",
+    "linea": 50,
+    "argomenti": [
+      "self",
+      "symbol",
+      "start"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/fred.py",
+    "qualifica": "FREDFetcher._download",
+    "tipo": "sync",
+    "linea": 60,
+    "argomenti": [
+      "self",
+      "url"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/fred.py",
+    "qualifica": "FREDFetcher.parse",
+    "tipo": "sync",
+    "linea": 84,
+    "argomenti": [
+      "self",
+      "payload",
+      "symbol"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/registry.py",
+    "qualifica": "BaseCSVFetcher.__init__",
+    "tipo": "sync",
+    "linea": 48,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/registry.py",
+    "qualifica": "BaseCSVFetcher.fetch",
+    "tipo": "sync",
+    "linea": 64,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/registry.py",
+    "qualifica": "BaseCSVFetcher.build_url",
+    "tipo": "sync",
+    "linea": 123,
+    "argomenti": [
+      "self",
+      "symbol",
+      "start"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/registry.py",
+    "qualifica": "BaseCSVFetcher.parse",
+    "tipo": "sync",
+    "linea": 126,
+    "argomenti": [
+      "self",
+      "payload",
+      "symbol"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/registry.py",
+    "qualifica": "BaseCSVFetcher._download",
+    "tipo": "sync",
+    "linea": 130,
+    "argomenti": [
+      "self",
+      "url"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/registry.py",
+    "qualifica": "BaseCSVFetcher._simple_frame",
+    "tipo": "sync",
+    "linea": 155,
+    "argomenti": [
+      "self",
+      "payload",
+      "symbol"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/registry.py",
+    "qualifica": "BaseCSVFetcher._write_csv",
+    "tipo": "sync",
+    "linea": 180,
+    "argomenti": [
+      "self",
+      "data",
+      "timestamp"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/registry.py",
+    "qualifica": "_fetcher_map",
+    "tipo": "sync",
+    "linea": 191,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/registry.py",
+    "qualifica": "available_sources",
+    "tipo": "sync",
+    "linea": 205,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/ingest/registry.py",
+    "qualifica": "create_fetcher",
+    "tipo": "sync",
+    "linea": 211,
+    "argomenti": [
+      "source"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/registry.py",
+    "qualifica": "run_ingest",
+    "tipo": "sync",
+    "linea": 219,
+    "argomenti": [
+      "source"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/stooq.py",
+    "qualifica": "StooqFetcher.build_url",
+    "tipo": "sync",
+    "linea": 18,
+    "argomenti": [
+      "self",
+      "symbol",
+      "start"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/ingest/stooq.py",
+    "qualifica": "StooqFetcher.parse",
+    "tipo": "sync",
+    "linea": 23,
+    "argomenti": [
+      "self",
+      "payload",
+      "symbol"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/mapping/beta.py",
+    "qualifica": "_prepare_frames",
+    "tipo": "sync",
+    "linea": 13,
+    "argomenti": [
+      "returns",
+      "factors"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/mapping/beta.py",
+    "qualifica": "_enforce_signs",
+    "tipo": "sync",
+    "linea": 30,
+    "argomenti": [
+      "values",
+      "factors",
+      "sign"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/mapping/beta.py",
+    "qualifica": "_solve_ridge",
+    "tipo": "sync",
+    "linea": 41,
+    "argomenti": [
+      "xtx",
+      "xty"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/mapping/beta.py",
+    "qualifica": "rolling_beta_ridge",
+    "tipo": "sync",
+    "linea": 48,
+    "argomenti": [
+      "returns",
+      "factors",
+      "window",
+      "lambda_beta",
+      "sign"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/mapping/beta.py",
+    "qualifica": "beta_ci_bootstrap",
+    "tipo": "sync",
+    "linea": 95,
+    "argomenti": [
+      "returns",
+      "factors",
+      "beta_ts",
+      "B",
+      "alpha"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/mapping/hrp_intra.py",
+    "qualifica": "_corr_from_cov",
+    "tipo": "sync",
+    "linea": 9,
+    "argomenti": [
+      "cov"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/mapping/hrp_intra.py",
+    "qualifica": "_hrp_weights",
+    "tipo": "sync",
+    "linea": 18,
+    "argomenti": [
+      "cov"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/mapping/hrp_intra.py",
+    "qualifica": "_cluster_variance",
+    "tipo": "sync",
+    "linea": 57,
+    "argomenti": [
+      "cov",
+      "indices"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/mapping/hrp_intra.py",
+    "qualifica": "hrp_weights",
+    "tipo": "sync",
+    "linea": 64,
+    "argomenti": [
+      "Sigma",
+      "labels"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/mapping/liquidity.py",
+    "qualifica": "max_trade_notional",
+    "tipo": "sync",
+    "linea": 6,
+    "argomenti": [
+      "adv",
+      "prices",
+      "cap_ratio"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/mapping/liquidity.py",
+    "qualifica": "clip_trades_to_adv",
+    "tipo": "sync",
+    "linea": 18,
+    "argomenti": [
+      "delta_w",
+      "portfolio_value",
+      "adv",
+      "prices",
+      "cap_ratio"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/mapping/pipeline.py",
+    "qualifica": "_load_factor_allocation",
+    "tipo": "sync",
+    "linea": 28,
+    "argomenti": [
+      "artifacts_root"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/mapping/pipeline.py",
+    "qualifica": "_load_returns",
+    "tipo": "sync",
+    "linea": 37,
+    "argomenti": [
+      "clean_root"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/mapping/pipeline.py",
+    "qualifica": "_load_factors",
+    "tipo": "sync",
+    "linea": 49,
+    "argomenti": [
+      "artifacts_root"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/mapping/pipeline.py",
+    "qualifica": "_load_metadata",
+    "tipo": "sync",
+    "linea": 59,
+    "argomenti": [
+      "artifacts_root"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/mapping/pipeline.py",
+    "qualifica": "_solve_instrument_weights",
+    "tipo": "sync",
+    "linea": 77,
+    "argomenti": [
+      "beta_matrix",
+      "factor_weights"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/mapping/pipeline.py",
+    "qualifica": "run_mapping_pipeline",
+    "tipo": "sync",
+    "linea": 89,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/mapping/te_budget.py",
+    "qualifica": "tracking_error",
+    "tipo": "sync",
+    "linea": 6,
+    "argomenti": [
+      "weights",
+      "baseline",
+      "sigma"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/mapping/te_budget.py",
+    "qualifica": "enforce_te_budget",
+    "tipo": "sync",
+    "linea": 21,
+    "argomenti": [
+      "weights",
+      "baseline",
+      "sigma",
+      "cap"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/committee.py",
+    "qualifica": "CommitteeWeights.normalised",
+    "tipo": "sync",
+    "linea": 20,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/regime/committee.py",
+    "qualifica": "_filter_hmm_prob",
+    "tipo": "sync",
+    "linea": 28,
+    "argomenti": [
+      "ret"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/committee.py",
+    "qualifica": "_volatility_stress",
+    "tipo": "sync",
+    "linea": 57,
+    "argomenti": [
+      "vol"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/regime/committee.py",
+    "qualifica": "_macro_slowdown",
+    "tipo": "sync",
+    "linea": 67,
+    "argomenti": [
+      "macro"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/regime/committee.py",
+    "qualifica": "crisis_probability",
+    "tipo": "sync",
+    "linea": 84,
+    "argomenti": [
+      "returns",
+      "vol",
+      "macro",
+      "weights"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/hysteresis.py",
+    "qualifica": "apply_hysteresis",
+    "tipo": "sync",
+    "linea": 8,
+    "argomenti": [
+      "p",
+      "on",
+      "off",
+      "dwell_days",
+      "cooldown_days"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/hysteresis.py",
+    "qualifica": "tilt_lambda",
+    "tipo": "sync",
+    "linea": 51,
+    "argomenti": [
+      "p_t"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/reporting/audit.py",
+    "qualifica": "ensure_audit_dir",
+    "tipo": "sync",
+    "linea": 27,
+    "argomenti": [
+      "audit_dir"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/reporting/audit.py",
+    "qualifica": "copy_seed_snapshot",
+    "tipo": "sync",
+    "linea": 33,
+    "argomenti": [
+      "seed_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/reporting/audit.py",
+    "qualifica": "snapshot_configs",
+    "tipo": "sync",
+    "linea": 55,
+    "argomenti": [
+      "config_paths"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/reporting/audit.py",
+    "qualifica": "record_checksums",
+    "tipo": "sync",
+    "linea": 78,
+    "argomenti": [
+      "targets"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/reporting/audit.py",
+    "qualifica": "append_change_log",
+    "tipo": "sync",
+    "linea": 106,
+    "argomenti": [
+      "message"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/reporting/audit.py",
+    "qualifica": "run_audit_snapshot",
+    "tipo": "sync",
+    "linea": 124,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/reporting/monthly.py",
+    "qualifica": "_annualisation_factor",
+    "tipo": "sync",
+    "linea": 57,
+    "argomenti": [
+      "index"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/reporting/monthly.py",
+    "qualifica": "_max_drawdown",
+    "tipo": "sync",
+    "linea": 65,
+    "argomenti": [
+      "returns"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/reporting/monthly.py",
+    "qualifica": "_cvar",
+    "tipo": "sync",
+    "linea": 72,
+    "argomenti": [
+      "returns",
+      "alpha"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/reporting/monthly.py",
+    "qualifica": "_edar",
+    "tipo": "sync",
+    "linea": 82,
+    "argomenti": [
+      "returns",
+      "window",
+      "alpha"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/reporting/monthly.py",
+    "qualifica": "compute_monthly_metrics",
+    "tipo": "sync",
+    "linea": 101,
+    "argomenti": [
+      "returns"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/reporting/monthly.py",
+    "qualifica": "_aggregate_monthly",
+    "tipo": "sync",
+    "linea": 125,
+    "argomenti": [
+      "series",
+      "method"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/reporting/monthly.py",
+    "qualifica": "simulate_fan_chart",
+    "tipo": "sync",
+    "linea": 137,
+    "argomenti": [
+      "returns"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/reporting/monthly.py",
+    "qualifica": "_cluster_weights",
+    "tipo": "sync",
+    "linea": 152,
+    "argomenti": [
+      "weights",
+      "cluster_map"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/reporting/monthly.py",
+    "qualifica": "generate_monthly_report",
+    "tipo": "sync",
+    "linea": 170,
+    "argomenti": [
+      "inputs"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/reporting/plots.py",
+    "qualifica": "_resolve_path",
+    "tipo": "sync",
+    "linea": 23,
+    "argomenti": [
+      "path",
+      "filename"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/reporting/plots.py",
+    "qualifica": "plot_fan_chart",
+    "tipo": "sync",
+    "linea": 34,
+    "argomenti": [
+      "wealth_paths",
+      "percentiles"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/reporting/plots.py",
+    "qualifica": "plot_attribution",
+    "tipo": "sync",
+    "linea": 83,
+    "argomenti": [
+      "contributions"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/reporting/plots.py",
+    "qualifica": "plot_turnover_costs",
+    "tipo": "sync",
+    "linea": 116,
+    "argomenti": [
+      "turnover",
+      "costs"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/robustness/ablation.py",
+    "qualifica": "_normalise_flags",
+    "tipo": "sync",
+    "linea": 34,
+    "argomenti": [
+      "features",
+      "base_flags"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/robustness/ablation.py",
+    "qualifica": "run_ablation_study",
+    "tipo": "sync",
+    "linea": 45,
+    "argomenti": [
+      "runner"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/robustness/bootstrap.py",
+    "qualifica": "RobustnessGates.passes",
+    "tipo": "sync",
+    "linea": 27,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/robustness/bootstrap.py",
+    "qualifica": "_prepare_returns",
+    "tipo": "sync",
+    "linea": 34,
+    "argomenti": [
+      "returns"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/robustness/bootstrap.py",
+    "qualifica": "_block_bootstrap_samples",
+    "tipo": "sync",
+    "linea": 41,
+    "argomenti": [
+      "arr"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/robustness/bootstrap.py",
+    "qualifica": "_max_drawdown",
+    "tipo": "sync",
+    "linea": 63,
+    "argomenti": [
+      "path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/robustness/bootstrap.py",
+    "qualifica": "_cagr",
+    "tipo": "sync",
+    "linea": 73,
+    "argomenti": [
+      "path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/robustness/bootstrap.py",
+    "qualifica": "block_bootstrap_metrics",
+    "tipo": "sync",
+    "linea": 86,
+    "argomenti": [
+      "returns"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/robustness/lab.py",
+    "qualifica": "_render_pdf",
+    "tipo": "sync",
+    "linea": 56,
+    "argomenti": [
+      "bootstrap",
+      "scenarios",
+      "gates"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/robustness/lab.py",
+    "qualifica": "run_robustness_lab",
+    "tipo": "sync",
+    "linea": 92,
+    "argomenti": [
+      "returns"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/robustness/lab.py",
+    "qualifica": "runner",
+    "tipo": "sync",
+    "linea": 153,
+    "argomenti": [
+      "flags"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/robustness/scenarios.py",
+    "qualifica": "_scenario_max_drawdown",
+    "tipo": "sync",
+    "linea": 25,
+    "argomenti": [
+      "path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/robustness/scenarios.py",
+    "qualifica": "_scenario_cagr",
+    "tipo": "sync",
+    "linea": 34,
+    "argomenti": [
+      "path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/robustness/scenarios.py",
+    "qualifica": "default_shock_scenarios",
+    "tipo": "sync",
+    "linea": 129,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/robustness/scenarios.py",
+    "qualifica": "_scale_scenario",
+    "tipo": "sync",
+    "linea": 135,
+    "argomenti": [
+      "returns",
+      "target_vol"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/robustness/scenarios.py",
+    "qualifica": "replay_shocks",
+    "tipo": "sync",
+    "linea": 143,
+    "argomenti": [
+      "base_returns"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/io.py",
+    "qualifica": "ensure_dir",
+    "tipo": "sync",
+    "linea": 31,
+    "argomenti": [
+      "path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/io.py",
+    "qualifica": "safe_path_segment",
+    "tipo": "sync",
+    "linea": 39,
+    "argomenti": [
+      "name"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/io.py",
+    "qualifica": "artifact_path",
+    "tipo": "sync",
+    "linea": 46,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/io.py",
+    "qualifica": "read_yaml",
+    "tipo": "sync",
+    "linea": 70,
+    "argomenti": [
+      "path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/io.py",
+    "qualifica": "write_yaml",
+    "tipo": "sync",
+    "linea": 77,
+    "argomenti": [
+      "data",
+      "path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/io.py",
+    "qualifica": "sha256_file",
+    "tipo": "sync",
+    "linea": 87,
+    "argomenti": [
+      "path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/io.py",
+    "qualifica": "compute_checksums",
+    "tipo": "sync",
+    "linea": 99,
+    "argomenti": [
+      "paths"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/io.py",
+    "qualifica": "copy_with_timestamp",
+    "tipo": "sync",
+    "linea": 111,
+    "argomenti": [
+      "src",
+      "dest_dir"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/io.py",
+    "qualifica": "write_json",
+    "tipo": "sync",
+    "linea": 133,
+    "argomenti": [
+      "data",
+      "path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/log.py",
+    "qualifica": "default_log_dir",
+    "tipo": "sync",
+    "linea": 10,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/log.py",
+    "qualifica": "_as_level",
+    "tipo": "sync",
+    "linea": 17,
+    "argomenti": [
+      "level"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/utils/log.py",
+    "qualifica": "_file_handler",
+    "tipo": "sync",
+    "linea": 24,
+    "argomenti": [
+      "path",
+      "level",
+      "max_bytes",
+      "backup_count"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/utils/log.py",
+    "qualifica": "setup_logger",
+    "tipo": "sync",
+    "linea": 45,
+    "argomenti": [
+      "name"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/log.py",
+    "qualifica": "get_logger",
+    "tipo": "sync",
+    "linea": 108,
+    "argomenti": [
+      "name"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/logging.py",
+    "qualifica": "_determine_level",
+    "tipo": "sync",
+    "linea": 21,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/logging.py",
+    "qualifica": "_determine_format",
+    "tipo": "sync",
+    "linea": 40,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/logging.py",
+    "qualifica": "get_stream_logger",
+    "tipo": "sync",
+    "linea": 54,
+    "argomenti": [
+      "name"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/psd.py",
+    "qualifica": "project_to_psd",
+    "tipo": "sync",
+    "linea": 8,
+    "argomenti": [
+      "matrix",
+      "eps"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/rand.py",
+    "qualifica": "load_seeds",
+    "tipo": "sync",
+    "linea": 27,
+    "argomenti": [
+      "seed_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/rand.py",
+    "qualifica": "save_seeds",
+    "tipo": "sync",
+    "linea": 59,
+    "argomenti": [
+      "seeds",
+      "seed_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/rand.py",
+    "qualifica": "seed_for_stream",
+    "tipo": "sync",
+    "linea": 73,
+    "argomenti": [
+      "stream"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/rand.py",
+    "qualifica": "generator_from_seed",
+    "tipo": "sync",
+    "linea": 87,
+    "argomenti": [
+      "seed"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/rand.py",
+    "qualifica": "broadcast_seed",
+    "tipo": "sync",
+    "linea": 105,
+    "argomenti": [
+      "seed"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/utils/rand.py",
+    "qualifica": "spawn_child_rng",
+    "tipo": "sync",
+    "linea": 113,
+    "argomenti": [
+      "parent"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/conftest.py",
+    "qualifica": "_insert_repo_root",
+    "tipo": "sync",
+    "linea": 13,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/conftest.py",
+    "qualifica": "pytest_report_header",
+    "tipo": "sync",
+    "linea": 24,
+    "argomenti": [
+      "config"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/conftest.py",
+    "qualifica": "_set_verbose_logging",
+    "tipo": "sync",
+    "linea": 33,
+    "argomenti": [
+      "monkeypatch"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/property/test_allocators_erc.py",
+    "qualifica": "test_balance_clusters_within_tol",
+    "tipo": "sync",
+    "linea": 9,
+    "argomenti": [
+      "k"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_checksums.py",
+    "qualifica": "test_sha256_stable",
+    "tipo": "sync",
+    "linea": 11,
+    "argomenti": [
+      "tmp_path_factory",
+      "data"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_etl_no_lookahead.py",
+    "qualifica": "_setup_raw",
+    "tipo": "sync",
+    "linea": 11,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_etl_no_lookahead.py",
+    "qualifica": "test_features_use_only_past_observations",
+    "tipo": "sync",
+    "linea": 24,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_execution_no_trade.py",
+    "qualifica": "test_no_trade_when_drift_within_band",
+    "tipo": "sync",
+    "linea": 15,
+    "argomenti": [
+      "dim",
+      "band"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_factors_orthogonality_property.py",
+    "qualifica": "test_orthogonalisation_does_not_increase_condition_number",
+    "tipo": "sync",
+    "linea": 16,
+    "argomenti": [
+      "n_rows",
+      "n_cols"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_goals_mc_property.py",
+    "qualifica": "_goal_strategy",
+    "tipo": "sync",
+    "linea": 11,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_goals_mc_property.py",
+    "qualifica": "test_goal_probabilities_within_bounds",
+    "tipo": "sync",
+    "linea": 45,
+    "argomenti": [
+      "goals",
+      "seed"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_mapping_liquidity_property.py",
+    "qualifica": "_case_strategy",
+    "tipo": "sync",
+    "linea": 11,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_mapping_liquidity_property.py",
+    "qualifica": "build_case",
+    "tipo": "sync",
+    "linea": 12,
+    "argomenti": [
+      "n"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_mapping_liquidity_property.py",
+    "qualifica": "test_clip_trades_respects_adv_caps",
+    "tipo": "sync",
+    "linea": 39,
+    "argomenti": [
+      "case"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_psd.py",
+    "qualifica": "test_project_to_psd_eigenvalues_non_negative",
+    "tipo": "sync",
+    "linea": 10,
+    "argomenti": [
+      "dim"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_psd.py",
+    "qualifica": "test_project_to_psd_idempotent_for_psd",
+    "tipo": "sync",
+    "linea": 20,
+    "argomenti": [
+      "dim"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_regime_hysteresis_property.py",
+    "qualifica": "test_hysteresis_cooldown_blocks_reentry",
+    "tipo": "sync",
+    "linea": 12,
+    "argomenti": [
+      "probabilities"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_reporting_metrics_property.py",
+    "qualifica": "test_max_drawdown_is_non_positive",
+    "tipo": "sync",
+    "linea": 24,
+    "argomenti": [
+      "returns"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_reporting_metrics_property.py",
+    "qualifica": "test_zero_turnover_zero_costs",
+    "tipo": "sync",
+    "linea": 31,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_robustness_bootstrap_property.py",
+    "qualifica": "test_bootstrap_exceedance_prob_under_threshold",
+    "tipo": "sync",
+    "linea": 16,
+    "argomenti": [
+      "samples"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_allocators_primitives.py",
+    "qualifica": "test_risk_contributions_sum_to_one",
+    "tipo": "sync",
+    "linea": 10,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_allocators_primitives.py",
+    "qualifica": "test_sharpe_objective_positive",
+    "tipo": "sync",
+    "linea": 17,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_allocators_primitives.py",
+    "qualifica": "test_dro_penalty_non_negative",
+    "tipo": "sync",
+    "linea": 25,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_boe_csv_offline.py",
+    "qualifica": "test_boe_csv_parsing",
+    "tipo": "sync",
+    "linea": 11,
+    "argomenti": [
+      "monkeypatch"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_boe_html_error.py",
+    "qualifica": "test_boe_html_error",
+    "tipo": "sync",
+    "linea": 10,
+    "argomenti": [
+      "monkeypatch"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_cli_etl.py",
+    "qualifica": "_create_raw",
+    "tipo": "sync",
+    "linea": 11,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_cli_etl.py",
+    "qualifica": "test_cli_etl_rebuild",
+    "tipo": "sync",
+    "linea": 23,
+    "argomenti": [
+      "tmp_path",
+      "capsys"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_cli_execute.py",
+    "qualifica": "test_cli_execute_dry_run",
+    "tipo": "sync",
+    "linea": 8,
+    "argomenti": [
+      "capsys"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_cli_goals.py",
+    "qualifica": "test_cli_goals_runs",
+    "tipo": "sync",
+    "linea": 10,
+    "argomenti": [
+      "tmp_path",
+      "capsys"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_cli_ingest.py",
+    "qualifica": "test_cli_ingest_dispatch",
+    "tipo": "sync",
+    "linea": 16,
+    "argomenti": [
+      "monkeypatch",
+      "tmp_path",
+      "capsys"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_cli_ingest.py",
+    "qualifica": "fake_run_ingest",
+    "tipo": "sync",
+    "linea": 39,
+    "argomenti": [
+      "source"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_cli_pipeline.py",
+    "qualifica": "_write_clean_panel",
+    "tipo": "sync",
+    "linea": 14,
+    "argomenti": [
+      "root"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_cli_pipeline.py",
+    "qualifica": "patched_environment",
+    "tipo": "sync",
+    "linea": 42,
+    "argomenti": [
+      "tmp_path",
+      "monkeypatch"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_cli_pipeline.py",
+    "qualifica": "test_cli_pipeline_end_to_end",
+    "tipo": "sync",
+    "linea": 51,
+    "argomenti": [
+      "tmp_path",
+      "patched_environment"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_cli_report.py",
+    "qualifica": "test_cli_report_monthly",
+    "tipo": "sync",
+    "linea": 11,
+    "argomenti": [
+      "tmp_path",
+      "capsys"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ecb_fetcher.py",
+    "qualifica": "test_ecb_build_url_domain_and_params",
+    "tipo": "sync",
+    "linea": 17,
+    "argomenti": [
+      "symbol",
+      "start_str"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ecb_fetcher.py",
+    "qualifica": "test_ecb_parse_csv_payload_to_float",
+    "tipo": "sync",
+    "linea": 30,
+    "argomenti": [
+      "monkeypatch"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_etl_cleaning.py",
+    "qualifica": "test_apply_hampel_removes_spike",
+    "tipo": "sync",
+    "linea": 16,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_etl_cleaning.py",
+    "qualifica": "test_winsorize_series_bounds",
+    "tipo": "sync",
+    "linea": 25,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_etl_cleaning.py",
+    "qualifica": "test_clean_price_history_applies_per_symbol",
+    "tipo": "sync",
+    "linea": 34,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_etl_cleaning.py",
+    "qualifica": "test_prepare_estimation_copy_winsorizes",
+    "tipo": "sync",
+    "linea": 46,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_etl_dedup.py",
+    "qualifica": "test_compute_returns_handles_duplicate_index",
+    "tipo": "sync",
+    "linea": 10,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_etl_panel.py",
+    "qualifica": "_write_raw_series",
+    "tipo": "sync",
+    "linea": 10,
+    "argomenti": [
+      "path",
+      "symbol",
+      "start",
+      "values"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_etl_panel.py",
+    "qualifica": "test_tr_panel_builder_creates_artifacts",
+    "tipo": "sync",
+    "linea": 17,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_execution_primitives.py",
+    "qualifica": "test_target_to_lots_rounds_and_handles_zero_inputs",
+    "tipo": "sync",
+    "linea": 17,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_execution_primitives.py",
+    "qualifica": "test_trading_costs_matches_formula",
+    "tipo": "sync",
+    "linea": 28,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_execution_primitives.py",
+    "qualifica": "test_tax_penalty_it_applies_rates_and_loss_bucket",
+    "tipo": "sync",
+    "linea": 47,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_execution_primitives.py",
+    "qualifica": "test_drift_bands_and_expected_benefit",
+    "tipo": "sync",
+    "linea": 64,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_execution_primitives.py",
+    "qualifica": "test_summarise_decision_structures_breakdown",
+    "tipo": "sync",
+    "linea": 85,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_factors_core.py",
+    "qualifica": "_synthetic_panel",
+    "tipo": "sync",
+    "linea": 9,
+    "argomenti": [
+      "rows",
+      "symbols"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_factors_core.py",
+    "qualifica": "test_factor_library_shapes_and_metadata",
+    "tipo": "sync",
+    "linea": 28,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_factors_core.py",
+    "qualifica": "test_macro_overlay_uses_input_series",
+    "tipo": "sync",
+    "linea": 54,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_factors_core.py",
+    "qualifica": "test_factor_library_quantile_requires_features",
+    "tipo": "sync",
+    "linea": 75,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_factors_orthogonality.py",
+    "qualifica": "_make_correlated_factors",
+    "tipo": "sync",
+    "linea": 14,
+    "argomenti": [
+      "rows"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_factors_orthogonality.py",
+    "qualifica": "test_merge_correlated_factors_reduces_columns",
+    "tipo": "sync",
+    "linea": 28,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_factors_orthogonality.py",
+    "qualifica": "test_enforce_orthogonality_caps_condition_number",
+    "tipo": "sync",
+    "linea": 35,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_factors_validation.py",
+    "qualifica": "_make_factors",
+    "tipo": "sync",
+    "linea": 14,
+    "argomenti": [
+      "n_days",
+      "n_factors"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_factors_validation.py",
+    "qualifica": "test_cross_purged_splits_embargo",
+    "tipo": "sync",
+    "linea": 30,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_factors_validation.py",
+    "qualifica": "test_validate_factor_set_returns_results",
+    "tipo": "sync",
+    "linea": 46,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_factors_validation.py",
+    "qualifica": "test_fdr_bh_behaviour",
+    "tipo": "sync",
+    "linea": 59,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_fred_csv_zip_offline.py",
+    "qualifica": "build_zip_payload",
+    "tipo": "sync",
+    "linea": 12,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_fred_csv_zip_offline.py",
+    "qualifica": "test_fred_csv_zip_parsing",
+    "tipo": "sync",
+    "linea": 25,
+    "argomenti": [
+      "monkeypatch"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_fred_html_error.py",
+    "qualifica": "test_fred_html_error",
+    "tipo": "sync",
+    "linea": 10,
+    "argomenti": [
+      "monkeypatch"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_fred_json_offline.py",
+    "qualifica": "test_fred_json_parsing",
+    "tipo": "sync",
+    "linea": 15,
+    "argomenti": [
+      "monkeypatch"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_function_inventory.py",
+    "qualifica": "inventario_tmp",
+    "tipo": "sync",
+    "linea": 18,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_function_inventory.py",
+    "qualifica": "test_build_inventory_raccoglie_funzioni_note",
+    "tipo": "sync",
+    "linea": 24,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_function_inventory.py",
+    "qualifica": "test_save_inventory_crea_json_ben_formato",
+    "tipo": "sync",
+    "linea": 32,
+    "argomenti": [
+      "inventario_tmp"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_generators.py",
+    "qualifica": "_toy_cov",
+    "tipo": "sync",
+    "linea": 12,
+    "argomenti": [
+      "n"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_generators.py",
+    "qualifica": "test_generator_a_respects_turnover_and_sum",
+    "tipo": "sync",
+    "linea": 18,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_generators.py",
+    "qualifica": "test_generator_b_hrp_returns_valid_weights",
+    "tipo": "sync",
+    "linea": 46,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_generators.py",
+    "qualifica": "test_generator_c_dro_closed_simple_case",
+    "tipo": "sync",
+    "linea": 53,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_generators.py",
+    "qualifica": "test_generator_d_cvar_erc_feasible",
+    "tipo": "sync",
+    "linea": 61,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_goals_mc.py",
+    "qualifica": "test_load_goal_configs_from_yaml",
+    "tipo": "sync",
+    "linea": 16,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_goals_mc.py",
+    "qualifica": "test_simulate_goals_is_deterministic",
+    "tipo": "sync",
+    "linea": 22,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_goals_mc.py",
+    "qualifica": "test_run_goal_monte_carlo_writes_artifacts",
+    "tipo": "sync",
+    "linea": 49,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_ecb_cli.py",
+    "qualifica": "test_run_ingest_ecb_writes_raw_file",
+    "tipo": "sync",
+    "linea": 18,
+    "argomenti": [
+      "tmp_path",
+      "monkeypatch"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_fetchers.py",
+    "qualifica": "RecordingLogger.__init__",
+    "tipo": "sync",
+    "linea": 22,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_fetchers.py",
+    "qualifica": "RecordingLogger.info",
+    "tipo": "sync",
+    "linea": 25,
+    "argomenti": [
+      "self",
+      "message"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_fetchers.py",
+    "qualifica": "test_available_sources_contains_defaults",
+    "tipo": "sync",
+    "linea": 41,
+    "argomenti": [
+      "source"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_fetchers.py",
+    "qualifica": "test_create_fetcher_returns_instance",
+    "tipo": "sync",
+    "linea": 45,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_fetchers.py",
+    "qualifica": "_write_and_validate",
+    "tipo": "sync",
+    "linea": 50,
+    "argomenti": [
+      "result_path",
+      "expected_rows"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_fetchers.py",
+    "qualifica": "test_ecb_fetcher",
+    "tipo": "sync",
+    "linea": 58,
+    "argomenti": [
+      "tmp_path",
+      "monkeypatch"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_fetchers.py",
+    "qualifica": "test_fred_fetcher_filters_start",
+    "tipo": "sync",
+    "linea": 71,
+    "argomenti": [
+      "tmp_path",
+      "monkeypatch"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_fetchers.py",
+    "qualifica": "test_boe_fetcher",
+    "tipo": "sync",
+    "linea": 87,
+    "argomenti": [
+      "tmp_path",
+      "monkeypatch"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_fetchers.py",
+    "qualifica": "test_stooq_fetcher",
+    "tipo": "sync",
+    "linea": 98,
+    "argomenti": [
+      "tmp_path",
+      "monkeypatch"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_logging_utils.py",
+    "qualifica": "ripristina_env",
+    "tipo": "sync",
+    "linea": 16,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_logging_utils.py",
+    "qualifica": "pulisci_logger",
+    "tipo": "sync",
+    "linea": 34,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_logging_utils.py",
+    "qualifica": "test_get_stream_logger_imposta_handler_e_formato",
+    "tipo": "sync",
+    "linea": 46,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_logging_utils.py",
+    "qualifica": "test_get_stream_logger_rispetta_livello_da_env",
+    "tipo": "sync",
+    "linea": 58,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_logging_utils.py",
+    "qualifica": "test_get_stream_logger_valore_env_non_valido",
+    "tipo": "sync",
+    "linea": 66,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_mapping_beta.py",
+    "qualifica": "_toy_data",
+    "tipo": "sync",
+    "linea": 9,
+    "argomenti": [
+      "n_obs"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_mapping_beta.py",
+    "qualifica": "test_rolling_beta_ridge_recovers_coefficients",
+    "tipo": "sync",
+    "linea": 18,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_mapping_beta.py",
+    "qualifica": "test_rolling_beta_respects_sign_constraints",
+    "tipo": "sync",
+    "linea": 26,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_mapping_beta.py",
+    "qualifica": "test_beta_ci_bootstrap_shapes_and_bounds",
+    "tipo": "sync",
+    "linea": 33,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_mapping_hrp.py",
+    "qualifica": "test_hrp_weights_cluster_budgets",
+    "tipo": "sync",
+    "linea": 8,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_mapping_hrp.py",
+    "qualifica": "test_hrp_weights_single_member_cluster",
+    "tipo": "sync",
+    "linea": 20,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_mapping_liquidity.py",
+    "qualifica": "test_max_trade_notional_scales_adv",
+    "tipo": "sync",
+    "linea": 8,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_mapping_liquidity.py",
+    "qualifica": "test_clip_trades_to_adv_limits_notional",
+    "tipo": "sync",
+    "linea": 17,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_mapping_te_budget.py",
+    "qualifica": "test_tracking_error_identity",
+    "tipo": "sync",
+    "linea": 8,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_mapping_te_budget.py",
+    "qualifica": "test_enforce_te_budget_shrinks_to_cap",
+    "tipo": "sync",
+    "linea": 16,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_meta_allocator.py",
+    "qualifica": "test_meta_weights_simple_case",
+    "tipo": "sync",
+    "linea": 6,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_mu_bl.py",
+    "qualifica": "make_sample_frames",
+    "tipo": "sync",
+    "linea": 8,
+    "argomenti": [
+      "seed"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_mu_bl.py",
+    "qualifica": "test_estimate_mu_ensemble_deterministic",
+    "tipo": "sync",
+    "linea": 16,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_mu_bl.py",
+    "qualifica": "test_estimate_mu_ensemble_small_sample_fallback",
+    "tipo": "sync",
+    "linea": 25,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_mu_bl.py",
+    "qualifica": "test_reverse_opt_mu_eq_matches_manual",
+    "tipo": "sync",
+    "linea": 35,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_mu_bl.py",
+    "qualifica": "test_blend_mu_fallback_and_blend",
+    "tipo": "sync",
+    "linea": 43,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_pipeline_verbosity.py",
+    "qualifica": "test_get_stream_logger_respects_environment",
+    "tipo": "sync",
+    "linea": 18,
+    "argomenti": [
+      "monkeypatch",
+      "caplog"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_pipeline_verbosity.py",
+    "qualifica": "_patch_optimisation_inputs",
+    "tipo": "sync",
+    "linea": 37,
+    "argomenti": [
+      "monkeypatch"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_pipeline_verbosity.py",
+    "qualifica": "test_run_optimization_pipeline_requires_generators",
+    "tipo": "sync",
+    "linea": 52,
+    "argomenti": [
+      "monkeypatch",
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_pipeline_verbosity.py",
+    "qualifica": "test_run_optimization_pipeline_emits_verbose_logs",
+    "tipo": "sync",
+    "linea": 69,
+    "argomenti": [
+      "monkeypatch",
+      "tmp_path",
+      "caplog"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_pipeline_verbosity.py",
+    "qualifica": "_patch_estimate_inputs",
+    "tipo": "sync",
+    "linea": 91,
+    "argomenti": [
+      "monkeypatch"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_pipeline_verbosity.py",
+    "qualifica": "test_run_estimate_pipeline_creates_expected_artifacts",
+    "tipo": "sync",
+    "linea": 105,
+    "argomenti": [
+      "monkeypatch",
+      "tmp_path",
+      "caplog"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_regime_committee.py",
+    "qualifica": "test_crisis_probability_range_and_alignment",
+    "tipo": "sync",
+    "linea": 10,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_regime_committee.py",
+    "qualifica": "test_committee_weights_normalise_and_validate",
+    "tipo": "sync",
+    "linea": 35,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_regime_committee.py",
+    "qualifica": "test_crisis_probability_empty_intersection_returns_empty",
+    "tipo": "sync",
+    "linea": 44,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_regime_hysteresis.py",
+    "qualifica": "test_apply_hysteresis_enforces_dwell_and_cooldown",
+    "tipo": "sync",
+    "linea": 9,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_regime_hysteresis.py",
+    "qualifica": "test_apply_hysteresis_threshold_validation",
+    "tipo": "sync",
+    "linea": 20,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_regime_hysteresis.py",
+    "qualifica": "test_tilt_lambda_clamps_range",
+    "tipo": "sync",
+    "linea": 31,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_reporting_audit.py",
+    "qualifica": "test_copy_seed_snapshot_creates_default",
+    "tipo": "sync",
+    "linea": 15,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_reporting_audit.py",
+    "qualifica": "test_record_checksums_appends",
+    "tipo": "sync",
+    "linea": 23,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_reporting_audit.py",
+    "qualifica": "test_run_audit_snapshot_creates_changelog",
+    "tipo": "sync",
+    "linea": 36,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_reporting_monthly.py",
+    "qualifica": "_sample_inputs",
+    "tipo": "sync",
+    "linea": 15,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_reporting_monthly.py",
+    "qualifica": "test_compute_monthly_metrics_structure",
+    "tipo": "sync",
+    "linea": 64,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_reporting_monthly.py",
+    "qualifica": "test_simulate_fan_chart_deterministic",
+    "tipo": "sync",
+    "linea": 71,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_reporting_monthly.py",
+    "qualifica": "test_generate_monthly_report_outputs",
+    "tipo": "sync",
+    "linea": 79,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_reporting_plots.py",
+    "qualifica": "test_plot_fan_chart_creates_file",
+    "tipo": "sync",
+    "linea": 11,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_reporting_plots.py",
+    "qualifica": "test_plot_attribution_requires_data",
+    "tipo": "sync",
+    "linea": 18,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_reporting_plots.py",
+    "qualifica": "test_plot_turnover_costs_index_alignment",
+    "tipo": "sync",
+    "linea": 28,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_robustness_lab.py",
+    "qualifica": "test_block_bootstrap_metrics_deterministic",
+    "tipo": "sync",
+    "linea": 17,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_robustness_lab.py",
+    "qualifica": "test_replay_shocks_sorted_by_drawdown",
+    "tipo": "sync",
+    "linea": 33,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_robustness_lab.py",
+    "qualifica": "test_run_robustness_lab_generates_artifacts",
+    "tipo": "sync",
+    "linea": 42,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_robustness_lab.py",
+    "qualifica": "runner",
+    "tipo": "sync",
+    "linea": 46,
+    "argomenti": [
+      "flags",
+      "seed"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_sigma.py",
+    "qualifica": "sample_returns",
+    "tipo": "sync",
+    "linea": 17,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_sigma.py",
+    "qualifica": "test_ledoit_wolf_positive_semidefinite",
+    "tipo": "sync",
+    "linea": 24,
+    "argomenti": [
+      "sample_returns"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_sigma.py",
+    "qualifica": "test_graphical_lasso_bic_selects_candidate",
+    "tipo": "sync",
+    "linea": 30,
+    "argomenti": [
+      "sample_returns"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_sigma.py",
+    "qualifica": "test_factor_shrink_structure",
+    "tipo": "sync",
+    "linea": 37,
+    "argomenti": [
+      "sample_returns"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_sigma.py",
+    "qualifica": "test_median_of_covariances_requires_inputs",
+    "tipo": "sync",
+    "linea": 44,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_sigma.py",
+    "qualifica": "test_median_of_covariances_returns_psd",
+    "tipo": "sync",
+    "linea": 49,
+    "argomenti": [
+      "sample_returns"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_sigma.py",
+    "qualifica": "test_ewma_regime_convex_combination",
+    "tipo": "sync",
+    "linea": 59,
+    "argomenti": [
+      "sample_returns"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_sigma.py",
+    "qualifica": "test_frobenius_relative_drift_zero_when_equal",
+    "tipo": "sync",
+    "linea": 68,
+    "argomenti": [
+      "sample_returns"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_sigma.py",
+    "qualifica": "test_max_corr_drift_matches_manual",
+    "tipo": "sync",
+    "linea": 73,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_stooq_fetcher_offline.py",
+    "qualifica": "test_stooq_lowercase_symbol_ok",
+    "tipo": "sync",
+    "linea": 11,
+    "argomenti": [
+      "monkeypatch"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_stooq_fetcher_offline.py",
+    "qualifica": "test_stooq_html_error",
+    "tipo": "sync",
+    "linea": 19,
+    "argomenti": [
+      "monkeypatch"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_utils_io.py",
+    "qualifica": "test_artifact_path_creates_directory",
+    "tipo": "sync",
+    "linea": 7,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_utils_io.py",
+    "qualifica": "test_checksum_deterministic",
+    "tipo": "sync",
+    "linea": 14,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_utils_io.py",
+    "qualifica": "test_compute_checksums_skips_missing",
+    "tipo": "sync",
+    "linea": 22,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_utils_io.py",
+    "qualifica": "test_safe_path_segment_replaces_invalid_characters",
+    "tipo": "sync",
+    "linea": 31,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_utils_io.py",
+    "qualifica": "test_safe_path_segment_strips_trailing_dots_and_spaces",
+    "tipo": "sync",
+    "linea": 42,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_utils_rand.py",
+    "qualifica": "test_load_seeds_defaults_when_missing",
+    "tipo": "sync",
+    "linea": 19,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_utils_rand.py",
+    "qualifica": "test_seed_round_trip",
+    "tipo": "sync",
+    "linea": 25,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_utils_rand.py",
+    "qualifica": "test_generator_from_seed_respects_int",
+    "tipo": "sync",
+    "linea": 33,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_utils_rand.py",
+    "qualifica": "test_broadcast_seed_sets_python_stack",
+    "tipo": "sync",
+    "linea": 38,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_utils_rand.py",
+    "qualifica": "test_spawn_child_rng_jumps_forward",
+    "tipo": "sync",
+    "linea": 43,
+    "argomenti": [],
+    "ha_docstring": false
+  }
+]

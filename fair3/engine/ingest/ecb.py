@@ -8,7 +8,7 @@ __all__ = ["ECBFetcher"]
 
 
 class ECBFetcher(BaseCSVFetcher):
-    """Download ECB foreign exchange reference rates."""
+    """Scarica i cambi ufficiali BCE convertendoli nello schema FAIR canonico."""
 
     SOURCE = "ecb"
     LICENSE = "European Central Bank (ECB) Statistical Data Warehouse Terms of Use"
@@ -16,6 +16,7 @@ class ECBFetcher(BaseCSVFetcher):
     DEFAULT_SYMBOLS = ("USD", "GBP")
 
     def build_url(self, symbol: str, start: pd.Timestamp | None) -> str:
+        """Compone l'URL EXR con filtri opzionali sulla data iniziale."""
         series = f"D.{symbol}.EUR.SP00.A"
         params: list[str] = ["format=csvdata"]
         if start is not None:
@@ -24,6 +25,7 @@ class ECBFetcher(BaseCSVFetcher):
         return f"{self.BASE_URL}/{series}?{query}"
 
     def parse(self, payload: str, symbol: str) -> pd.DataFrame:
+        """Normalizza il CSV EXR e forza i valori numerici a float espliciti."""
         frame = self._simple_frame(
             payload,
             symbol,
