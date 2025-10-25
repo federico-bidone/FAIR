@@ -62,13 +62,23 @@ def load_fx_rates(records: Iterable[pd.DataFrame], base_currency: str) -> FXFram
             msg = "il record deve contenere le colonne date/value/symbol"
             raise ValueError(msg)
         symbol = record["symbol"].iat[0]
+        invert = False
         if "/" in symbol:
             base, quote = symbol.split("/", 1)
             # Normalizziamo i simboli FX in formato `<quote>_to_<base>` per
             # allinearli all'interfaccia `FXFrame.lookup`.
             symbol = f"{quote}_to_{base}"
+            invert = True
         frame = record.copy()
         frame["date"] = pd.to_datetime(frame["date"]).dt.normalize()
+        if invert:
+            if (frame["value"] == 0).any():
+                msg = (
+                    "impossibile invertire il tasso FX normalizzato "
+                    f"{symbol}: contiene uno zero"
+                )
+                raise ValueError(msg)
+            frame["value"] = 1 / frame["value"]
         frame = frame.rename(columns={"value": symbol})[["date", symbol]]
         frames.append(frame)
 
