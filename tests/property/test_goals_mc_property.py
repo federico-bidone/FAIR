@@ -5,7 +5,7 @@ from hypothesis import given
 from hypothesis import strategies as st
 from hypothesis.strategies import SearchStrategy
 
-from fair3.engine.goals import GoalConfig, simulate_goals
+from fair3.engine.goals import GoalConfig, GoalParameters, simulate_goals
 
 
 def _goal_strategy() -> SearchStrategy[GoalConfig]:
@@ -43,12 +43,19 @@ def _goal_strategy() -> SearchStrategy[GoalConfig]:
     seed=st.integers(min_value=0, max_value=10_000),
 )
 def test_goal_probabilities_within_bounds(goals: list[GoalConfig], seed: int) -> None:
+    parameters = GoalParameters.from_mapping(
+        {
+            "investor": "property",
+            "contrib_monthly": 500.0,
+            "initial_wealth": 10_000.0,
+            "contribution_growth": 0.02,
+        }
+    )
     summary = simulate_goals(
         goals,
         draws=256,
         seed=seed,
-        monthly_contribution=500.0,
-        initial_wealth=10_000.0,
+        parameters=parameters,
     )
     probs = summary.results["probability"].to_numpy()
     assert np.all((probs >= 0.0) & (probs <= 1.0))

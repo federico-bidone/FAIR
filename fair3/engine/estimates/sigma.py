@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import logging
 import warnings
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 
 import numpy as np
@@ -13,6 +14,8 @@ from sklearn.covariance import graphical_lasso
 from sklearn.exceptions import ConvergenceWarning
 
 from fair3.engine.utils import project_to_psd
+
+LOG = logging.getLogger(__name__)
 
 
 @dataclass
@@ -141,6 +144,164 @@ def median_of_covariances(covs: list[NDArray[np.float64]]) -> NDArray[np.float64
     return project_to_psd(median)
 
 
+def _symmetrize(matrix: NDArray[np.float64]) -> NDArray[np.float64]:
+    return 0.5 * (matrix + matrix.T)
+
+
+def _matrix_from_eigendecomposition(
+    matrix: NDArray[np.float64],
+    transform: Callable[[NDArray[np.float64]], NDArray[np.float64]],
+) -> NDArray[np.float64]:
+    sym = _symmetrize(matrix)
+    eigvals, eigvecs = np.linalg.eigh(sym)
+    eigvals = transform(np.clip(eigvals, 1e-12, None))
+    rebuilt = eigvecs @ np.diag(eigvals) @ eigvecs.T
+    return _symmetrize(rebuilt)
+
+
+def _matrix_power(matrix: NDArray[np.float64], power: float) -> NDArray[np.float64]:
+    return _matrix_from_eigendecomposition(matrix, lambda vals: vals**power)
+
+
+def _matrix_log(matrix: NDArray[np.float64]) -> NDArray[np.float64]:
+    return _matrix_from_eigendecomposition(matrix, lambda vals: np.log(vals))
+
+
+def _matrix_exp(matrix: NDArray[np.float64]) -> NDArray[np.float64]:
+    return _matrix_from_eigendecomposition(matrix, lambda vals: np.exp(vals))
+
+
+def _ensure_spd(matrix: NDArray[np.float64], min_eig: float = 1e-8) -> NDArray[np.float64]:
+    sym = _symmetrize(matrix)
+    eigvals, eigvecs = np.linalg.eigh(sym)
+    eigvals = np.clip(eigvals, min_eig, None)
+    rebuilt = eigvecs @ np.diag(eigvals) @ eigvecs.T
+    return _symmetrize(rebuilt)
+
+
+def _riemannian_log(base: NDArray[np.float64], target: NDArray[np.float64]) -> NDArray[np.float64]:
+    base = _ensure_spd(base)
+    target = _ensure_spd(target)
+    base_inv_sqrt = _matrix_power(base, -0.5)
+    base_sqrt = _matrix_power(base, 0.5)
+    transported = base_inv_sqrt @ target @ base_inv_sqrt
+    log_transport = _matrix_log(transported)
+    return _symmetrize(base_sqrt @ log_transport @ base_sqrt)
+
+
+def _riemannian_exp(base: NDArray[np.float64], tangent: NDArray[np.float64]) -> NDArray[np.float64]:
+    base = _ensure_spd(base)
+    tangent = _symmetrize(tangent)
+    base_inv_sqrt = _matrix_power(base, -0.5)
+    base_sqrt = _matrix_power(base, 0.5)
+    transported = base_inv_sqrt @ tangent @ base_inv_sqrt
+    exp_transport = _matrix_exp(transported)
+    proposal = base_sqrt @ exp_transport @ base_sqrt
+    return _ensure_spd(proposal)
+
+
+def sigma_consensus_psd(covariances: list[pd.DataFrame]) -> pd.DataFrame:
+    """Compute the PSD consensus covariance via element-wise median.
+
+    Args:
+      covariances: Covariance estimates expressed as square dataframes with the
+        same index and columns ordering.
+
+    Returns:
+      Positive semidefinite covariance matrix as dataframe matching the first
+      input frame's labels.
+
+    Raises:
+      ValueError: If the covariance list is empty or contains incompatible
+        shapes/index alignment.
+    """
+
+    if not covariances:
+        raise ValueError("At least one covariance matrix is required")
+    first = covariances[0]
+    arrays: list[NDArray[np.float64]] = []
+    for frame in covariances:
+        if frame.shape != first.shape:
+            raise ValueError("All covariance matrices must share the same shape")
+        if not frame.index.equals(first.index) or not frame.columns.equals(first.columns):
+            raise ValueError("Covariance matrices must share identical labels")
+        arrays.append(_symmetrize(frame.to_numpy(dtype=float)))
+    median = median_of_covariances(arrays)
+    return pd.DataFrame(median, index=first.index.copy(), columns=first.columns.copy())
+
+
+def sigma_spd_median(
+    covariances: list[pd.DataFrame],
+    *,
+    max_iter: int = 200,
+    tol: float = 1e-6,
+) -> pd.DataFrame:
+    """Compute the geometric median of SPD covariance matrices.
+
+    The routine performs Riemannian gradient descent on the manifold of SPD
+    matrices using the affine-invariant metric. If convergence is not achieved
+    within ``max_iter`` iterations, a warning is emitted and the PSD consensus
+    estimate is returned instead.
+
+    Args:
+      covariances: Covariance estimates expressed as square dataframes with the
+        same ordering of labels.
+      max_iter: Maximum number of gradient iterations before falling back.
+      tol: Convergence tolerance on the Frobenius norm of the gradient.
+
+    Returns:
+      Dataframe containing the SPD geometric median aligned with the first
+      covariance frame labels.
+
+    Raises:
+      ValueError: If the covariance collection is empty or labels are
+        inconsistent across inputs.
+    """
+
+    if not covariances:
+        raise ValueError("At least one covariance matrix is required")
+    consensus = sigma_consensus_psd(covariances)
+    try:
+        arrays = [_ensure_spd(frame.to_numpy(dtype=float)) for frame in covariances]
+        current = _ensure_spd(consensus.to_numpy(dtype=float))
+    except np.linalg.LinAlgError as exc:
+        LOG.warning("SPD median input not SPD; falling back to PSD median: %s", exc)
+        return consensus
+    success = False
+    for iteration in range(max_iter):
+        gradient = np.zeros_like(current)
+        for array in arrays:
+            try:
+                gradient += _riemannian_log(current, array)
+            except np.linalg.LinAlgError as exc:
+                LOG.warning("SPD median log map failed; falling back to PSD median: %s", exc)
+                return consensus
+        gradient /= float(len(arrays))
+        grad_norm = float(np.linalg.norm(gradient, ord="fro"))
+        if not np.isfinite(grad_norm):
+            break
+        if grad_norm <= tol:
+            success = True
+            break
+        step = 1.0 / float(iteration + 1)
+        try:
+            current = _riemannian_exp(current, -step * gradient)
+        except np.linalg.LinAlgError as exc:
+            LOG.warning("SPD median exp map failed; falling back to PSD median: %s", exc)
+            return consensus
+    if not success:
+        LOG.warning(
+            "SPD median did not converge within max_iter=%s; falling back to PSD median",
+            max_iter,
+        )
+        return consensus
+    return pd.DataFrame(
+        _symmetrize(current),
+        index=consensus.index.copy(),
+        columns=consensus.columns.copy(),
+    )
+
+
 def ewma_regime(
     sigma_prev: NDArray[np.float64],
     sigma_star_psd: NDArray[np.float64],
@@ -163,4 +324,6 @@ __all__ = [
     "graphical_lasso_bic",
     "ledoit_wolf",
     "median_of_covariances",
+    "sigma_consensus_psd",
+    "sigma_spd_median",
 ]

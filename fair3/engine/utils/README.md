@@ -4,7 +4,8 @@
 La directory contiene gli strumenti trasversali che supportano le pipeline FAIR-III.
 Gli obiettivi principali sono:
 
-- fornire utilità di logging condivise e verbose per tutta la piattaforma;
+- fornire utilità di logging condivise e verbose per tutta la piattaforma tramite
+  il modulo `fair3.engine.logging`;
 - gestire input/output di configurazioni, artefatti e checksum in modo riproducibile;
 - mantenere generatori casuali deterministici e proiezioni matematiche sicure.
 
@@ -13,11 +14,9 @@ funzione, come lo fa e perché è utile nel flusso complessivo.
 
 ### Moduli principali
 
-- **`log`** – crea logger a rotazione pronti per audit con messaggi verbosi e
-  opzionali handler da console. I commenti spiegano come prevenire duplicazioni
-  e perché le rotazioni garantiscono log compatti.
-- **`logging`** – espone shortcut per log di streaming condivisi e fixture di
-  test; è accompagnato da docstring che motivano ciascun parametro ambientale.
+- **`logging`** – (spostato in `fair3.engine.logging`) fornisce logger strutturati
+  con mirroring JSON, progress bar e helper per metriche; le docstring spiegano
+  le variabili d'ambiente supportate e come ri-configurare i loggers dal CLI.
 - **`io`** – gestisce cartelle di artefatti, serializzazioni YAML/JSON
   deterministiche e checksum; ogni funzione documenta il comportamento sui
   corner case (percorso inesistente, file corrotti, ecc.).
@@ -37,13 +36,14 @@ quantitative logic while guaranteeing reproducibility and auditability demanded 
 
 ### Public API
 
-#### Logging (`fair3.engine.utils.log`)
-- `setup_logger(name, level="INFO", log_dir=None, max_bytes=1_048_576, backup_count=5, console=False)`
-- `get_logger(name)`
-- `default_log_dir()`
+#### Logging (`fair3.engine.logging`)
+- `setup_logger(name, json_format=False, level=None)`
+- `record_metrics(metric_name, value, tags=None)`
+- `configure_cli_logging(json_logs, level=None)`
 
-All log files rotate automatically under `artifacts/audit/`. Use `console=True` for verbose CLI
-runs and `level="DEBUG"` when invoking `--trace` flags.
+Structured logs live in `artifacts/audit/fair3.log` when `json_format=True` or
+`FAIR_JSON_LOGS=1`. Console output always follows `[LEVEL] module: message`. Metrics are appended
+to `artifacts/audit/metrics.jsonl` for downstream observability.
 
 #### Randomness (`fair3.engine.utils.rand`)
 - `load_seeds(seed_path="audit/seeds.yml")`
@@ -76,10 +76,11 @@ Projects symmetric matrici sul cono PSD usando la procedura di Higham (2002) con
 ## Examples
 
 ```python
-from fair3.engine.utils import generator_from_seed, project_to_psd, setup_logger, artifact_path
+from fair3.engine.logging import setup_logger
+from fair3.engine.utils import generator_from_seed, project_to_psd, artifact_path
 
 rng = generator_from_seed(stream="factors")
-logger = setup_logger("fair3.factors", level="DEBUG", console=True)
+logger = setup_logger("fair3.factors", json_format=True)
 outfile = artifact_path("factors", "loadings.parquet")
 logger.info("Saving factors to %s", outfile)
 psd_cov = project_to_psd(covariance_matrix)
@@ -95,6 +96,7 @@ psd_cov = project_to_psd(covariance_matrix)
 
 ## Tracing and Debug Flags
 
-The CLI will pass `--trace` to trigger `setup_logger(..., level="DEBUG", console=True)`. For
-module-level debugging, request stream-specific RNGs (`generator_from_seed(stream="module"))`
-and include the stream name in audit metadata.
+The CLI exposes `--json-logs/--no-json-logs` to toggle the JSON audit mirror and honours
+`FAIR_LOG_LEVEL=DEBUG` for verbose diagnostics. For module-level debugging, request
+stream-specific RNGs (`generator_from_seed(stream="module"))` and include the stream name in
+audit metadata.

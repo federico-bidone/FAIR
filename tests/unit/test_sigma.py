@@ -10,6 +10,8 @@ from fair3.engine.estimates import (
     ledoit_wolf,
     max_corr_drift,
     median_of_covariances,
+    sigma_consensus_psd,
+    sigma_spd_median,
 )
 
 
@@ -54,6 +56,47 @@ def test_median_of_covariances_returns_psd(sample_returns: pd.DataFrame) -> None
     cov = median_of_covariances(covs)
     eigs = np.linalg.eigvalsh(cov)
     assert eigs.min() >= -1e-10
+
+
+def test_sigma_consensus_psd_preserves_labels(sample_returns: pd.DataFrame) -> None:
+    columns = sample_returns.columns
+    cov_lw = ledoit_wolf(sample_returns.iloc[:80])
+    cov_fs = factor_shrink(sample_returns.iloc[20:])
+    frames = [
+        pd.DataFrame(cov_lw, index=columns, columns=columns),
+        pd.DataFrame(cov_fs, index=columns, columns=columns),
+    ]
+    consensus = sigma_consensus_psd(frames)
+    assert list(consensus.index) == list(columns)
+    assert list(consensus.columns) == list(columns)
+    eigs = np.linalg.eigvalsh(consensus.to_numpy())
+    assert eigs.min() >= -1e-10
+
+
+def test_sigma_spd_median_fallback_to_consensus(sample_returns: pd.DataFrame) -> None:
+    columns = sample_returns.columns
+    cov_lw = ledoit_wolf(sample_returns.iloc[:80])
+    cov_fs = factor_shrink(sample_returns.iloc[20:])
+    frames = [
+        pd.DataFrame(cov_lw, index=columns, columns=columns),
+        pd.DataFrame(cov_fs, index=columns, columns=columns),
+    ]
+    fallback = sigma_consensus_psd(frames)
+    result = sigma_spd_median(frames, max_iter=0, tol=1e-8)
+    assert np.allclose(result.to_numpy(), fallback.to_numpy())
+
+
+def test_sigma_spd_median_positive_definite(sample_returns: pd.DataFrame) -> None:
+    columns = sample_returns.columns
+    cov_lw = ledoit_wolf(sample_returns.iloc[:80])
+    cov_fs = factor_shrink(sample_returns.iloc[20:])
+    frames = [
+        pd.DataFrame(cov_lw, index=columns, columns=columns),
+        pd.DataFrame(cov_fs, index=columns, columns=columns),
+    ]
+    spd = sigma_spd_median(frames, max_iter=50, tol=1e-6)
+    eigs = np.linalg.eigvalsh(spd.to_numpy())
+    assert eigs.min() >= -1e-8
 
 
 def test_ewma_regime_convex_combination(sample_returns: pd.DataFrame) -> None:

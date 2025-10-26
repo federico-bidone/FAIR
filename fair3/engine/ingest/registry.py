@@ -11,9 +11,10 @@ from typing import Any
 
 import pandas as pd
 import requests
+from tqdm.auto import tqdm
 
+from fair3.engine.logging import setup_logger
 from fair3.engine.utils.io import ensure_dir
-from fair3.engine.utils.log import get_logger
 
 __all__ = [
     "IngestArtifact",
@@ -58,7 +59,7 @@ class BaseCSVFetcher:
         if not self.LICENSE:
             raise ValueError("LICENSE must be defined on subclasses")
         self.raw_root = Path(raw_root) if raw_root is not None else Path("data") / "raw"
-        self.logger = logger or get_logger(f"fair3.ingest.{self.SOURCE}")
+        self.logger = logger or setup_logger(f"fair3.ingest.{self.SOURCE}")
         self.session = session
 
     # --- public API -----------------------------------------------------
@@ -68,9 +69,24 @@ class BaseCSVFetcher:
         symbols: Iterable[str] | None = None,
         start: date | datetime | None = None,
         as_of: datetime | None = None,
+        progress: bool = False,
         session: requests.Session | None = None,
     ) -> IngestArtifact:
-        """Scarica i simboli richiesti restituendo dati normalizzati e log auditabili."""
+        """Scarica i simboli richiesti restituendo dati normalizzati e log auditabili.
+
+        Args:
+            symbols: Lista opzionale di simboli specifici per la sorgente.
+            start: Data/ora minima da cui mantenere le osservazioni.
+            as_of: Timestamp di riferimento per nominare gli artefatti.
+            progress: Se ``True`` mostra una barra `tqdm` per le richieste.
+            session: Sessione HTTP riutilizzabile; creata internamente se assente.
+
+        Returns:
+            Artefatto con DataFrame normalizzato e metadati di audit.
+
+        Raises:
+            ValueError: Se non viene fornito alcun simbolo da scaricare.
+        """
         if symbols is None:
             symbol_list = list(self.DEFAULT_SYMBOLS)
         else:
@@ -85,7 +101,13 @@ class BaseCSVFetcher:
 
         # Per ogni simbolo ripetiamo download → parsing → filtro → log, mantenendo
         # un tracking puntuale dei metadati da restituire alla fine.
-        for symbol in symbol_list:
+        iterator = tqdm(
+            symbol_list,
+            disable=not progress,
+            desc=f"ingest:{self.SOURCE}",
+            unit="symbol",
+        )
+        for symbol in iterator:
             url = self.build_url(symbol, start_ts)
             payload = self._download(url, session=session)
             frame = self.parse(payload, symbol)
@@ -234,7 +256,20 @@ def run_ingest(
     start: date | datetime | None = None,
     raw_root: Path | str | None = None,
     as_of: datetime | None = None,
+    progress: bool = False,
 ) -> IngestArtifact:
-    """Convenienza per eseguire l'ingest end-to-end senza toccare le classi."""
+    """Convenienza per eseguire l'ingest end-to-end senza toccare le classi.
+
+    Args:
+        source: Chiave della sorgente registrata (es. ``ecb``).
+        symbols: Simboli opzionali da scaricare in override al default.
+        start: Data minima per filtrare le osservazioni.
+        raw_root: Cartella di destinazione per i CSV raw.
+        as_of: Timestamp usato per etichettare gli artefatti.
+        progress: Abilita la barra `tqdm` sui simboli scaricati.
+
+    Returns:
+        Artefatto risultante dallo scarico normalizzato.
+    """
     fetcher = create_fetcher(source, raw_root=raw_root)
-    return fetcher.fetch(symbols=symbols, start=start, as_of=as_of)
+    return fetcher.fetch(symbols=symbols, start=start, as_of=as_of, progress=progress)

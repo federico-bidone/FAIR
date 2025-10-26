@@ -4,14 +4,15 @@ build-backend = "hatchling.build"
 
 [project]
 name = "fair3"
-version = "0.1.0"
+version = "0.2.0"
 description = "FAIR-III Portfolio Engine (minimal, local, Windows-friendly)"
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "Apache-2.0"}
 dependencies = [
   "numpy", "pandas", "pyarrow", "scipy", "cvxpy", "scikit-learn",
-  "pyyaml", "requests", "matplotlib"
+  "pyyaml", "requests", "matplotlib", "pydantic>=2.5", "tqdm", "hmmlearn",
+  "reportlab>=4.1"
 ]
 
 [project.optional-dependencies]
@@ -22,3 +23,33 @@ fair3 = "fair3.cli.main:main"
 
 [tool.black]
 line-length = 100
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "ANN", "D"]
+ignore = [
+  "D100",
+  "D101",
+  "D102",
+  "D103",
+  "D104",
+  "D105",
+  "D106",
+  "D107",
+  "D202",
+  "D203",
+  "D205",
+  "D213",
+  "D401",
+  "D405",
+  "D411",
+  "D412",
+  "D416",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"

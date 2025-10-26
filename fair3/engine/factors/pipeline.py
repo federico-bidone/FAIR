@@ -9,16 +9,16 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from fair3.engine.logging import setup_logger
 from fair3.engine.reporting.audit import run_audit_snapshot
 from fair3.engine.utils.io import artifact_path, ensure_dir, write_json
-from fair3.engine.utils.logging import get_stream_logger
 from fair3.engine.utils.rand import DEFAULT_SEED_PATH
 
 from .core import FactorLibrary
 from .orthogonality import enforce_orthogonality
 from .validation import validate_factor_set
 
-LOG = get_stream_logger(__name__)
+LOG = setup_logger(__name__)
 
 
 @dataclass(slots=True)

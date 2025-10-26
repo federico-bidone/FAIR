@@ -9,7 +9,7 @@ Il sottosistema di ingest raccoglie dati grezzi da fonti pubbliche (ECB, FRED, B
 - `create_fetcher(source, **kwargs)` restituisce l'istanza di fetcher pronta all'uso.
 - `run_ingest(source, symbols=None, start=None, raw_root=None, as_of=None)` è l'entry point usato dal CLI.
 
-Tutti i fetcher accettano `raw_root` opzionale per redirigere l'output (utile nei test) e loggano automaticamente licenza e URL tramite `fair3.engine.utils.log`.
+Tutti i fetcher accettano `raw_root` opzionale per redirigere l'output (utile nei test) e loggano automaticamente licenza e URL tramite `fair3.engine.logging.setup_logger`.
 
 ## Utilizzo CLI
 ```bash

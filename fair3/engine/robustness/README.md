@@ -71,5 +71,5 @@ print("Gates superati:", gates.passes())
 
 Impostando `seed` o affidandosi a `audit/seeds.yml` si ottengono risultati
 riproducibili per bootstrap e scenari. Le pipeline dovrebbero loggare i path
-prodotti tramite `fair3.engine.utils.logging.get_logger` quando è attiva la
-modalità `--trace`.
+prodotti tramite `fair3.engine.logging.setup_logger` (con `--json-logs` quando
+serve l'audit trail completo) anche in modalità `--trace`.
