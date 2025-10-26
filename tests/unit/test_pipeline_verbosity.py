@@ -2,38 +2,31 @@
 
 from __future__ import annotations
 
-import logging
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import pytest
 
-import fair3.engine.utils.logging as logging_utils
+from fair3.engine import logging as runtime_logging
 from fair3.engine.allocators import pipeline as alloc_pipeline
 from fair3.engine.estimates import pipeline as est_pipeline
-from fair3.engine.utils.logging import get_stream_logger
+from fair3.engine.logging import setup_logger
 
 
-def test_get_stream_logger_respects_environment(
-    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+def test_setup_logger_respects_environment(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """Il logger deve rispettare livello e formato configurati."""
 
-    monkeypatch.setenv("FAIR_LOG_LEVEL", "DEBUG")
-    monkeypatch.setenv("FAIR_LOG_FORMAT", "%(levelname)s:%(name)s:%(message)s")
-    logging_utils._determine_level.cache_clear()
-    logging_utils._determine_format.cache_clear()
-    logger = get_stream_logger("fair3.tests.logging")
+    monkeypatch.setenv(runtime_logging.LEVEL_ENV_FLAG, "DEBUG")
+    logger = setup_logger("fair3.tests.logging")
 
-    root = logging.getLogger()
-    assert root.level == logging.DEBUG
-    assert logging_utils._determine_level() == logging.DEBUG
-    assert logging_utils._determine_format() == "%(levelname)s:%(name)s:%(message)s"
-
-    with caplog.at_level("DEBUG", logger=logger.name):
-        logger.debug("hello world")
-    assert "hello world" in caplog.text
+    logger.debug("hello world")
+    for handler in logger.handlers:
+        handler.flush()
+    err_output = capsys.readouterr().err
+    assert "hello world" in err_output
 
 
 def _patch_optimisation_inputs(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -78,7 +71,7 @@ def test_run_optimization_pipeline_emits_verbose_logs(
     """La pipeline di ottimizzazione deve loggare i passaggi chiave."""
 
     _patch_optimisation_inputs(monkeypatch)
-    caplog.set_level("INFO")
+    caplog.set_level("INFO", logger="fair3.engine.allocators.pipeline")
     result = alloc_pipeline.run_optimization_pipeline(
         artifacts_root=tmp_path,
         params_path=tmp_path / "params.yml",
@@ -118,7 +111,7 @@ def test_run_estimate_pipeline_creates_expected_artifacts(
     """La pipeline di stima salva gli artefatti e spiega il blending."""
 
     _patch_estimate_inputs(monkeypatch)
-    caplog.set_level("INFO")
+    caplog.set_level("INFO", logger="fair3.engine.estimates.pipeline")
     result = est_pipeline.run_estimate_pipeline(
         artifacts_root=tmp_path,
         thresholds_path=tmp_path / "thresholds.yml",

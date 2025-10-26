@@ -15,6 +15,23 @@ regime:
   off: 0.45
   dwell_days: 20
   cooldown_days: 10
+  activate_streak: 3
+  deactivate_streak: 3
+  weights:
+    hmm: 0.5
+    volatility: 0.3
+    macro: 0.2
+  volatility:
+    window: 63
+    min_duration: 5
+    smoothing: 5
+  macro:
+    inflation_weight: 0.4
+    pmi_weight: 0.35
+    real_rate_weight: 0.25
+    pmi_threshold: 50.0
+    real_rate_threshold: 0.0
+    smoothing: 3
 drift:
   weight_tol: 0.02
   rc_tol: 0.02

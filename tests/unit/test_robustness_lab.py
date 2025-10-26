@@ -33,6 +33,7 @@ def test_block_bootstrap_metrics_deterministico() -> None:
     )
     assert len(metrics) == 32
     assert np.isclose(metrics["max_drawdown"].std(ddof=0), 0.0)
+    assert {"sharpe", "cvar", "edar"}.issubset(metrics.columns)
     assert gates.exceedance_probability == 0.0
     assert gates.passes()
 

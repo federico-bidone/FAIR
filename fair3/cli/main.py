@@ -1,11 +1,15 @@
+"""Command-line interface orchestrating the FAIR-III pipelines."""
+
 from __future__ import annotations
 
 import argparse
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
+from dataclasses import replace
 from datetime import date, datetime
 from pathlib import Path
 
 import pandas as pd
+import yaml
 
 from fair3.engine.allocators import run_optimization_pipeline
 from fair3.engine.estimates import run_estimate_pipeline
@@ -17,10 +21,14 @@ from fair3.engine.goals import (
     load_goal_parameters,
     run_goal_monte_carlo,
 )
+from fair3.engine.gui import launch_gui
 from fair3.engine.ingest import available_sources, run_ingest
+from fair3.engine.logging import configure_cli_logging, record_metrics
 from fair3.engine.mapping import run_mapping_pipeline
+from fair3.engine.regime import run_regime_pipeline
 from fair3.engine.reporting import MonthlyReportInputs, generate_monthly_report
 from fair3.engine.utils.rand import generator_from_seed
+from fair3.engine.validate import validate_configs
 
 DESCRIPTION = "FAIR-III Portfolio Engine"
 
@@ -110,6 +118,12 @@ def _add_estimate_subparser(
         help="Cross-validation splits for ensemble",
     )
     estimate.add_argument("--seed", type=int, default=0, help="Random seed for ensemble")
+    estimate.add_argument(
+        "--sigma-engine",
+        choices=("median_psd", "spd_median"),
+        default="median_psd",
+        help="Covariance consensus engine to employ",
+    )
 
 
 def _add_optimize_subparser(
@@ -171,6 +185,50 @@ def _add_map_subparser(
     )
     mapping.add_argument("--hrp-intra", action="store_true", help="Apply intra-factor HRP baseline")
     mapping.add_argument("--adv-cap", type=float, help="ADV cap ratio for trade clipping")
+    mapping.add_argument(
+        "--te-factor-max",
+        type=float,
+        help="Maximum absolute deviation per factor exposure",
+    )
+    mapping.add_argument(
+        "--tau-beta",
+        type=float,
+        help="Maximum CI80 width before shrinking instrument weights",
+    )
+
+
+def _add_regime_subparser(
+    subparsers: argparse._SubParsersAction[argparse.ArgumentParser],
+) -> None:
+    regime = subparsers.add_parser("regime", help="Estimate regime probabilities and hysteresis")
+    regime.add_argument(
+        "--clean-root",
+        type=Path,
+        default=Path("data") / "clean",
+        help="Directory containing the clean PIT panel",
+    )
+    regime.add_argument(
+        "--thresholds",
+        type=Path,
+        default=Path("configs") / "thresholds.yml",
+        help="Path to thresholds configuration YAML",
+    )
+    regime.add_argument("--seed", type=int, default=0, help="Seed for deterministic regime engine")
+    regime.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Run analytics without triggering downstream execution",
+    )
+    regime.add_argument(
+        "--output-dir",
+        type=Path,
+        help="Optional directory for regime artefacts",
+    )
+    regime.add_argument(
+        "--trace",
+        action="store_true",
+        help="Print the tail of the regime probabilities for inspection",
+    )
 
 
 def _add_report_subparser(
@@ -238,6 +296,11 @@ def _add_goals_subparser(
         type=Path,
         help="Optional directory for goal artefacts",
     )
+    goals.add_argument(
+        "--simulate",
+        action="store_true",
+        help="Run the Monte Carlo simulation and generate artefacts",
+    )
 
 
 def _add_execute_subparser(
@@ -256,11 +319,124 @@ def _add_execute_subparser(
         action="store_true",
         help="Print decision breakdown without submitting orders",
     )
+    execute.add_argument(
+        "--tax-method",
+        choices=["fifo", "lifo", "min_tax"],
+        default="fifo",
+        help="Select the tax lot matching method (default: fifo)",
+    )
+
+
+def _add_validate_subparser(
+    subparsers: argparse._SubParsersAction[argparse.ArgumentParser],
+) -> None:
+    """Attach the validate command used for configuration schema checks."""
+
+    validate = subparsers.add_parser("validate", help="Validate YAML configuration files")
+    validate.add_argument(
+        "--params",
+        type=Path,
+        default=Path("configs") / "params.yml",
+        help="Path to params.yml configuration",
+    )
+    validate.add_argument(
+        "--thresholds",
+        type=Path,
+        default=Path("configs") / "thresholds.yml",
+        help="Path to thresholds.yml configuration",
+    )
+    validate.add_argument(
+        "--goals",
+        type=Path,
+        default=Path("configs") / "goals.yml",
+        help="Path to goals.yml configuration",
+    )
+    validate.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Print the parsed configuration payloads on success",
+    )
+
+
+def _add_gui_subparser(
+    subparsers: argparse._SubParsersAction[argparse.ArgumentParser],
+) -> None:
+    """Attach the gui command that launches the optional PySide6 interface.
+
+    Args:
+        subparsers: Collection of subparsers that will receive the GUI command.
+
+    Returns:
+        None.
+    """
+
+    gui = subparsers.add_parser("gui", help="Launch the optional PySide6 orchestration GUI")
+    gui.add_argument("--dry-run", action="store_true", help="Print configuration without launching")
+    gui.add_argument(
+        "--raw-root",
+        type=Path,
+        default=Path("data/raw"),
+        help="Directory containing raw CSV downloads",
+    )
+    gui.add_argument(
+        "--clean-root",
+        type=Path,
+        default=Path("data/clean"),
+        help="Directory containing the clean PIT panel",
+    )
+    gui.add_argument(
+        "--artifacts-root",
+        type=Path,
+        default=Path("artifacts"),
+        help="Directory for pipeline artefacts",
+    )
+    gui.add_argument(
+        "--audit-root",
+        type=Path,
+        default=Path("audit"),
+        help="Directory for audit trail outputs",
+    )
+    gui.add_argument(
+        "--thresholds",
+        type=Path,
+        default=Path("configs") / "thresholds.yml",
+        help="Threshold configuration used by estimate and regime steps",
+    )
+    gui.add_argument(
+        "--params",
+        type=Path,
+        default=Path("configs") / "params.yml",
+        help="Household parameters used by the goal engine",
+    )
+    gui.add_argument(
+        "--goals",
+        type=Path,
+        default=Path("configs") / "goals.yml",
+        help="Goal configuration used by the Monte Carlo simulation",
+    )
+    gui.add_argument(
+        "--report",
+        type=Path,
+        help="Optional report path pre-filled in the GUI",
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="fair3", description=DESCRIPTION)
+    parser.add_argument(
+        "--progress",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Display tqdm progress bars for long-running steps",
+    )
+    parser.add_argument(
+        "--json-logs",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Mirror logs to artifacts/audit/fair3.log in JSON format",
+    )
     sub = parser.add_subparsers(dest="cmd", required=True)
+    _add_validate_subparser(sub)
     _add_ingest_subparser(sub)
     _add_etl_subparser(sub)
     _add_report_subparser(sub)
@@ -270,17 +446,29 @@ def build_parser() -> argparse.ArgumentParser:
     _add_estimate_subparser(sub)
     _add_optimize_subparser(sub)
     _add_map_subparser(sub)
+    _add_regime_subparser(sub)
+    _add_gui_subparser(sub)
     return parser
 
 
 def _handle_ingest(args: argparse.Namespace) -> None:
-    result = run_ingest(args.source, symbols=args.symbols, start=args.start_date)
+    result = run_ingest(
+        args.source,
+        symbols=args.symbols,
+        start=args.start_date,
+        progress=args.progress,
+    )
     symbols: Iterable[str] = args.symbols if args.symbols is not None else ()
     symbol_list = list(symbols)
     symbol_str = ",".join(symbol_list) if symbol_list else "default"
     print(
         f"[fair3] ingest source={result.source} symbols={symbol_str} "
         f"rows={len(result.data)} path={result.path}"
+    )
+    record_metrics(
+        "ingest_rows",
+        float(len(result.data)),
+        {"source": result.source, "symbols": symbol_str or "default"},
     )
 
 
@@ -308,9 +496,9 @@ def _parse_period(value: str) -> tuple[pd.Timestamp, pd.Timestamp]:
     except ValueError as exc:  # pragma: no cover - argparse validation
         raise argparse.ArgumentTypeError("Expected period format YYYY-MM:YYYY-MM") from exc
     try:
-        start = pd.Period(start_str, freq="M").to_timestamp("M")
-        end = pd.Period(end_str, freq="M").to_timestamp("M")
-    except ValueError as exc:  # pragma: no cover - pandas parsing
+        start = pd.Timestamp(start_str) + pd.offsets.MonthEnd(0)
+        end = pd.Timestamp(end_str) + pd.offsets.MonthEnd(0)
+    except (TypeError, ValueError) as exc:  # pragma: no cover - pandas parsing
         raise argparse.ArgumentTypeError("Invalid YYYY-MM period specification") from exc
     if start > end:
         raise argparse.ArgumentTypeError("Period start must be before end")
@@ -320,7 +508,7 @@ def _parse_period(value: str) -> tuple[pd.Timestamp, pd.Timestamp]:
 def _synthetic_monthly_inputs(
     start: pd.Timestamp, end: pd.Timestamp, seed: int
 ) -> MonthlyReportInputs:
-    months = pd.period_range(start=start, end=end, freq="M").to_timestamp("M")
+    months = pd.date_range(start=start, end=end, freq=pd.offsets.MonthEnd())
     rng = generator_from_seed(seed)
     returns = pd.Series(rng.normal(0.005, 0.02, len(months)), index=months)
     instruments = ["EQT_ETF", "BND_ETF", "ALT_ETF", "CASH"]
@@ -339,6 +527,28 @@ def _synthetic_monthly_inputs(
         index=months,
         columns=instruments,
     )
+    instrument_returns = pd.DataFrame(
+        rng.normal(0.004, 0.015, size=(len(months), len(instruments))),
+        index=months,
+        columns=instruments,
+    )
+    factor_returns = pd.DataFrame(
+        rng.normal(0.002, 0.01, size=(len(months), len(factor_cols))),
+        index=months,
+        columns=factor_cols,
+    )
+    bootstrap_metrics = pd.DataFrame(
+        {
+            "max_drawdown": rng.uniform(-0.35, -0.1, size=256),
+            "cagr": rng.normal(0.05, 0.01, size=256),
+        }
+    )
+    thresholds = {
+        "max_drawdown_threshold": -0.25,
+        "cagr_target": 0.03,
+        "max_drawdown_exceedance": 0.05,
+        "cagr_alpha": 0.05,
+    }
     turnover = pd.Series(rng.uniform(0.0, 0.15, len(months)), index=months)
     costs = pd.Series(rng.uniform(0.0, 0.001, len(months)), index=months)
     taxes = pd.Series(rng.uniform(0.0, 0.0005, len(months)), index=months)
@@ -363,6 +573,10 @@ def _synthetic_monthly_inputs(
         taxes=taxes,
         compliance_flags=compliance,
         cluster_map=cluster_map,
+        instrument_returns=instrument_returns,
+        factor_returns=factor_returns,
+        bootstrap_metrics=bootstrap_metrics,
+        thresholds=thresholds,
     )
 
 
@@ -389,6 +603,7 @@ def _handle_estimate(args: argparse.Namespace) -> None:
         audit_dir=args.audit_dir,
         cv_splits=args.cv_splits,
         seed=args.seed,
+        sigma_engine=args.sigma_engine,
     )
     print(
         f"[fair3] estimate mu_post={result.mu_post_path} "
@@ -424,10 +639,37 @@ def _handle_map(args: argparse.Namespace) -> None:
         bootstrap_samples=args.bootstrap,
         use_hrp_intra=args.hrp_intra,
         adv_cap_ratio=args.adv_cap,
+        te_factor_max=args.te_factor_max,
+        tau_beta=args.tau_beta,
     )
     print(
         f"[fair3] map instruments={result.instrument_weights_path} "
         f"betas={result.beta_path} summary={result.summary_path}"
+    )
+
+
+def _handle_regime(args: argparse.Namespace) -> None:
+    result = run_regime_pipeline(
+        clean_root=args.clean_root,
+        thresholds_path=args.thresholds,
+        output_dir=args.output_dir,
+        seed=args.seed,
+        dry_run=args.dry_run,
+        trace=args.trace,
+    )
+    latest = result.scores.iloc[-1]
+    regime_cfg = result.thresholds if isinstance(result.thresholds, Mapping) else {}
+    on = float(regime_cfg.get("on", 0.65))
+    off = float(regime_cfg.get("off", 0.45))
+    mode = "dry-run" if args.dry_run else "live"
+    print(
+        f"[fair3] regime mode={mode} p_crisis={latest['p_crisis']:.3f} "
+        f"on={on:.2f} off={off:.2f} path={result.probabilities_path}"
+    )
+    record_metrics(
+        "regime_p_crisis",
+        float(latest["p_crisis"]),
+        {"mode": mode, "path": str(result.probabilities_path)},
     )
 
 
@@ -446,7 +688,8 @@ def _handle_report(args: argparse.Namespace) -> None:
     )
     print(
         f"[fair3] report monthly period={label} metrics={artifacts.metrics_csv} "
-        f"fan_chart={artifacts.fan_chart}"
+        f"fan_chart={artifacts.fan_chart} acceptance={artifacts.acceptance_json} "
+        f"pdf={artifacts.report_pdf}"
     )
 
 
@@ -460,61 +703,110 @@ def _handle_execute(args: argparse.Namespace) -> None:
     )
     status = "rebalance" if breakdown.execute else "hold"
     prefix = "[fair3] execute"
+    tax_method = args.tax_method
     if args.dry_run:
         print(
             f"{prefix} dry-run date={args.rebalance_date.isoformat()} "
-            f"decision={status} net={breakdown.net_benefit:.4f}"
+            f"decision={status} tax_method={tax_method} net={breakdown.net_benefit:.4f}"
         )
     else:
         print(
             f"{prefix} date={args.rebalance_date.isoformat()} decision={status} "
-            "controller=placeholder"
+            f"tax_method={tax_method} controller=placeholder"
         )
+
+
+def _handle_validate(args: argparse.Namespace) -> None:
+    """Validate configuration files and report diagnostics to stdout."""
+
+    summary = validate_configs(
+        params_path=args.params,
+        thresholds_path=args.thresholds,
+        goals_path=args.goals,
+    )
+    if args.verbose and summary.configs:
+        for label, payload in summary.configs.items():
+            rendered = yaml.safe_dump(payload, sort_keys=True)
+            print(f"[fair3] validate {label}\n{rendered}", end="")
+    for warning in summary.warnings:
+        print(f"[fair3] validate warning: {warning}")
+    if summary.errors:
+        for error in summary.errors:
+            print(f"[fair3] validate error: {error}")
+        raise SystemExit(1)
+    print("[fair3] validate status=ok")
+
+
+def _handle_gui(args: argparse.Namespace) -> None:
+    """Launch the optional PySide6 GUI if available.
+
+    Args:
+        args: Parsed CLI arguments for the gui command.
+
+    Returns:
+        None.
+    """
+
+    config = {
+        "raw_root": args.raw_root,
+        "clean_root": args.clean_root,
+        "artifacts_root": args.artifacts_root,
+        "audit_root": args.audit_root,
+        "thresholds": args.thresholds,
+        "params": args.params,
+        "goals": args.goals,
+    }
+    if args.report is not None:
+        config["report_path"] = args.report
+    if args.dry_run:
+        print(
+            "[fair3] gui dry-run "
+            f"raw_root={args.raw_root} clean_root={args.clean_root} "
+            f"artifacts_root={args.artifacts_root}"
+        )
+        return
+    launch_gui(config)
 
 
 def _handle_goals(args: argparse.Namespace) -> None:
     goals = load_goal_configs_from_yaml(args.goals_config)
     if not goals:
         raise SystemExit("No goals configured")
-    params = load_goal_parameters(args.params)
-    monthly_contribution = (
-        float(args.monthly_contribution)
-        if args.monthly_contribution is not None
-        else params.get("monthly_contribution", 0.0)
-    )
-    initial_wealth = (
-        float(args.initial_wealth)
-        if args.initial_wealth is not None
-        else params.get("initial_wealth", 0.0)
-    )
-    contribution_growth = (
-        float(args.contribution_growth)
-        if args.contribution_growth is not None
-        else params.get("contribution_growth", 0.02)
-    )
+    parameters = load_goal_parameters(args.params)
+    if args.monthly_contribution is not None:
+        parameters = replace(parameters, monthly_contribution=float(args.monthly_contribution))
+    if args.initial_wealth is not None:
+        parameters = replace(parameters, initial_wealth=float(args.initial_wealth))
+    if args.contribution_growth is not None:
+        parameters = replace(parameters, contribution_growth=float(args.contribution_growth))
     draws = max(1, int(args.draws))
     summary, artifacts = run_goal_monte_carlo(
         goals,
         draws=draws,
         seed=int(args.seed),
-        monthly_contribution=monthly_contribution,
-        initial_wealth=initial_wealth,
-        contribution_growth=contribution_growth,
+        parameters=parameters,
         output_dir=args.output_dir,
     )
+    if not args.simulate:
+        print(
+            f"[fair3] goals simulate flag not provided; configured_goals={len(goals)} "
+            f"investor={parameters.investor}"
+        )
     fragments = [
         f"{row.goal}={row.probability:.3f}" for row in summary.results.itertuples(index=False)
     ]
     result_str = ",".join(fragments) if fragments else "none"
     print(
-        f"[fair3] goals draws={summary.draws} weighted={summary.weighted_probability:.3f} "
-        f"results={result_str} pdf={artifacts.report_pdf}"
+        f"[fair3] goals draws={summary.draws} investor={parameters.investor} "
+        f"weighted={summary.weighted_probability:.3f} results={result_str} "
+        f"pdf={artifacts.report_pdf} fan={artifacts.fan_chart_csv}"
     )
 
 
 def main(argv: list[str] | None = None) -> None:
     parser = build_parser()
     args = parser.parse_args(argv)
+    configure_cli_logging(json_logs=bool(args.json_logs))
     if args.cmd == "ingest":
         _handle_ingest(args)
     elif args.cmd == "etl":
@@ -533,6 +825,12 @@ def main(argv: list[str] | None = None) -> None:
         _handle_optimize(args)
     elif args.cmd == "map":
         _handle_map(args)
+    elif args.cmd == "regime":
+        _handle_regime(args)
+    elif args.cmd == "gui":
+        _handle_gui(args)
+    elif args.cmd == "validate":
+        _handle_validate(args)
     else:
         print(f"[fair3] command = {args.cmd}")
 

@@ -7,10 +7,14 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from fair3.engine.mapping import beta_ci_bootstrap, rolling_beta_ridge
+from fair3.engine.mapping import beta_ci_bootstrap, cap_weights_by_beta_ci, rolling_beta_ridge
 from fair3.engine.mapping.hrp_intra import hrp_weights
 from fair3.engine.mapping.liquidity import clip_trades_to_adv
-from fair3.engine.mapping.te_budget import enforce_te_budget, tracking_error
+from fair3.engine.mapping.te_budget import (
+    enforce_portfolio_te_budget,
+    enforce_te_budget,
+    tracking_error,
+)
 from fair3.engine.reporting.audit import run_audit_snapshot
 from fair3.engine.utils import project_to_psd
 from fair3.engine.utils.io import artifact_path, read_yaml, write_json
@@ -99,8 +103,37 @@ def run_mapping_pipeline(
     bootstrap_samples: int = 200,
     use_hrp_intra: bool = False,
     adv_cap_ratio: float | None = None,
+    te_factor_max: float | None = None,
+    tau_beta: float | None = None,
 ) -> MappingPipelineResult:
-    """Map factor allocations to instrument weights with TE/ADV governance."""
+    """Map factor allocations to instrument weights with governance layers.
+
+    Args:
+      artifacts_root: Optional custom artifacts root for inputs/outputs.
+      clean_root: Directory containing the clean PIT return panels.
+      thresholds_path: Path to the thresholds configuration YAML file.
+      config_paths: Additional configuration paths for audit snapshots.
+      audit_dir: Directory where the audit snapshot will be persisted.
+      seed_path: Path to the deterministic seed manifest.
+      window: Rolling window length for beta estimation. Defaults to an adaptive
+        range between 12 and 60 observations.
+      lambda_beta: Ridge penalty for the beta regression.
+      bootstrap_samples: Number of bootstrap samples for beta confidence
+        intervals.
+      use_hrp_intra: Whether to apply intra-factor HRP as the baseline
+        distribution.
+      adv_cap_ratio: Optional ADV cap ratio override for trade clipping.
+      te_factor_max: Maximum deviation allowed between realised and target factor
+        exposures.
+      tau_beta: Maximum acceptable beta CI width before applying weight caps.
+
+    Returns:
+      MappingPipelineResult containing artifact paths for betas, confidence
+      intervals, instrument allocations, and the summary report.
+
+    Raises:
+      ValueError: If inputs are missing or insufficient to run the pipeline.
+    """
 
     artifacts_root = Path(artifacts_root) if artifacts_root is not None else None
     clean_root = Path(clean_root)
@@ -120,7 +153,8 @@ def run_mapping_pipeline(
         aligned_factors,
         window=window,
         lambda_beta=lambda_beta,
-        sign=sign_map,
+        sign_prior=sign_map,
+        enforce_sign=True,
     )
     beta_path = artifact_path("mapping", "rolling_betas.parquet", root=artifacts_root)
     betas.to_parquet(beta_path)
@@ -132,6 +166,7 @@ def run_mapping_pipeline(
         B=bootstrap_samples,
         alpha=0.2,
     )
+    beta_ci_valid = beta_ci.dropna(how="all")
     beta_ci_path = artifact_path("mapping", "beta_ci.parquet", root=artifacts_root)
     beta_ci.to_parquet(beta_ci_path)
 
@@ -143,8 +178,37 @@ def run_mapping_pipeline(
     beta_matrix = beta_df.to_numpy().T
     instr_names = beta_df.columns.tolist()
 
-    factor_vector = factor_weights.reindex(beta_df.index).fillna(0.0).to_numpy(dtype=float)
+    factor_target = factor_weights.reindex(beta_df.index).fillna(0.0)
+    factor_vector = factor_target.to_numpy(dtype=float)
     instr_weights = _solve_instrument_weights(beta_matrix, factor_vector)
+
+    thresholds = read_yaml(Path(thresholds_path))
+    tau_section = thresholds.get("tau", {}) if isinstance(thresholds, dict) else {}
+    execution = thresholds.get("execution", {}) if isinstance(thresholds, dict) else {}
+    tau_beta_default = tau_section.get("beta_CI_width", 0.25)
+    tau_beta_value = float(tau_beta if tau_beta is not None else tau_beta_default)
+    te_factor_limit = float(
+        te_factor_max if te_factor_max is not None else execution.get("TE_max_factor", 0.02)
+    )
+
+    exposures = pd.Series(beta_matrix.T @ instr_weights, index=factor_target.index)
+    exposures_capped = enforce_te_budget(exposures, factor_target, te_factor_limit)
+    if not exposures_capped.equals(exposures):
+        capped_array = exposures_capped.to_numpy(dtype=float)
+        instr_weights = _solve_instrument_weights(beta_matrix, capped_array)
+        exposures = exposures_capped
+
+    weight_series = pd.Series(instr_weights, index=instr_names, name="weight")
+    weight_series = cap_weights_by_beta_ci(weight_series, beta_ci_valid, tau_beta_value)
+    instr_weights = weight_series.to_numpy(dtype=float)
+
+    exposures = pd.Series(beta_matrix.T @ instr_weights, index=factor_target.index)
+    exposures_capped = enforce_te_budget(exposures, factor_target, te_factor_limit)
+    if not exposures_capped.equals(exposures):
+        capped_array = exposures_capped.to_numpy(dtype=float)
+        instr_weights = _solve_instrument_weights(beta_matrix, capped_array)
+        weight_series = pd.Series(instr_weights, index=instr_names, name="weight")
+        exposures = exposures_capped
 
     cov_instr = np.cov(instrument_returns.to_numpy(dtype=float), rowvar=False)
     cov_instr = project_to_psd(cov_instr)
@@ -155,10 +219,8 @@ def run_mapping_pipeline(
     else:
         baseline = np.full_like(instr_weights, 1.0 / len(instr_weights))
 
-    thresholds = read_yaml(Path(thresholds_path))
-    execution = thresholds.get("execution", {}) if isinstance(thresholds, dict) else {}
-    cap = float(execution.get("TE_max_factor", 0.02))
-    adjusted = enforce_te_budget(instr_weights, baseline, cov_instr, cap)
+    pre_te_weights = instr_weights.copy()
+    adjusted = enforce_portfolio_te_budget(instr_weights, baseline, cov_instr, te_factor_limit)
 
     if adv_cap_ratio is None:
         adv_cap_ratio = float(execution.get("adv_cap_ratio", 0.05))
@@ -175,12 +237,26 @@ def run_mapping_pipeline(
     instrument_path = artifact_path("weights", "instrument_allocation.csv", root=artifacts_root)
     instrument_weights.to_csv(instrument_path)
 
-    te_before = tracking_error(instr_weights, baseline, cov_instr)
+    te_before = tracking_error(pre_te_weights, baseline, cov_instr)
     te_after = tracking_error(adjusted, baseline, cov_instr)
+    final_array = instrument_weights.to_numpy(dtype=float)
+    exposures_final = pd.Series(beta_matrix.T @ final_array, index=factor_target.index)
     summary = {
         "tracking_error_before": float(te_before),
         "tracking_error_after": float(te_after),
         "sum_weights": float(adjusted.sum()),
+        "max_beta_ci_width": (
+            float(
+                beta_ci_valid.xs("upper", level="bound", axis=1)
+                .sub(beta_ci_valid.xs("lower", level="bound", axis=1))
+                .abs()
+                .max()
+                .max()
+            )
+            if not beta_ci_valid.empty
+            else 0.0
+        ),
+        "max_factor_deviation": float((exposures_final - factor_target).abs().max()),
     }
     summary_path = artifact_path("mapping", "summary.json", root=artifacts_root)
     write_json(summary, summary_path)

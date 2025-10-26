@@ -16,7 +16,16 @@ __all__ = ["FREDFetcher"]
 
 
 class FREDFetcher(BaseCSVFetcher):
-    """Scarica serie FRED tramite l'API ufficiale delle osservazioni."""
+    """Scarica serie FRED tramite l'API ufficiale delle osservazioni.
+
+    Attributes:
+        SOURCE: Codice sorgente utilizzato dal registry di ingest.
+        LICENSE: Licenza sintetica riportata nei log e nei metadati.
+        BASE_URL: Endpoint REST ``series/observations`` dell'API FRED.
+        HEADERS: Header HTTP minimi per ottenere JSON o ZIP CSV.
+        DEFAULT_SYMBOLS: Serie economiche chiave scaricate in assenza di
+            parametri espliciti (curve Treasury, breakeven, CPI, TIPS).
+    """
 
     SOURCE = "fred"
     LICENSE = "Federal Reserve Economic Data (FRED) Terms of Use"
@@ -25,7 +34,22 @@ class FREDFetcher(BaseCSVFetcher):
         "Accept": "application/json, application/zip;q=0.9, text/csv;q=0.8, */*;q=0.1",
         "User-Agent": "fair3/0.1 (+https://github.com/federico-bidone/FAIR)",
     }
-    DEFAULT_SYMBOLS = ("DGS10", "DCOILWTICO")
+    DEFAULT_SYMBOLS = (
+        "DGS01",
+        "DGS02",
+        "DGS03",
+        "DGS05",
+        "DGS07",
+        "DGS10",
+        "DGS20",
+        "DGS30",
+        "DTB3",
+        "CPIAUCSL",
+        "T5YIE",
+        "T10YIE",
+        "DFII5",
+        "DFII10",
+    )
 
     def __init__(
         self,

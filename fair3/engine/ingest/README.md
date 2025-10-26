@@ -9,7 +9,7 @@ Il sottosistema di ingest raccoglie dati grezzi da fonti pubbliche (ECB, FRED, B
 - `create_fetcher(source, **kwargs)` restituisce l'istanza di fetcher pronta all'uso.
 - `run_ingest(source, symbols=None, start=None, raw_root=None, as_of=None)` è l'entry point usato dal CLI.
 
-Tutti i fetcher accettano `raw_root` opzionale per redirigere l'output (utile nei test) e loggano automaticamente licenza e URL tramite `fair3.engine.utils.log`.
+Tutti i fetcher accettano `raw_root` opzionale per redirigere l'output (utile nei test) e loggano automaticamente licenza e URL tramite `fair3.engine.logging.setup_logger`.
 
 ## Utilizzo CLI
 ```bash
@@ -18,6 +18,14 @@ fair3 ingest --source ecb --symbols USD GBP --from 2020-01-01
 - `--source`: uno tra `ecb`, `fred`, `boe`, `stooq`.
 - `--symbols`: lista opzionale di simboli specifici della sorgente (default codificati per ogni fetcher).
 - `--from`: data minima (ISO `YYYY-MM-DD`) per filtrare le osservazioni.
+
+Per FRED, i simboli predefiniti coprono Treasury a più scadenze, TIPS,
+breakeven e CPI:
+
+```
+DGS01, DGS02, DGS03, DGS05, DGS07, DGS10, DGS20, DGS30,
+DTB3, CPIAUCSL, T5YIE, T10YIE, DFII5, DFII10
+```
 
 Il comando stampa un riepilogo con numero di righe e percorso del CSV prodotto. I log ruotati sono salvati in `artifacts/audit/fair3_ingest_<source>.log`.
 

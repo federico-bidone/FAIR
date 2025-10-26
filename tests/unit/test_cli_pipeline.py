@@ -13,7 +13,7 @@ from fair3.engine.utils import rand as rand_utils
 
 def _write_clean_panel(root: Path) -> None:
     root.mkdir(parents=True, exist_ok=True)
-    dates = pd.date_range("2020-01-31", periods=36, freq="ME")
+    dates = pd.date_range("2020-01-31", periods=36, freq=pd.offsets.MonthEnd())
     symbols = ["EQT", "BND", "ALT"]
     index = pd.MultiIndex.from_product([dates, symbols], names=["date", "symbol"])
     rng = np.random.default_rng(42)
@@ -67,6 +67,8 @@ def test_cli_pipeline_end_to_end(tmp_path: Path, patched_environment: Path) -> N
             "estimate",
             "--artifacts-root",
             str(artifacts_root),
+            "--sigma-engine",
+            "spd_median",
         ]
     )
     cli_main(
@@ -87,6 +89,10 @@ def test_cli_pipeline_end_to_end(tmp_path: Path, patched_environment: Path) -> N
             "--hrp-intra",
             "--adv-cap",
             "0.05",
+            "--te-factor-max",
+            "0.02",
+            "--tau-beta",
+            "0.25",
         ]
     )
 

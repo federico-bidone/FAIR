@@ -22,12 +22,12 @@ from fair3.engine.allocators import (
     generator_D_cvar_erc,
     risk_contributions,
 )
+from fair3.engine.logging import setup_logger
 from fair3.engine.reporting.audit import run_audit_snapshot
 from fair3.engine.utils.io import artifact_path, read_yaml
-from fair3.engine.utils.logging import get_stream_logger
 from fair3.engine.utils.rand import DEFAULT_SEED_PATH
 
-LOG = get_stream_logger(__name__)
+LOG = setup_logger(__name__)
 
 
 @dataclass(slots=True)

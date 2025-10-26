@@ -18,6 +18,7 @@ def test_cli_ingest_dispatch(
     tmp_path: Path,
     capsys: CaptureFixtureStr,
 ) -> None:
+    monkeypatch.chdir(tmp_path)
     dates = pd.to_datetime(["2024-01-02"])
     data = pd.DataFrame({"date": dates, "value": [1.0], "symbol": ["USD"]})
     artifact_path = tmp_path / "ecb_20240102.csv"
@@ -41,10 +42,12 @@ def test_cli_ingest_dispatch(
         *,
         symbols: list[str] | None = None,
         start: date | None = None,
+        progress: bool = False,
     ) -> IngestArtifact:
         captured["source"] = source
         captured["symbols"] = symbols
         captured["start"] = start
+        captured["progress"] = progress
         return artifact
 
     monkeypatch.setattr("fair3.cli.main.run_ingest", fake_run_ingest)
@@ -55,3 +58,59 @@ def test_cli_ingest_dispatch(
     assert "rows=1" in out
     assert captured["symbols"] == ["USD"]
     assert str(captured["start"]) == "2024-01-02"
+    assert captured["progress"] is False
+
+
+def test_cli_ingest_respects_global_flags(
+    monkeypatch: MonkeyPatch,
+    tmp_path: Path,
+    capsys: CaptureFixtureStr,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    artifact = IngestArtifact(
+        source="ecb",
+        path=tmp_path / "ecb.csv",
+        data=pd.DataFrame(
+            {
+                "date": pd.to_datetime(["2024-01-02"]),
+                "value": [1.0],
+                "symbol": ["USD"],
+            }
+        ),
+        metadata={},
+    )
+
+    called: dict[str, object] = {}
+
+    def fake_configure(json_logs: bool) -> None:
+        called["json_logs"] = json_logs
+
+    def fake_run_ingest(
+        source: str,
+        *,
+        symbols: list[str] | None = None,
+        start: date | None = None,
+        progress: bool = False,
+    ) -> IngestArtifact:
+        called["progress"] = progress
+        return artifact
+
+    monkeypatch.setattr("fair3.cli.main.configure_cli_logging", fake_configure)
+    monkeypatch.setattr("fair3.cli.main.run_ingest", fake_run_ingest)
+
+    main(
+        [
+            "--json-logs",
+            "--progress",
+            "ingest",
+            "--source",
+            "ecb",
+            "--symbols",
+            "USD",
+            "--from",
+            "2024-01-02",
+        ]
+    )
+    capsys.readouterr()
+    assert called["json_logs"] is True
+    assert called["progress"] is True
