@@ -1,12 +1,43 @@
-# Utils Module
+# `fair3.engine.utils`
+
+## Panoramica (Italiano)
+La directory contiene gli strumenti trasversali che supportano le pipeline FAIR-III.
+Gli obiettivi principali sono:
+
+- fornire utilità di logging condivise e verbose per tutta la piattaforma;
+- gestire input/output di configurazioni, artefatti e checksum in modo riproducibile;
+- mantenere generatori casuali deterministici e proiezioni matematiche sicure.
+
+Ogni modulo espone docstring e commenti in italiano che spiegano cosa fa ogni
+funzione, come lo fa e perché è utile nel flusso complessivo.
+
+### Moduli principali
+
+- **`log`** – crea logger a rotazione pronti per audit con messaggi verbosi e
+  opzionali handler da console. I commenti spiegano come prevenire duplicazioni
+  e perché le rotazioni garantiscono log compatti.
+- **`logging`** – espone shortcut per log di streaming condivisi e fixture di
+  test; è accompagnato da docstring che motivano ciascun parametro ambientale.
+- **`io`** – gestisce cartelle di artefatti, serializzazioni YAML/JSON
+  deterministiche e checksum; ogni funzione documenta il comportamento sui
+  corner case (percorso inesistente, file corrotti, ecc.).
+- **`rand`** – normalizza la gestione dei seed, documentando il formato del file
+  `audit/seeds.yml` e la strategia per stream multipli; i test coprono
+  conversioni di tipo e generazione di RNG figlio.
+- **`psd`** – applica la proiezione di Higham con spiegazioni sulle soglie
+  automatiche per la stabilità numerica.
+
+---
+
+## Utils Module (English Reference)
 
 The utilities package centralises shared concerns such as deterministic randomness, structured
 logging, and artifact management. These helpers keep higher-level engine modules focused on
 quantitative logic while guaranteeing reproducibility and auditability demanded by FAIR-III.
 
-## Public API
+### Public API
 
-### Logging (`fair3.engine.utils.log`)
+#### Logging (`fair3.engine.utils.log`)
 - `setup_logger(name, level="INFO", log_dir=None, max_bytes=1_048_576, backup_count=5, console=False)`
 - `get_logger(name)`
 - `default_log_dir()`
@@ -14,7 +45,7 @@ quantitative logic while guaranteeing reproducibility and auditability demanded 
 All log files rotate automatically under `artifacts/audit/`. Use `console=True` for verbose CLI
 runs and `level="DEBUG"` when invoking `--trace` flags.
 
-### Randomness (`fair3.engine.utils.rand`)
+#### Randomness (`fair3.engine.utils.rand`)
 - `load_seeds(seed_path="audit/seeds.yml")`
 - `save_seeds(seeds, seed_path="audit/seeds.yml")`
 - `seed_for_stream(stream="global", seeds=None, seed_path=...)`
@@ -25,7 +56,7 @@ runs and `level="DEBUG"` when invoking `--trace` flags.
 Streams fall back to the global seed and default to 42 when no file is present. The helpers seed
 both NumPy and the Python standard library, ensuring consistent behaviour across workers.
 
-### IO (`fair3.engine.utils.io`)
+#### IO (`fair3.engine.utils.io`)
 - `artifact_path(*parts, create=True, root=None)`
 - `ensure_dir(path)`
 - `read_yaml(path)` / `write_yaml(data, path)`
@@ -36,7 +67,7 @@ both NumPy and the Python standard library, ensuring consistent behaviour across
 Use `artifact_path` to resolve canonical output locations (e.g. `artifact_path("audit", "checksums.json")`).
 Checksums stream large files safely using 64 KiB chunks.
 
-### PSD (`fair3.engine.utils.psd`)
+#### PSD (`fair3.engine.utils.psd`)
 - `project_to_psd(matrix, eps=None)`
 
 Projects symmetric matrici sul cono PSD usando la procedura di Higham (2002) con

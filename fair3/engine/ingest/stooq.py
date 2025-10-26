@@ -8,7 +8,7 @@ __all__ = ["StooqFetcher"]
 
 
 class StooqFetcher(BaseCSVFetcher):
-    """Download end-of-day prices from Stooq."""
+    """Scarica prezzi end-of-day da Stooq nel formato atteso dal motore."""
 
     SOURCE = "stooq"
     LICENSE = "Stooq.com data usage policy"
@@ -16,11 +16,13 @@ class StooqFetcher(BaseCSVFetcher):
     DEFAULT_SYMBOLS = ("spx",)
 
     def build_url(self, symbol: str, start: pd.Timestamp | None) -> str:
+        """Costruisce l'URL parametrico per il ticker giornaliero."""
         ticker = symbol.upper()
         params: list[str] = [f"s={ticker}", "i=d"]
         return f"{self.BASE_URL}?{'&'.join(params)}"
 
     def parse(self, payload: str, symbol: str) -> pd.DataFrame:
+        """Normalizza il CSV Stooq gestendo payload HTML di errore."""
         if payload.lstrip().startswith("<"):
             msg = "Stooq: payload HTML (ticker inesistente o endpoint non CSV)"
             raise ValueError(msg)

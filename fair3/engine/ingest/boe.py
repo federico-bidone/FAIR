@@ -12,7 +12,7 @@ __all__ = ["BOEFetcher"]
 
 
 class BOEFetcher(BaseCSVFetcher):
-    """Download Bank of England datasets via the CSV download interface."""
+    """Scarica i dataset Bank of England attraverso l'interfaccia CSV pubblica."""
 
     SOURCE = "boe"
     LICENSE = "Bank of England Data Services Terms and Conditions"
@@ -20,6 +20,7 @@ class BOEFetcher(BaseCSVFetcher):
     DEFAULT_SYMBOLS = ("IUMGBP",)
 
     def build_url(self, symbol: str, start: pd.Timestamp | None) -> str:
+        """Costruisce l'URL query-string assicurando la conversione date BoE."""
         if start is None:
             start_string = "01/Jan/1900"
         else:
@@ -39,12 +40,14 @@ class BOEFetcher(BaseCSVFetcher):
         return f"{self.BASE_URL}?{urlencode(params)}"
 
     def _validate_payload(self, payload: str) -> None:
+        """Intercetta HTML/errore di endpoint evitando parsing di risposta errata."""
         stripped = payload.lstrip("\ufeff\n\r ")
         if stripped.startswith("<") or "," not in payload:
             msg = "BoE: payload HTML o non-CSV (serie errata/endpoint cambiato)"
             raise ValueError(msg)
 
     def parse(self, payload: str, symbol: str) -> pd.DataFrame:
+        """Pulizia CSV e coercizione dei valori numerici secondo schema canonico."""
         self._validate_payload(payload)
         csv = pd.read_csv(StringIO(payload), header=None, names=["date", "value"], usecols=[0, 1])
         frame = pd.DataFrame(

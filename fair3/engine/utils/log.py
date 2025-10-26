@@ -1,3 +1,5 @@
+"""Configurazione centralizzata dei logger a rotazione per FAIR-III."""
+
 from __future__ import annotations
 
 import logging
@@ -8,7 +10,8 @@ __all__ = ["setup_logger", "get_logger", "default_log_dir"]
 
 
 def default_log_dir() -> Path:
-    """Return the default audit log directory, ensuring it exists."""
+    """Restituisce la cartella predefinita per i log di audit creandola se serve."""
+
     path = Path("artifacts") / "audit"
     path.mkdir(parents=True, exist_ok=True)
     return path
@@ -52,25 +55,12 @@ def setup_logger(
     console: bool = False,
     propagate: bool = False,
 ) -> logging.Logger:
-    """Configure and return a rotating-file logger.
+    """Configura e restituisce un logger con rotazione dei file.
 
-    Parameters
-    ----------
-    name:
-        Logger name. Will also be used to derive the log file name.
-    level:
-        Logging level (numeric or string).
-    log_dir:
-        Optional directory for log files. Defaults to ``artifacts/audit``.
-    max_bytes:
-        Maximum size of a single log file before rotation.
-    backup_count:
-        Number of rotated files to keep.
-    console:
-        When ``True``, attach a stream handler for stdout mirroring file output.
-    propagate:
-        Whether messages propagate to parent loggers. Disabled by default to
-        avoid duplicate log lines when embedding the engine.
+    I parametri consentono di armonizzare le impostazioni tra ambienti: si
+    possono scegliere destinazione, livello e rotazione e opzionalmente
+    duplicare l'output su console. La propagazione è disabilitata di default per
+    evitare duplicati quando l'engine è integrato in servizi più ampi.
     """
 
     resolved_level = _as_level(level)
@@ -88,13 +78,17 @@ def setup_logger(
         if isinstance(handler, RotatingFileHandler) and same_file:
             handler.setLevel(resolved_level)
             handler_exists = True
+
     if not handler_exists:
         handler = _file_handler(log_path, resolved_level, max_bytes, backup_count)
         logger.addHandler(handler)
 
     wants_console = console and not any(
-        isinstance(h, logging.StreamHandler) for h in logger.handlers
+        isinstance(h, logging.StreamHandler) and not isinstance(h, logging.FileHandler)
+        for h in logger.handlers
     )
+    # Gli handler di file ereditano StreamHandler: escludiamoli per consentire un
+    # vero duplicato su console quando esplicitamente richiesto.
     if wants_console:
         stream_handler = logging.StreamHandler()
         formatter = logging.Formatter("%(levelname)s | %(name)s | %(message)s")
@@ -106,5 +100,6 @@ def setup_logger(
 
 
 def get_logger(name: str) -> logging.Logger:
-    """Return a logger configured with default settings."""
+    """Restituisce un logger con le impostazioni predefinite di FAIR-III."""
+
     return setup_logger(name)

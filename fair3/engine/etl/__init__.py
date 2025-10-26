@@ -1,4 +1,4 @@
-"""Point-in-time ETL utilities for the FAIR-III engine."""
+"""Utilità ETL point-in-time del motore FAIR-III con localizzazione italiana."""
 
 from .calendar import TradingCalendar, build_calendar, reindex_frame
 from .cleaning import (

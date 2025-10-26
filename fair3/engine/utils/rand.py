@@ -1,3 +1,5 @@
+"""Gestione centralizzata dei seed casuali per l'engine FAIR-III."""
+
 from __future__ import annotations
 
 import random
@@ -25,11 +27,11 @@ __all__ = [
 
 
 def load_seeds(seed_path: Path | str = DEFAULT_SEED_PATH) -> dict[str, int]:
-    """Load the seed dictionary from ``seed_path``.
+    """Carica il dizionario dei seed dal percorso indicato.
 
-    Missing files produce a dictionary containing only the ``global`` stream
-    with the default seed, keeping the pipeline reproducible even before a
-    manual seed file is committed.
+    La funzione supporta file non ancora creati restituendo sempre almeno lo
+    stream ``global`` con il seed di default, così che la pipeline resti
+    deterministica sin dal primo avvio.
     """
 
     path = Path(seed_path)
@@ -60,7 +62,7 @@ def save_seeds(
     seeds: Mapping[str, int],
     seed_path: Path | str = DEFAULT_SEED_PATH,
 ) -> Path:
-    """Persist the provided seed mapping to ``seed_path``."""
+    """Salva su disco una mappatura ``stream -> seed`` normalizzata."""
 
     path = Path(seed_path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -76,7 +78,7 @@ def seed_for_stream(
     seeds: Mapping[str, int] | None = None,
     seed_path: Path | str = DEFAULT_SEED_PATH,
 ) -> int:
-    """Resolve the seed for ``stream`` using the provided mapping or file."""
+    """Ricava il seed per ``stream`` usando la mappatura fornita o il file."""
 
     seeds_dict = dict(seeds) if seeds is not None else load_seeds(seed_path)
     if DEFAULT_STREAM not in seeds_dict:
@@ -91,7 +93,7 @@ def generator_from_seed(
     seeds: Mapping[str, int] | None = None,
     seed_path: Path | str = DEFAULT_SEED_PATH,
 ) -> np.random.Generator:
-    """Return a :class:`numpy.random.Generator` based on the requested stream."""
+    """Restituisce un generatore NumPy coerente con lo stream richiesto."""
 
     if isinstance(seed, np.random.Generator):
         return seed
@@ -103,7 +105,7 @@ def generator_from_seed(
 
 
 def broadcast_seed(seed: int) -> np.random.Generator:
-    """Seed Python's RNG stack and return a NumPy generator."""
+    """Applica il seed sia al RNG di Python che a NumPy restituendo il generatore."""
 
     random.seed(seed)
     np.random.seed(seed)
@@ -115,9 +117,11 @@ def spawn_child_rng(
     *,
     jumps: int = 1,
 ) -> np.random.Generator:
-    """Spawn a deterministic child RNG using the jumpable bit generator."""
+    """Genera un RNG figlio deterministico eseguendo salti controllati."""
 
     if jumps < 1:
         raise ValueError("jumps must be >= 1")
+
+    # L'API ``jumped`` garantisce sequenze disgiunte replicabili tra i worker.
     jumped = parent.bit_generator.jumped(jumps)
     return np.random.Generator(jumped)
