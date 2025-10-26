@@ -36,4 +36,12 @@ def test_save_inventory_crea_json_ben_formato(inventario_tmp: Path) -> None:
     contenuto = json.loads(inventario_tmp.read_text(encoding="utf-8"))
     assert contenuto, "L'inventario non può essere vuoto"
     campione = contenuto[0]
-    assert {"percorso", "qualifica", "tipo", "linea", "argomenti", "ha_docstring"} <= campione.keys()
+    expected_keys = {
+        "percorso",
+        "qualifica",
+        "tipo",
+        "linea",
+        "argomenti",
+        "ha_docstring",
+    }
+    assert expected_keys <= campione.keys()

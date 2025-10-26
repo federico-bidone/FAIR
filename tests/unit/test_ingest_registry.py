@@ -5,7 +5,6 @@ from __future__ import annotations
 from datetime import UTC, date, datetime
 from io import StringIO
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 import pytest
@@ -22,7 +21,7 @@ class DummyFetcher(BaseCSVFetcher):
     BASE_URL = "https://example.invalid/dummy"
     DEFAULT_SYMBOLS = ("AAA", "BBB")
 
-    def __init__(self, *, payloads: dict[str, str], **kwargs: Any) -> None:
+    def __init__(self, *, payloads: dict[str, str], **kwargs: object) -> None:
         super().__init__(**kwargs)
         self._payloads = payloads
         self.request_log: list[tuple[str, str | None]] = []
@@ -36,13 +35,18 @@ class DummyFetcher(BaseCSVFetcher):
     def parse(self, payload: str, symbol: str) -> pd.DataFrame:
         """Converte il CSV in DataFrame usando lo schema canonico FAIR."""
         csv = pd.read_csv(StringIO(payload))
-        return pd.DataFrame(
-            {
-                "date": pd.to_datetime(csv["date"], errors="coerce"),
-                "value": pd.to_numeric(csv["value"], errors="coerce"),
-                "symbol": symbol,
-            }
-        ).dropna(subset=["date"]).reset_index(drop=True)
+        return (
+            pd.DataFrame(
+                {
+                    "date": pd.to_datetime(csv["date"], errors="coerce"),
+                    "value": pd.to_numeric(csv["value"], errors="coerce"),
+                    "symbol": symbol,
+                }
+            )
+            .dropna(subset=["date"])
+            .reset_index(drop=True)
+        )
+
 
 def _sample_payload(value: float, *, date: str = "2024-01-01") -> str:
     """Costruisce una riga CSV minima compatibile con DummyFetcher."""

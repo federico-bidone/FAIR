@@ -74,7 +74,9 @@ def test_setup_logger_non_duplicare_handler(tmp_path: Path) -> None:
     assert primo.handlers == secondo.handlers
 
 
-def test_get_logger_usa_impostazioni_default(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_get_logger_usa_impostazioni_default(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """L'helper deve delegare a ``setup_logger`` con la directory di default."""
 
     monkeypatch.chdir(tmp_path)

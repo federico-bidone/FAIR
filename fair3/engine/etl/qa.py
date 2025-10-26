@@ -1,6 +1,6 @@
-from __future__ import annotations
-
 """Componenti di quality assurance per il flusso ETL."""
+
+from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from datetime import datetime

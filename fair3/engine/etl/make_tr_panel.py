@@ -1,6 +1,6 @@
-from __future__ import annotations
-
 """Costruzione del pannello prezzi-rendimenti con pipeline tracciata."""
+
+from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path

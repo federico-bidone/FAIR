@@ -1,11 +1,11 @@
-from __future__ import annotations
-
 """Suite di test per il laboratorio di robustezza con messaggi in italiano."""
 
+from __future__ import annotations
+
 import json
-import numpy as np
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -87,13 +87,12 @@ def test_run_ablation_study_errori() -> None:
         )
 
 
-
-
 def test_replay_shocks_input_vuoto() -> None:
     """Gli shock richiedono almeno un rendimento di base."""
 
     with pytest.raises(ValueError, match="base_returns deve contenere"):
         replay_shocks([])
+
 
 def test_replay_shocks_scaling(tmp_path: Path) -> None:
     """Gli shock scalati devono gestire correttamente la volatilità nulla."""

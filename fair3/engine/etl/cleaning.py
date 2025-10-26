@@ -1,6 +1,6 @@
-from __future__ import annotations
-
 """Funzioni di pulizia serie storiche con spiegazioni italiane."""
+
+from __future__ import annotations
 
 from dataclasses import dataclass
 

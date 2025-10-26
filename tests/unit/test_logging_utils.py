@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import logging
 import os
+from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import Iterator
 
 import pytest
 
@@ -23,7 +23,7 @@ def ripristina_env(**updates: str) -> Iterator[None]:
             os.environ[chiave] = valore
         yield
     finally:
-        for chiave, valore in updates.items():
+        for chiave, _valore in updates.items():
             if vecchi[chiave] is None:
                 os.environ.pop(chiave, None)
             else:

@@ -34,7 +34,9 @@ def test_safe_path_segment_ripulisce_caratteri_illegali(nome: str, atteso: str) 
     assert io.safe_path_segment(nome) == atteso
 
 
-def test_artifact_path_puo_evitare_creazione(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_artifact_path_puo_evitare_creazione(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Il parametro ``create`` consente di lasciare non creata la cartella padre."""
 
     monkeypatch.setattr(io, "ARTIFACTS_ROOT", tmp_path)
@@ -112,5 +114,3 @@ def test_write_json_crea_directory_intermedie(tmp_path: Path) -> None:
     destinazione = tmp_path / "a" / "b" / "c.json"
     io.write_json({"chiave": "valore"}, destinazione)
     assert (tmp_path / "a" / "b").exists()
-
-

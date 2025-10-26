@@ -1,6 +1,6 @@
-from __future__ import annotations
-
 """Gestione dei tassi FX per normalizzare i prezzi nel pannello TR."""
+
+from __future__ import annotations
 
 from collections.abc import Iterable
 from dataclasses import dataclass
@@ -73,10 +73,7 @@ def load_fx_rates(records: Iterable[pd.DataFrame], base_currency: str) -> FXFram
         frame["date"] = pd.to_datetime(frame["date"]).dt.normalize()
         if invert:
             if (frame["value"] == 0).any():
-                msg = (
-                    "impossibile invertire il tasso FX normalizzato "
-                    f"{symbol}: contiene uno zero"
-                )
+                msg = f"impossibile invertire il tasso FX normalizzato {symbol}: contiene uno zero"
                 raise ValueError(msg)
             frame["value"] = 1 / frame["value"]
         frame = frame.rename(columns={"value": symbol})[["date", symbol]]

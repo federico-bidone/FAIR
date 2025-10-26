@@ -14,8 +14,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from fair3.engine.utils.logging import get_stream_logger
-
 from fair3.engine.allocators import (
     fit_meta_weights,
     generator_A,
@@ -26,8 +24,8 @@ from fair3.engine.allocators import (
 )
 from fair3.engine.reporting.audit import run_audit_snapshot
 from fair3.engine.utils.io import artifact_path, read_yaml
+from fair3.engine.utils.logging import get_stream_logger
 from fair3.engine.utils.rand import DEFAULT_SEED_PATH
-
 
 LOG = get_stream_logger(__name__)
 
@@ -123,7 +121,7 @@ def _run_generator(
             LOG.info("Avvio del generatore D (CVaR-ERC)")
             return generator_D_cvar_erc(mu_vec, sigma, constraints)
         LOG.warning("Generatore '%s' sconosciuto; ritorno pesi uguali", name)
-    except Exception as exc:  # pragma: no cover - defensive fallback
+    except Exception:  # pragma: no cover - defensive fallback
         LOG.exception("Generatore %s fallito; ritorno a pesi uguali", name)
     # In caso di errore restituiamo una allocazione uniforme per preservare la pipeline
     return np.full_like(mu_vec, 1.0 / mu_vec.size)
