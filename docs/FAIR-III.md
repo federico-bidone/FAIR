@@ -50,6 +50,8 @@ monitor structural drift:
 - **Factor shrinkage** from leading eigenvectors plus positive idiosyncratic
   noise.
 - **Element-wise median** aggregation followed by **Higham PSD projection**.
+- **Geometric SPD median** optional consensus (`--sigma-engine spd_median`) computed
+  via affine-invariant gradient descent with Higham fallback on non-convergence.
 - **EWMA regime blending** with configurable `lambda_r` to smooth transitions
   while enforcing PSD at every step.
 - **Drift diagnostics** (`frobenius_relative_drift`, `max_corr_drift`) feed the
@@ -81,11 +83,14 @@ respecting UCITS liquidity guardrails:
 - **Bootstrap confidence intervals:** `beta_ci_bootstrap` resamples windows with
   deterministic RNG streams to compute CI80 ranges used to cap noisy betas when
   `width > tau.beta_CI_width`.
+- **CI-driven caps:** `cap_weights_by_beta_ci` scales instrument weights when
+  CI80 widths breach `tau.beta_CI_width`, preserving the budget after
+  renormalisation.
 - **Intra-factor HRP:** `hrp_weights` splits instrument clusters by factor label
   and assigns equal cluster budgets before running HRP within each group.
-- **Tracking-error budgets:** `enforce_te_budget` shrinks mapped weights toward
-  a baseline (e.g., HRP) to satisfy `TE_max_factor` from
-  `configs/thresholds.yml`.
+- **Tracking-error budgets:** `enforce_te_budget` clamps factor deviations to
+  `TE_max_factor`, while `enforce_portfolio_te_budget` shrinks mapped weights
+  toward a baseline (e.g., HRP) to satisfy the same tolerance.
 - **ADV caps:** `clip_trades_to_adv` converts proposed trade weights into
   notional terms and rescales them to obey ADV percentage limits while
   preserving trade direction.
@@ -119,18 +124,22 @@ trails for compliance checks.
 ## Execution Layer (PR-11)
 The execution layer enforces the retail guardrails before any order is routed:
 
-- **Lot sizing:** `target_to_lots` converts weight deltas into integer lots
-  using portfolio value, latest prices, and instrument lot sizes. Zero-priced
-  instruments yield zero lots and are flagged for manual review.
+- **Lot sizing:** `size_orders` converts weight deltas into integer lots using
+  portfolio value, prices, and lot sizes; `target_to_lots` remains available as a
+  thin alias for backwards compatibility.
 - **Transaction costs:** `trading_costs` implements the Almgren–Chriss schema –
   explicit fees, half-spread slippage, and nonlinear market impact scaled by the
-  ADV percentage with deterministic handling of zero ADV instruments.
-- **Taxes:** `tax_penalty_it` applies the simplified Italian regime (26% default,
-  12.5% for govies ≥51% of collateral, 0.2% bollo) with a loss bucket that first
-  offsets higher-rate gains.
+  ADV percentage – while `almgren_chriss_cost` exposes the aggregated impact for
+  CLI summaries.
+- **Taxes:** `compute_tax_penalty` applies the Italian regime (26% default,
+  12.5% for govies ≥51%, 0.2% bollo) with FIFO/LIFO/min_tax matching and a
+  four-year `MinusBag` loss carry; `tax_penalty_it` remains as a quick
+  aggregated heuristic.
 - **No-trade guard:** `drift_bands_exceeded` checks weight and risk contribution
-  drift against tolerance bands; `should_trade` combines drift, turnover caps,
-  and the EB_LB − COST − TAX > 0 acceptance gate.
+  drift against tolerance bands; `expected_benefit_distribution` and
+  `expected_benefit_lower_bound` estimate EB_LB via block bootstrap before
+  `should_trade` combines drift, turnover caps, and the EB_LB − COST − TAX > 0
+  acceptance gate.
 - **Decision summaries:** `DecisionBreakdown` structures the gate evaluation for
   CLI dry-runs and audit logging ahead of the full controller landing in PR-12.
 
@@ -145,15 +154,24 @@ The reporting layer transforms PIT artefacts into retail-friendly disclosures:
   rounding (4 d.p.). Results are emitted as both CSV and JSON for auditability.
 - **Attribution:** Factor and instrument contributions are aggregated monthly
   and exported side-by-side with stacked bar plots for visual inspection.
-- **Fan charts:** `simulate_fan_chart` bootstraps wealth paths via
-  `numpy.random.default_rng(seed)` and `plot_fan_chart` renders deterministic
-  PNG outputs under `artifacts/reports/<period>/`.
+- **Fan charts:** `simulate_fan_chart` bootstraps wealth and return paths via
+  `numpy.random.default_rng(seed)`; `plot_fan_chart`/`plot_fanchart` render
+  deterministic PNG outputs for wealth and risk metrics under
+  `artifacts/reports/<period>/`.
 - **Turnover & costs:** Monthly turnover, cost, and tax series feed line/bar
   combos to surface compliance with turnover and TE budgets.
 - **ERC clusters:** Optional cluster maps roll up average monthly weights,
   supporting acceptance gates on cluster risk parity tolerances.
 - **Compliance log:** Flags such as UCITS eligibility, audit completion, and
   no-trade adherence are persisted in `compliance.json` for downstream checks.
+- **Acceptance gates:** `acceptance_gates` evaluates P(MaxDD > τ) and the CAGR
+  lower bound, emitting `acceptance.json` with pass/fail verdicts.
+- **Attribution IC:** `attribution_ic` computes instrument contributions,
+  factor contributions, and rolling IC metrics, optionally persisted as CSV for
+  governance reviews.
+- **PDF dashboard:** `generate_monthly_report` assembles metrics, compliance
+  flags, acceptance gates, and chart artefacts into a compact PDF using
+  `reportlab`.
 
 The CLI wrapper (`fair3 report --period ... --monthly`) currently feeds the
 report generator with deterministic synthetic data so acceptance gates and CI
@@ -164,7 +182,7 @@ synthetic stub for real PIT artefacts once the end-to-end pipeline is complete.
 The robustness laboratory extends FAIR-III governance with deterministic stress tests:
 
 - **Block bootstrap:** `block_bootstrap_metrics` samples 60-day blocks (default 1000 draws) to
-  compute distributions of max drawdown and CAGR. Acceptance gates enforce
+  compute distributions of max drawdown, CAGR, Sharpe, CVaR, and EDaR. Acceptance gates enforce
   P(MaxDD ≤ τ) ≥ 95% and the 5th-percentile CAGR ≥ target. All runs use the
   `robustness` RNG stream so they are reproducible across CI and research
   environments.
@@ -195,10 +213,12 @@ deterministic Monte Carlo engine for probability-of-success analysis:
 - **Glidepath:** `build_glidepath` linearly transitions allocation from growth
   heavy to defensive weights over the maximum horizon across configured goals,
   surfacing the implied asset mix for governance review.
-- **Outputs:** `run_goal_monte_carlo` writes deterministic `summary.csv`,
-  `glidepath.csv`, and `report.pdf` under `artifacts/goals/` (or a custom root);
-  the CLI command `fair3 goals` prints weighted success probabilities so users
-  can iterate on contributions and horizons quickly.
+- **Outputs:** `run_goal_monte_carlo` writes deterministic `goals_<investor>_summary.csv`,
+  `goals_<investor>_glidepaths.csv`, `goals_<investor>_fan_chart.csv`, e `goals_<investor>.pdf`
+  sotto `reports/` (o root custom);
+  il comando CLI `fair3 goals --simulate` stampa le probabilità ponderate e i
+  percorsi dei file generati così l'utente può iterare rapidamente su contributi
+  e orizzonti.
 
 Acceptance thresholds derive from `configs/goals.yml` (target wealth `W`,
 minimum probability `p_min`, weights) and `configs/params.yml` (household

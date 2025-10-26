@@ -34,7 +34,7 @@ Flag aggiuntivi per test/local-dev (nascosti nel `--help`): `--raw-root`, `--cle
 - `audit/qa_data_log.csv`: QA per simbolo (copertura, nulls, outliers, currency applied).
 
 ## Tracing e logging
-Abilitando `--trace` si ottiene un log sintetico su stdout (numero di file raw trovati); i log strutturati sono salvati via `write_qa_log`. Ulteriori step di tracing saranno agganciati alla rotazione log centralizzata (`utils.log`) nelle milestone successive.
+Abilitando `--trace` si ottiene un log sintetico su stdout (numero di file raw trovati); i log strutturati sono salvati via `write_qa_log`. Ulteriori step di tracing saranno agganciati alla rotazione log centralizzata (`fair3.engine.logging`).
 
 ## Errori comuni
 - **Nessun raw trovato**: eseguire prima `fair3 ingest --source ...` per popolari `data/raw/`.
@@ -47,4 +47,4 @@ Il flag `--trace` stampa su stdout il numero di file raw processati ed è utile 
 
 ## Dove trovare i log
 - `audit/qa_data_log.csv`: QA tabellare appendibile (ordinato per `symbol`, `source`).
-- Log futuri (rolling file) saranno gestiti da `fair3.engine.utils.log` e collegati in questa sezione in milestone dedicate.
+- Log futuri (rolling file) saranno gestiti da `fair3.engine.logging` e collegati in questa sezione in milestone dedicate.

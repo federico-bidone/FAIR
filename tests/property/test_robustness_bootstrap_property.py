@@ -23,5 +23,6 @@ def test_bootstrap_exceedance_prob_under_threshold(samples: list[float]) -> None
         seed=1234,
     )
     assert not metrics.empty
+    assert {"sharpe", "cvar", "edar"}.issubset(metrics.columns)
     assert gates.exceedance_probability <= 0.05 + 1e-9
     assert gates.passes()
