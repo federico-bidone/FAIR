@@ -15,8 +15,19 @@ from collections.abc import Iterable, Iterator
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+
+def _project_root() -> Path:
+    """Trova la radice del repository cercando il primo genitore con pyproject.toml."""
+
+    here = Path(__file__).resolve()
+    for parent in here.parents:
+        if (parent / "pyproject.toml").exists():
+            return parent
+    return here.parents[1]
+
+
 # Radice del progetto (cartella che contiene pyproject.toml)
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = _project_root()
 # Cartelle da analizzare per estrarre le funzioni: codice applicativo e test.
 SOURCE_ROOTS = (PROJECT_ROOT / "fair3", PROJECT_ROOT / "tests")
 
@@ -54,7 +65,7 @@ def _iter_functions(path: Path) -> Iterator[FunctionRecord]:
 
         def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
             record = FunctionRecord(
-                percorso=str(path.relative_to(PROJECT_ROOT)),
+                percorso=path.relative_to(PROJECT_ROOT).as_posix(),
                 qualifica=".".join(stack + [node.name]),
                 tipo="async" if isinstance(node, ast.AsyncFunctionDef) else "sync",
                 linea=node.lineno,
