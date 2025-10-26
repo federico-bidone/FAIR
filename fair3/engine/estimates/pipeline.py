@@ -25,7 +25,6 @@ from .sigma import (
     median_of_covariances,
 )
 
-
 LOG = get_stream_logger(__name__)
 
 

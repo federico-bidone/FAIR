@@ -24,7 +24,11 @@ def test_tr_panel_builder_senza_file_raw(tmp_path: Path) -> None:
         builder.build()
 
 
-def test_tr_panel_builder_pipeline_minima(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
+def test_tr_panel_builder_pipeline_minima(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     """La pipeline deve produrre artefatti coerenti e log QA in italiano."""
 
     raw_root = tmp_path / "raw"
@@ -35,15 +39,12 @@ def test_tr_panel_builder_pipeline_minima(tmp_path: Path, monkeypatch: pytest.Mo
 
     asset_csv = raw_root / "asset" / "AAA.csv"
     asset_csv.write_text(
-        "date,value,symbol,currency\n"
-        "2023-01-02,10,AAA,USD\n"
-        "2023-01-03,11,AAA,USD\n",
+        "date,value,symbol,currency\n2023-01-02,10,AAA,USD\n2023-01-03,11,AAA,USD\n",
         encoding="utf-8",
     )
     fx_csv = raw_root / "fx" / "EURUSD.csv"
     fx_csv.write_text(
-        "date,value,symbol\n"
-        "2023-01-02,0.5,EUR/USD\n",
+        "date,value,symbol\n2023-01-02,0.5,EUR/USD\n",
         encoding="utf-8",
     )
 

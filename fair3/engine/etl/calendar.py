@@ -1,6 +1,6 @@
-from __future__ import annotations
-
 """Utility di calendario per armonizzare i dataset ETL in formato PIT."""
+
+from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass

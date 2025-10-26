@@ -9,13 +9,15 @@ import numpy as np
 import pandas as pd
 import pytest
 
+import fair3.engine.utils.logging as logging_utils
 from fair3.engine.allocators import pipeline as alloc_pipeline
 from fair3.engine.estimates import pipeline as est_pipeline
-import fair3.engine.utils.logging as logging_utils
 from fair3.engine.utils.logging import get_stream_logger
 
 
-def test_get_stream_logger_respects_environment(monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture) -> None:
+def test_get_stream_logger_respects_environment(
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
     """Il logger deve rispettare livello e formato configurati."""
 
     monkeypatch.setenv("FAIR_LOG_LEVEL", "DEBUG")
@@ -49,7 +51,9 @@ def _patch_optimisation_inputs(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(alloc_pipeline, "run_audit_snapshot", lambda **_: {})
 
 
-def test_run_optimization_pipeline_requires_generators(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_run_optimization_pipeline_requires_generators(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     """Viene sollevato un errore esplicito senza generatori richiesti."""
 
     _patch_optimisation_inputs(monkeypatch)
@@ -66,7 +70,11 @@ def test_run_optimization_pipeline_requires_generators(monkeypatch: pytest.Monke
         )
 
 
-def test_run_optimization_pipeline_emits_verbose_logs(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
+def test_run_optimization_pipeline_emits_verbose_logs(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
     """La pipeline di ottimizzazione deve loggare i passaggi chiave."""
 
     _patch_optimisation_inputs(monkeypatch)
@@ -102,7 +110,11 @@ def _patch_estimate_inputs(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(est_pipeline, "run_audit_snapshot", lambda **_: {})
 
 
-def test_run_estimate_pipeline_creates_expected_artifacts(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
+def test_run_estimate_pipeline_creates_expected_artifacts(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
     """La pipeline di stima salva gli artefatti e spiega il blending."""
 
     _patch_estimate_inputs(monkeypatch)
@@ -120,4 +132,3 @@ def test_run_estimate_pipeline_creates_expected_artifacts(monkeypatch: pytest.Mo
     assert result.mu_post_path.exists()
     assert result.sigma_path.exists()
     assert "Blending con omega" in caplog.text
-

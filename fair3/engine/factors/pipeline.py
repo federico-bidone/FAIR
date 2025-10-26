@@ -18,7 +18,6 @@ from .core import FactorLibrary
 from .orthogonality import enforce_orthogonality
 from .validation import validate_factor_set
 
-
 LOG = get_stream_logger(__name__)
 
 

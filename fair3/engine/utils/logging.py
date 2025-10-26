@@ -10,14 +10,14 @@ from __future__ import annotations
 
 import logging
 import os
-from functools import lru_cache
+from functools import cache
 from typing import Final
 
 DEFAULT_FORMAT: Final[str] = "[%(levelname)s] %(name)s: %(message)s"
 DEFAULT_LEVEL: Final[str] = "INFO"
 
 
-@lru_cache(maxsize=None)
+@cache
 def _determine_level() -> int:
     """Calcola il livello di logging partendo da ``FAIR_LOG_LEVEL``.
 
@@ -36,7 +36,7 @@ def _determine_level() -> int:
     return logging.INFO
 
 
-@lru_cache(maxsize=None)
+@cache
 def _determine_format() -> str:
     """Restituisce la stringa di formato per i messaggi FAIR-III.
 

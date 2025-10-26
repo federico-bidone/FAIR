@@ -61,7 +61,12 @@ def test_convert_to_base_applica_forward_fill() -> None:
             index=pd.DatetimeIndex(["2023-01-02"], name="date"),
         ),
     )
-    convertito = fx.convert_to_base(dati, fx=fx_frame, value_column="price", currency_column="currency")
+    convertito = fx.convert_to_base(
+        dati,
+        fx=fx_frame,
+        value_column="price",
+        currency_column="currency",
+    )
     assert convertito.loc[0, "price"] == pytest.approx(5.0)
     assert convertito.loc[1, "price"] == pytest.approx(5.5)
     assert set(convertito["currency"].unique()) == {"EUR"}
@@ -79,9 +84,7 @@ def test_convert_to_base_convalida_colonne() -> None:
 def test_fx_frame_save_scrive_csv(tmp_path: Path) -> None:
     """La serializzazione deve rispettare l'indice data."""
 
-    dati = pd.DataFrame(
-        {"USD_to_EUR": [0.9]}, index=pd.DatetimeIndex(["2023-01-02"], name="date")
-    )
+    dati = pd.DataFrame({"USD_to_EUR": [0.9]}, index=pd.DatetimeIndex(["2023-01-02"], name="date"))
     frame = fx.FXFrame(base_currency="EUR", rates=dati)
     destinazione = tmp_path / "fx.csv"
     frame.save(destinazione)

@@ -11,9 +11,9 @@ from __future__ import annotations
 
 import ast
 import json
+from collections.abc import Iterable, Iterator
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Iterable, Iterator, List
 
 # Radice del progetto (cartella che contiene pyproject.toml)
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -29,7 +29,7 @@ class FunctionRecord:
     qualifica: str
     tipo: str
     linea: int
-    argomenti: List[str]
+    argomenti: list[str]
     ha_docstring: bool
 
 
@@ -77,8 +77,7 @@ def _walk_python_files() -> Iterable[Path]:
     for root in SOURCE_ROOTS:
         if not root.exists():
             continue
-        for path in sorted(root.rglob("*.py")):
-            yield path
+        yield from sorted(root.rglob("*.py"))
 
 
 def build_inventory() -> list[FunctionRecord]:
