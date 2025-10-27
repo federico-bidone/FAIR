@@ -34,6 +34,8 @@
 - Mini GUI opzionale: `launch_gui`, comando `fair3 gui` con flag di percorso,
   fallback quando PySide6 manca, documentazione dedicata e test smoke con
   stub/assenza dipendenza.
+- Ingest FRED esteso: default con curve Treasury 1-30Y, DTB3, CPI, breakeven
+  5Y/10Y e TIPS 5Y/10Y, con test offline JSON/ZIP e documentazione aggiornata.
 
 ### Changed
 - Bumped package version to `0.2.0` in `pyproject.toml` and exposed the version in `fair3.__init__` for runtime introspection.

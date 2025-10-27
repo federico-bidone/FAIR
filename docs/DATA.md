@@ -4,7 +4,7 @@
 | Codice | Fonte | Endpoint principale | Licenza sintetica |
 | ------ | ----- | ------------------ | ----------------- |
 | `ecb`  | European Central Bank (ECB Data Portal) | `https://data-api.ecb.europa.eu/service/data/EXR` | Uso conforme ai [Terms of Use ECB SDW](https://www.ecb.europa.eu/stats/ecb_statistics/governance/shared_data/en.html) |
-| `fred` | Federal Reserve Economic Data | `https://fred.stlouisfed.org/graph/fredgraph.csv` | [FRED Terms of Use](https://fredhelp.stlouisfed.org/fred/terms-of-use/) |
+| `fred` | Federal Reserve Economic Data | `https://api.stlouisfed.org/fred/series/observations` | [FRED Terms of Use](https://fredhelp.stlouisfed.org/fred/terms-of-use/) |
 | `boe`  | Bank of England Data Services | `https://www.bankofengland.co.uk/boeapps/database/_iadb-getTDDownloadCSV` | [BoE Data Terms](https://www.bankofengland.co.uk/terms-and-conditions) |
 | `stooq` | Stooq.com EOD | `https://stooq.com/q/d/l/` | [Stooq data policy](https://stooq.com/db/en/) |
 
@@ -46,7 +46,7 @@ Esempio completo:
 ```bash
 fair3 ingest --source fred --symbols DGS10 DCOILWTICO --from 2010-01-01
 ```
-Il parametro `--from` filtra le osservazioni successive alla data indicata dopo il download (utile quando gli endpoint non espongono filtri di query omogenei). Se non vengono specificati simboli, ogni fetcher utilizza un set di default documentato nel rispettivo modulo.
+Il parametro `--from` filtra le osservazioni successive alla data indicata dopo il download (utile quando gli endpoint non espongono filtri di query omogenei). Se non vengono specificati simboli, ogni fetcher utilizza un set di default documentato nel rispettivo modulo. Per `fred` il set copre Treasury a scadenze 1-30Y, Treasury Bill a 3 mesi, CPI, breakeven 5Y/10Y e TIPS 5Y/10Y.
 
 ## Note di licenza e redistribuzione
 - I dati vengono scaricati solo localmente; non devono essere ridistribuiti nel repository.

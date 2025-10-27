@@ -122,3 +122,30 @@
   `plot_fanchart` error paths.
 - Update README, module docs, and CHANGELOG to describe the expanded reporting
   workflow and CLI output.
+
+
+# PR-27 Plan (FRED ingest extension)
+
+## Scope
+- Expand the FRED fetcher defaults to cover Treasury constant maturities (1Y-30Y),
+  3M Treasury Bills, CPI headline, 5Y/10Y breakeven inflation, and 5Y/10Y TIPS real yields.
+- Ensure the fetcher supports both JSON and ZIP CSV payloads for all defaults with
+  deterministic parsing, NaN handling for ``."`` placeholders, and start-date filtering.
+- Refresh ingest documentation, data source catalogues, and changelog notes to reflect
+  the richer default coverage for macro features.
+
+## Design Notes
+- Keep credential validation unchanged but surface the extended ``DEFAULT_SYMBOLS`` tuple
+  for reuse by CLI callers and documentation. The tuple order mirrors curve tenors to
+  preserve audit readability.
+- Reuse the existing ZIP parsing logic and reinforce unit coverage to guard the default
+  symbol set, default-run behaviour, and metadata bookkeeping.
+- Update ingest docs to list the default series explicitly so operators know which
+  macro drivers they obtain out-of-the-box when running ``fair3 ingest --source fred``.
+
+## Testing & Tooling
+- Add unit tests that assert the expected default tuple and simulate a default fetch run
+  via monkeypatched downloads, verifying symbol coverage, metadata length, and dtype
+  normalisation.
+- Re-run ``ruff``, ``black``, and ``pytest`` and ensure offline fixtures still exercise the
+  ZIP parsing path for CSV exports.

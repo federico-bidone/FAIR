@@ -64,6 +64,10 @@ le funzionalità da implementare, i file principali da toccare e i rischi da mon
   SQLite, test offline con fixture.
 - Aggiornare `fair3/engine/ingest/registry.py`, CLI `fair3 ingest`, documentazione e CHANGELOG per ogni fonte.
 
+## PR-27 — FRED ingest extension ✅
+- Estendere `FREDFetcher` con default Treasury 1-30Y, DTB3, CPI, breakeven 5Y/10Y e TIPS 5Y/10Y.
+- Aggiornare documentazione ingest/dati e CHANGELOG; aggiungere test offline JSON/ZIP e verifica default tuple.
+
 ## PR-49 — QA end-to-end
 - Esecuzione completa pipeline su dataset ridotto, verifica artefatti, acceptance gates, ablation.
 - Aggiornare README, docs e seeds/checksum snapshot.
