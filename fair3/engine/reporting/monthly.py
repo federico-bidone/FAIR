@@ -7,6 +7,9 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfgen import canvas
 
 try:  # pragma: no cover - optional dependency shim
     from reportlab.lib.pagesizes import A4

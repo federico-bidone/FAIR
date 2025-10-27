@@ -11,6 +11,7 @@ from typing import Any
 
 import pandas as pd
 import requests
+from tqdm.auto import tqdm
 
 try:  # pragma: no cover - optional dependency shim
     from tqdm.auto import tqdm
