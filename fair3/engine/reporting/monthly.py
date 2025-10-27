@@ -11,6 +11,18 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 
+try:  # pragma: no cover - optional dependency shim
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.utils import ImageReader
+    from reportlab.pdfgen import canvas
+
+    _HAS_REPORTLAB = True
+except ModuleNotFoundError:  # pragma: no cover - fallback
+    A4 = (595.0, 842.0)  # type: ignore[assignment]
+    ImageReader = None  # type: ignore[assignment]
+    canvas = None  # type: ignore[assignment]
+    _HAS_REPORTLAB = False
+
 from fair3.engine.reporting.analytics import acceptance_gates, attribution_ic
 from fair3.engine.reporting.plots import (
     plot_attribution,
@@ -341,6 +353,60 @@ def _render_metric_fan_chart(
     return output
 
 
+def _escape_pdf_text(text: str) -> str:
+    """Escape characters that are special in PDF text streams."""
+
+    return text.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
+
+
+def _write_fallback_pdf(path: Path, lines: Sequence[str]) -> Path:
+    """Generate a minimal PDF document without relying on reportlab.
+
+    The PDF writer is intentionally small: it renders the provided lines using a
+    single Helvetica font on one page.  The structure follows the PDF 1.4
+    specification and is sufficient for unit tests that check the existence and
+    non-zero size of the produced file.
+    """
+
+    ensure_dir(path.parent)
+    content: list[str] = ["BT", "/F1 12 Tf", "72 800 Td"]
+    for index, line in enumerate(lines):
+        if index > 0:
+            content.append("0 -14 Td")
+        content.append(f"({_escape_pdf_text(line)}) Tj")
+    content.append("ET")
+    stream_bytes = ("\n".join(content) + "\n").encode("latin-1", "replace")
+
+    page_entry = (
+        b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] "
+        b"/Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>"
+    )
+    objects = [
+        b"<< /Type /Catalog /Pages 2 0 R >>",
+        b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        page_entry,
+        b"<< /Length %d >>\nstream\n" % len(stream_bytes) + stream_bytes + b"endstream",
+        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+    ]
+
+    with path.open("wb") as handle:
+        handle.write(b"%PDF-1.4\n")
+        offsets: list[int] = []
+        for index, body in enumerate(objects, start=1):
+            offsets.append(handle.tell())
+            handle.write(f"{index} 0 obj\n".encode("ascii"))
+            handle.write(body)
+            handle.write(b"\nendobj\n")
+        xref_offset = handle.tell()
+        handle.write(b"xref\n0 6\n")
+        handle.write(b"0000000000 65535 f \n")
+        for offset in offsets:
+            handle.write(f"{offset:010d} 00000 n \n".encode("ascii"))
+        handle.write(b"trailer << /Size 6 /Root 1 0 R >>\n")
+        handle.write(f"startxref\n{xref_offset}\n%%EOF\n".encode("ascii"))
+    return path
+
+
 def _build_pdf_report(
     period_label: str,
     metrics: Mapping[str, float],
@@ -365,6 +431,25 @@ def _build_pdf_report(
     """
 
     ensure_dir(path.parent)
+    if not _HAS_REPORTLAB:
+        lines = [f"FAIR-III Monthly Report: {period_label}", "Metrics:"]
+        for key, value in metrics.items():
+            lines.append(f"  {key}: {value:.4f}")
+        lines.append("Compliance:")
+        for key, value in compliance.items():
+            lines.append(f"  {key}: {'PASS' if value else 'FAIL'}")
+        lines.append("Acceptance gates:")
+        drawdown_status = "PASS" if acceptance["max_drawdown_gate"] else "FAIL"
+        lines.append(
+            f"  MaxDD prob={acceptance['max_drawdown_probability']:.3f} gate={drawdown_status}"
+        )
+        cagr_status = "PASS" if acceptance["cagr_gate"] else "FAIL"
+        lines.append(f"  CAGR LB={acceptance['cagr_lower_bound']:.3%} gate={cagr_status}")
+        if charts:
+            lines.append("Charts:")
+            lines.extend(f"  {chart.name}" for chart in charts)
+        return _write_fallback_pdf(path, lines)
+
     page_width, page_height = A4
     pdf = canvas.Canvas(str(path), pagesize=A4)
     margin_x = 40

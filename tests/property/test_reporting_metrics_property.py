@@ -4,6 +4,10 @@ import json
 from pathlib import Path
 
 import pandas as pd
+import pytest
+
+pytest.importorskip("hypothesis")
+
 from hypothesis import given
 from hypothesis import strategies as st
 

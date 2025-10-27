@@ -8,7 +8,14 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from hmmlearn.hmm import GaussianHMM
+
+try:  # pragma: no cover - optional dependency shim
+    from hmmlearn.hmm import GaussianHMM
+
+    _HAS_HMMLEARN = True
+except ModuleNotFoundError:  # pragma: no cover - fallback
+    GaussianHMM = None  # type: ignore[assignment]
+    _HAS_HMMLEARN = False
 
 from fair3.engine.logging import setup_logger
 from fair3.engine.regime.hysteresis import apply_hysteresis
@@ -117,6 +124,14 @@ def _fit_hmm(series: pd.Series, seed: int) -> tuple[pd.Series, pd.Series]:
 
     series = series.sort_index().astype(float).replace([np.inf, -np.inf], np.nan).fillna(0.0)
     index = _ensure_datetime_index(series.index)
+    if not _HAS_HMMLEARN:
+        centred = series - series.mean()
+        scale = float(series.std()) or 1.0
+        z_score = centred / scale
+        probs = pd.Series(1.0 / (1.0 + np.exp(z_score.to_numpy())), index=index)
+        states = (probs > 0.5).astype(float)
+        return probs.clip(0.0, 1.0), states
+
     values = series.to_numpy(dtype="float64").reshape(-1, 1)
     if np.ptp(values) < 1e-8:
         baseline = np.full(len(values), 0.05, dtype="float64")

@@ -2,6 +2,10 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+import pytest
+
+pytest.importorskip("hypothesis")
+
 from hypothesis import given, settings
 from hypothesis import strategies as st
 

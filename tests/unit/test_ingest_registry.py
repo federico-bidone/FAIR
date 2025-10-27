@@ -116,6 +116,26 @@ def test_fetch_richiede_almeno_un_simbolo(tmp_path: Path) -> None:
         fetcher.fetch(symbols=[])
 
 
+def test_available_sources_includes_manual_and_alpha_sources() -> None:
+    """L'elenco delle sorgenti deve includere i dataset manuali (AQR, Alpha)."""
+
+    sources = registry.available_sources()
+    assert "aqr" in sources
+    assert "alpha" in sources
+    assert "oecd" in sources
+    assert "bis" in sources
+    assert "worldbank" in sources
+    assert "cboe" in sources
+    assert "nareit" in sources
+    assert "alphavantage_fx" in sources
+    assert "lbma" in sources
+    assert "yahoo" in sources
+    assert "tiingo" in sources
+    assert "coingecko" in sources
+    assert "binance" in sources
+    assert "portviz" in sources
+
+
 def test_simple_frame_rileva_colonne_mancanti(tmp_path: Path) -> None:
     """`_simple_frame` deve fallire se il CSV non espone le colonne attese."""
 

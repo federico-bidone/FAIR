@@ -5,7 +5,7 @@
 > **Educational only** — This repository provides a research and learning implementation of the FAIR-III portfolio construction framework. It is **not** an investment recommendation, financial promotion, or personalised advice under MiFID II.
 
 ## Overview
-FAIR-III (Unified) is a Windows-first, Python-only portfolio research stack that ingests free macro and market data (ECB, FRED, BoE, Stooq), builds point-in-time panels, estimates expected returns and covariance matrices, constructs factor-aware allocations with strong retail implementability constraints, and produces auditable execution and reporting artefacts. The system emphasises parsimony, replicability, and compliance with UCITS/EU/IT constraints, including deterministic seeding, audit trails, and realistic cost/tax handling.
+FAIR-III (Unified) is a Windows-first, Python-only portfolio research stack that ingests free macro and market data (ECB, FRED, BoE, Stooq, French Data Library, BIS, OECD, World Bank, CBOE, Nareit, LBMA, Yahoo fallback via yfinance), builds point-in-time panels, estimates expected returns and covariance matrices, constructs factor-aware allocations with strong retail implementability constraints, and produces auditable execution and reporting artefacts. The system emphasises parsimony, replicability, and compliance with UCITS/EU/IT constraints, including deterministic seeding, audit trails, and realistic cost/tax handling.
 
 ### Key Features
 - Deterministic, auditable pipeline with central seed management and checksum logging.
@@ -153,8 +153,22 @@ di successo.
 | --- | --- | --- |
 | ECB | Euro area rates, macro | Uses SDW REST CSV endpoint with logged license/URL per request. |
 | FRED | US macro/market | Public CSV interface (`fredgraph.csv`) without API key; missing data coerced to NaN. |
+| OECD | Leading indicators, PMI, macro composites | SDMX endpoint (`stats.oecd.org/sdmx-json/data`) requested as CSV with `dimensionAtObservation=TimeDimension`. |
 | Bank of England | Rates, balance sheet | CSV download interface (`_iadb-getTDDownloadCSV`) with attribution logged. |
-| Stooq | Market indices, FX | Daily CSV feed (`q/d/l`) respecting personal-use policy. |
+| BIS | Real/nominal effective exchange rates | SDMX CSV endpoint (`/api/v1/data/REER`) with `startPeriod` rounding and rate-limit guards. |
+| CBOE | Volatility (VIX) and SKEW indices | Direct CSV download (`cdn.cboe.com/api/global/us_indices/daily_prices`) with HTML guardrails and license notice. |
+| LBMA | Gold & Silver PM fix (EUR converted) | HTML tables scraped at 15:00 London, converted to EUR via ECB FX with `pit_flag` at 16:00 CET. |
+| Nareit | FTSE Nareit REIT indices (monthly) | Manual Excel drop (`data/nareit_manual/NAREIT_AllSeries.xlsx`) parsed via `fair3 ingest --source nareit`; licenza “for informational purposes only”. |
+| Portfolio Visualizer (manual) | Synthetic asset class references (monthly) | Manual CSV drops in `data/portfolio_visualizer_manual/` parsed via `fair3 ingest --source portviz`; educational/informational use only. |
+| Stooq | Market indices, FX | Daily CSV feed (`q/d/l`) with `.us/.pl` normalisation, in-process caching, and timezone metadata. |
+| Yahoo (fallback) | Equities/ETF adjusted closes | Requires optional `yfinance`; limited to five-year window with two-second throttle and personal-use license notice. |
+| AQR (manual) | Factors (QMJ, BAB, VALUE) | Manual CSV drop in `data/aqr_manual/`; license requires educational use only. |
+| Alpha / q-Factors / Novy-Marx | Quality, profitability, value spreads | HTTP CSV (Alpha Architect, q5) with manual HTML drops in `data/alpha_manual/` for Novy-Marx tables; educational-use license only. |
+| Alpha Vantage FX | Daily FX EUR crosses (USD, GBP, CHF) | REST API `function=FX_DAILY` (`ALPHAVANTAGE_API_KEY` env var) with automatic throttling (5 calls/min) and CSV normalisation. |
+| Tiingo | Equities/ETF adjusted closes | Requires `TIINGO_API_KEY`; REST JSON endpoint (`/tiingo/daily/<symbol>/prices`) with Authorization header and deterministic throttling. |
+| CoinGecko | Crypto spot prices (EUR) | REST endpoint `coins/<id>/market_chart/range` sampled at 15:00 UTC (16:00 CET) with one-second throttle and PIT flagging. |
+| Binance Data Portal | Crypto spot klines (1d/1h) | Daily ZIP archives `data/binance.vision/data/spot/daily/klines/<symbol>/<interval>/<symbol>-<interval>-<date>.zip` parsed with quote-currency metadata and redistribution guardrails. |
+| World Bank | Macro indicators (GDP, population, debt) | JSON API (`api.worldbank.org/v2/country/<ISO3>/indicator/<series>`) with auto-pagination and ISO3-normalised symbols. |
 
 Ogni esecuzione di `fair3 ingest` produce file CSV timestampati (`<source>_YYYYMMDDTHHMMSSZ.csv`) con colonne standard (`date`, `value`, `symbol`) salvati in `data/raw/<source>/`. Le informazioni di licenza e gli URL vengono registrati nei log rotanti sotto `artifacts/audit/` per supportare la conformità UCITS/EU/IT. Il passo ETL ricostruisce un pannello PIT salvando `prices.parquet`, `returns.parquet`, `features.parquet` in `data/clean/` e il QA log in `audit/qa_data_log.csv`. Do not redistribute third-party datasets without permission.
 
@@ -223,7 +237,7 @@ The following table summarises the most important packages so that new contribut
 | Package | Purpose | Key Entry Points |
 | --- | --- | --- |
 | `fair3.cli` | Command line interface definitions and argument parsing. | `fair3/cli/main.py` orchestrates sub-commands such as `fair3 factors` or `fair3 optimize`. |
-| `fair3.engine.ingest` | Downloaders for ECB, FRED, BoE, and Stooq data sources with offline fixtures. | `run_ingest` pipeline, fetcher classes like `FREDFetcher`. |
+| `fair3.engine.ingest` | Downloaders for ECB, FRED, BoE, BIS, OECD, World Bank, CBOE, Nareit, LBMA, Stooq, French Data Library, and Yahoo fallback (yfinance) sources with offline fixtures. | `run_ingest` pipeline, fetcher classes like `FREDFetcher`, `YahooFetcher`. |
 | `fair3.engine.etl` | Point-in-time panel construction and TR cleaning utilities. | `TRPanelBuilder`, ETL CLI invoked via `fair3 etl`. |
 | `fair3.engine.factors` | Factor library, orthogonalisation, validation harness. | `FactorLibrary`, `run_factor_pipeline`, CLI `fair3 factors`. |
 | `fair3.engine.estimates` | Mean/variance estimation stack, Black–Litterman blending, drift diagnostics. | `run_estimate_pipeline`, `estimate_mu_ensemble`. |

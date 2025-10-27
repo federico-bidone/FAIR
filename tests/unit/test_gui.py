@@ -31,22 +31,22 @@ if "reportlab" not in sys.modules:
         def __init__(self, *args: object, **kwargs: object) -> None:
             return None
 
-        def setFont(
+        def setFont(  # noqa: N802 - match reportlab API
             self, *args: object, **kwargs: object
-        ) -> None:  # noqa: N802 - match reportlab API
+        ) -> None:
             return None
 
-        def drawString(
+        def drawString(  # noqa: N802 - match reportlab API
             self, *args: object, **kwargs: object
-        ) -> None:  # noqa: N802 - match reportlab API
+        ) -> None:
             return None
 
         def showPage(self) -> None:  # noqa: N802 - match reportlab API
             return None
 
-        def drawImage(
+        def drawImage(  # noqa: N802 - match reportlab API
             self, *args: object, **kwargs: object
-        ) -> None:  # noqa: N802 - match reportlab API
+        ) -> None:
             return None
 
         def save(self) -> None:

@@ -13,6 +13,16 @@ import pandas as pd
 import requests
 from tqdm.auto import tqdm
 
+try:  # pragma: no cover - optional dependency shim
+    from tqdm.auto import tqdm
+except ModuleNotFoundError:  # pragma: no cover - fallback
+
+    def tqdm(iterable: Iterable[str] | None = None, **_: object) -> Iterable[str]:
+        """Minimal tqdm stub returning the iterable unchanged."""
+
+        return iterable if iterable is not None else []
+
+
 from fair3.engine.logging import setup_logger
 from fair3.engine.utils.io import ensure_dir
 
@@ -221,16 +231,46 @@ class BaseCSVFetcher:
 
 
 def _fetcher_map() -> Mapping[str, type[BaseCSVFetcher]]:
+    from .alpha import AlphaFetcher
+    from .alphavantage import AlphaVantageFXFetcher
+    from .aqr import AQRFetcher
+    from .binance import BinanceFetcher
+    from .bis import BISFetcher
     from .boe import BOEFetcher
+    from .cboe import CBOEFetcher
+    from .coingecko import CoinGeckoFetcher
     from .ecb import ECBFetcher
     from .fred import FREDFetcher
+    from .french import FrenchFetcher
+    from .lbma import LBMAFetcher
+    from .nareit import NareitFetcher
+    from .oecd import OECDFetcher
+    from .portfolio_visualizer import PortfolioVisualizerFetcher
     from .stooq import StooqFetcher
+    from .tiingo import TiingoFetcher
+    from .worldbank import WorldBankFetcher
+    from .yahoo import YahooFetcher
 
     return {
+        AlphaFetcher.SOURCE: AlphaFetcher,
+        AlphaVantageFXFetcher.SOURCE: AlphaVantageFXFetcher,
+        AQRFetcher.SOURCE: AQRFetcher,
+        BinanceFetcher.SOURCE: BinanceFetcher,
+        BISFetcher.SOURCE: BISFetcher,
         BOEFetcher.SOURCE: BOEFetcher,
+        CBOEFetcher.SOURCE: CBOEFetcher,
+        CoinGeckoFetcher.SOURCE: CoinGeckoFetcher,
         ECBFetcher.SOURCE: ECBFetcher,
         FREDFetcher.SOURCE: FREDFetcher,
+        FrenchFetcher.SOURCE: FrenchFetcher,
+        LBMAFetcher.SOURCE: LBMAFetcher,
+        NareitFetcher.SOURCE: NareitFetcher,
+        OECDFetcher.SOURCE: OECDFetcher,
+        PortfolioVisualizerFetcher.SOURCE: PortfolioVisualizerFetcher,
         StooqFetcher.SOURCE: StooqFetcher,
+        TiingoFetcher.SOURCE: TiingoFetcher,
+        WorldBankFetcher.SOURCE: WorldBankFetcher,
+        YahooFetcher.SOURCE: YahooFetcher,
     }
 
 
