@@ -3,7 +3,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_parse_date",
     "tipo": "sync",
-    "linea": 28,
+    "linea": 34,
     "argomenti": [
       "value"
     ],
@@ -13,7 +13,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_add_ingest_subparser",
     "tipo": "sync",
-    "linea": 35,
+    "linea": 41,
     "argomenti": [
       "subparsers"
     ],
@@ -23,7 +23,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_add_etl_subparser",
     "tipo": "sync",
-    "linea": 58,
+    "linea": 64,
     "argomenti": [
       "subparsers"
     ],
@@ -33,7 +33,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_add_factors_subparser",
     "tipo": "sync",
-    "linea": 71,
+    "linea": 77,
     "argomenti": [
       "subparsers"
     ],
@@ -43,7 +43,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_add_estimate_subparser",
     "tipo": "sync",
-    "linea": 94,
+    "linea": 100,
     "argomenti": [
       "subparsers"
     ],
@@ -53,7 +53,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_add_optimize_subparser",
     "tipo": "sync",
-    "linea": 115,
+    "linea": 127,
     "argomenti": [
       "subparsers"
     ],
@@ -63,7 +63,17 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_add_map_subparser",
     "tipo": "sync",
-    "linea": 141,
+    "linea": 153,
+    "argomenti": [
+      "subparsers"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_add_regime_subparser",
+    "tipo": "sync",
+    "linea": 188,
     "argomenti": [
       "subparsers"
     ],
@@ -73,7 +83,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_add_report_subparser",
     "tipo": "sync",
-    "linea": 176,
+    "linea": 222,
     "argomenti": [
       "subparsers"
     ],
@@ -83,7 +93,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_add_goals_subparser",
     "tipo": "sync",
-    "linea": 203,
+    "linea": 249,
     "argomenti": [
       "subparsers"
     ],
@@ -93,7 +103,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_add_execute_subparser",
     "tipo": "sync",
-    "linea": 243,
+    "linea": 289,
     "argomenti": [
       "subparsers"
     ],
@@ -101,9 +111,19 @@
   },
   {
     "percorso": "fair3/cli/main.py",
+    "qualifica": "_add_validate_subparser",
+    "tipo": "sync",
+    "linea": 307,
+    "argomenti": [
+      "subparsers"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/cli/main.py",
     "qualifica": "build_parser",
     "tipo": "sync",
-    "linea": 261,
+    "linea": 338,
     "argomenti": [],
     "ha_docstring": false
   },
@@ -111,7 +131,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_handle_ingest",
     "tipo": "sync",
-    "linea": 276,
+    "linea": 367,
     "argomenti": [
       "args"
     ],
@@ -121,7 +141,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_handle_etl",
     "tipo": "sync",
-    "linea": 287,
+    "linea": 388,
     "argomenti": [
       "args"
     ],
@@ -131,7 +151,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_parse_period",
     "tipo": "sync",
-    "linea": 305,
+    "linea": 406,
     "argomenti": [
       "value"
     ],
@@ -141,7 +161,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_synthetic_monthly_inputs",
     "tipo": "sync",
-    "linea": 320,
+    "linea": 421,
     "argomenti": [
       "start",
       "end",
@@ -153,7 +173,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_handle_factors",
     "tipo": "sync",
-    "linea": 369,
+    "linea": 470,
     "argomenti": [
       "args"
     ],
@@ -163,7 +183,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_handle_estimate",
     "tipo": "sync",
-    "linea": 385,
+    "linea": 486,
     "argomenti": [
       "args"
     ],
@@ -173,7 +193,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_handle_optimize",
     "tipo": "sync",
-    "linea": 399,
+    "linea": 501,
     "argomenti": [
       "args"
     ],
@@ -183,7 +203,17 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_handle_map",
     "tipo": "sync",
-    "linea": 416,
+    "linea": 518,
+    "argomenti": [
+      "args"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/cli/main.py",
+    "qualifica": "_handle_regime",
+    "tipo": "sync",
+    "linea": 536,
     "argomenti": [
       "args"
     ],
@@ -193,7 +223,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_handle_report",
     "tipo": "sync",
-    "linea": 434,
+    "linea": 561,
     "argomenti": [
       "args"
     ],
@@ -203,7 +233,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "_handle_execute",
     "tipo": "sync",
-    "linea": 453,
+    "linea": 580,
     "argomenti": [
       "args"
     ],
@@ -211,9 +241,19 @@
   },
   {
     "percorso": "fair3/cli/main.py",
+    "qualifica": "_handle_validate",
+    "tipo": "sync",
+    "linea": 602,
+    "argomenti": [
+      "args"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/cli/main.py",
     "qualifica": "_handle_goals",
     "tipo": "sync",
-    "linea": 475,
+    "linea": 623,
     "argomenti": [
       "args"
     ],
@@ -223,7 +263,7 @@
     "percorso": "fair3/cli/main.py",
     "qualifica": "main",
     "tipo": "sync",
-    "linea": 515,
+    "linea": 663,
     "argomenti": [
       "argv"
     ],
@@ -422,7 +462,7 @@
     "percorso": "fair3/engine/allocators/pipeline.py",
     "qualifica": "_load_mu_sigma",
     "tipo": "sync",
-    "linea": 38,
+    "linea": 43,
     "argomenti": [
       "artifacts_root"
     ],
@@ -432,7 +472,7 @@
     "percorso": "fair3/engine/allocators/pipeline.py",
     "qualifica": "_load_factors",
     "tipo": "sync",
-    "linea": 56,
+    "linea": 61,
     "argomenti": [
       "artifacts_root"
     ],
@@ -442,7 +482,7 @@
     "percorso": "fair3/engine/allocators/pipeline.py",
     "qualifica": "_load_configs",
     "tipo": "sync",
-    "linea": 71,
+    "linea": 76,
     "argomenti": [
       "params_path",
       "thresholds_path"
@@ -453,7 +493,7 @@
     "percorso": "fair3/engine/allocators/pipeline.py",
     "qualifica": "_cluster_indices",
     "tipo": "sync",
-    "linea": 82,
+    "linea": 91,
     "argomenti": [
       "n_assets",
       "n_clusters"
@@ -464,7 +504,7 @@
     "percorso": "fair3/engine/allocators/pipeline.py",
     "qualifica": "_run_generator",
     "tipo": "sync",
-    "linea": 92,
+    "linea": 101,
     "argomenti": [
       "name",
       "mu_vec",
@@ -477,7 +517,7 @@
     "percorso": "fair3/engine/allocators/pipeline.py",
     "qualifica": "run_optimization_pipeline",
     "tipo": "sync",
-    "linea": 120,
+    "linea": 130,
     "argomenti": [],
     "ha_docstring": true
   },
@@ -605,7 +645,7 @@
     "percorso": "fair3/engine/estimates/pipeline.py",
     "qualifica": "_load_factors",
     "tipo": "sync",
-    "linea": 42,
+    "linea": 45,
     "argomenti": [
       "artifacts_root"
     ],
@@ -615,7 +655,7 @@
     "percorso": "fair3/engine/estimates/pipeline.py",
     "qualifica": "_load_thresholds",
     "tipo": "sync",
-    "linea": 57,
+    "linea": 60,
     "argomenti": [
       "config_path"
     ],
@@ -625,7 +665,7 @@
     "percorso": "fair3/engine/estimates/pipeline.py",
     "qualifica": "_to_correlation",
     "tipo": "sync",
-    "linea": 68,
+    "linea": 74,
     "argomenti": [
       "matrix"
     ],
@@ -635,7 +675,7 @@
     "percorso": "fair3/engine/estimates/pipeline.py",
     "qualifica": "_write_series",
     "tipo": "sync",
-    "linea": 81,
+    "linea": 87,
     "argomenti": [
       "series"
     ],
@@ -645,7 +685,7 @@
     "percorso": "fair3/engine/estimates/pipeline.py",
     "qualifica": "_append_drift_log",
     "tipo": "sync",
-    "linea": 91,
+    "linea": 97,
     "argomenti": [
       "path",
       "frob",
@@ -657,7 +697,7 @@
     "percorso": "fair3/engine/estimates/pipeline.py",
     "qualifica": "run_estimate_pipeline",
     "tipo": "sync",
-    "linea": 106,
+    "linea": 112,
     "argomenti": [],
     "ha_docstring": true
   },
@@ -665,7 +705,7 @@
     "percorso": "fair3/engine/estimates/sigma.py",
     "qualifica": "_validate_frame",
     "tipo": "sync",
-    "linea": 26,
+    "linea": 30,
     "argomenti": [
       "frame"
     ],
@@ -675,7 +715,7 @@
     "percorso": "fair3/engine/estimates/sigma.py",
     "qualifica": "ledoit_wolf",
     "tipo": "sync",
-    "linea": 34,
+    "linea": 38,
     "argomenti": [
       "frame"
     ],
@@ -685,7 +725,7 @@
     "percorso": "fair3/engine/estimates/sigma.py",
     "qualifica": "_graphical_lasso_path",
     "tipo": "sync",
-    "linea": 45,
+    "linea": 49,
     "argomenti": [
       "emp_cov",
       "lambdas",
@@ -697,7 +737,7 @@
     "percorso": "fair3/engine/estimates/sigma.py",
     "qualifica": "graphical_lasso_bic",
     "tipo": "sync",
-    "linea": 74,
+    "linea": 78,
     "argomenti": [
       "frame",
       "lambdas",
@@ -710,7 +750,7 @@
     "percorso": "fair3/engine/estimates/sigma.py",
     "qualifica": "factor_shrink",
     "tipo": "sync",
-    "linea": 107,
+    "linea": 111,
     "argomenti": [
       "frame",
       "n_factors"
@@ -721,7 +761,7 @@
     "percorso": "fair3/engine/estimates/sigma.py",
     "qualifica": "median_of_covariances",
     "tipo": "sync",
-    "linea": 132,
+    "linea": 136,
     "argomenti": [
       "covs"
     ],
@@ -729,9 +769,114 @@
   },
   {
     "percorso": "fair3/engine/estimates/sigma.py",
+    "qualifica": "_symmetrize",
+    "tipo": "sync",
+    "linea": 148,
+    "argomenti": [
+      "matrix"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/sigma.py",
+    "qualifica": "_matrix_from_eigendecomposition",
+    "tipo": "sync",
+    "linea": 152,
+    "argomenti": [
+      "matrix",
+      "transform"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/sigma.py",
+    "qualifica": "_matrix_power",
+    "tipo": "sync",
+    "linea": 163,
+    "argomenti": [
+      "matrix",
+      "power"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/sigma.py",
+    "qualifica": "_matrix_log",
+    "tipo": "sync",
+    "linea": 167,
+    "argomenti": [
+      "matrix"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/sigma.py",
+    "qualifica": "_matrix_exp",
+    "tipo": "sync",
+    "linea": 171,
+    "argomenti": [
+      "matrix"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/sigma.py",
+    "qualifica": "_ensure_spd",
+    "tipo": "sync",
+    "linea": 175,
+    "argomenti": [
+      "matrix",
+      "min_eig"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/sigma.py",
+    "qualifica": "_riemannian_log",
+    "tipo": "sync",
+    "linea": 183,
+    "argomenti": [
+      "base",
+      "target"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/sigma.py",
+    "qualifica": "_riemannian_exp",
+    "tipo": "sync",
+    "linea": 195,
+    "argomenti": [
+      "base",
+      "tangent"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "fair3/engine/estimates/sigma.py",
+    "qualifica": "sigma_consensus_psd",
+    "tipo": "sync",
+    "linea": 208,
+    "argomenti": [
+      "covariances"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/estimates/sigma.py",
+    "qualifica": "sigma_spd_median",
+    "tipo": "sync",
+    "linea": 238,
+    "argomenti": [
+      "covariances"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/estimates/sigma.py",
     "qualifica": "ewma_regime",
     "tipo": "sync",
-    "linea": 144,
+    "linea": 298,
     "argomenti": [
       "sigma_prev",
       "sigma_star_psd",
@@ -743,28 +888,28 @@
     "percorso": "fair3/engine/etl/calendar.py",
     "qualifica": "TradingCalendar.to_frame",
     "tipo": "sync",
-    "linea": 22,
+    "linea": 30,
     "argomenti": [
       "self"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/etl/calendar.py",
     "qualifica": "TradingCalendar.save",
     "tipo": "sync",
-    "linea": 25,
+    "linea": 38,
     "argomenti": [
       "self",
       "path"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/etl/calendar.py",
     "qualifica": "build_calendar",
     "tipo": "sync",
-    "linea": 33,
+    "linea": 48,
     "argomenti": [
       "frames"
     ],
@@ -774,7 +919,7 @@
     "percorso": "fair3/engine/etl/calendar.py",
     "qualifica": "reindex_frame",
     "tipo": "sync",
-    "linea": 67,
+    "linea": 94,
     "argomenti": [
       "frame"
     ],
@@ -784,17 +929,17 @@
     "percorso": "fair3/engine/etl/cleaning.py",
     "qualifica": "HampelConfig.__post_init__",
     "tipo": "sync",
-    "linea": 22,
+    "linea": 33,
     "argomenti": [
       "self"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/etl/cleaning.py",
     "qualifica": "apply_hampel",
     "tipo": "sync",
-    "linea": 29,
+    "linea": 42,
     "argomenti": [
       "series",
       "config"
@@ -805,7 +950,7 @@
     "percorso": "fair3/engine/etl/cleaning.py",
     "qualifica": "winsorize_series",
     "tipo": "sync",
-    "linea": 48,
+    "linea": 71,
     "argomenti": [
       "series"
     ],
@@ -815,7 +960,7 @@
     "percorso": "fair3/engine/etl/cleaning.py",
     "qualifica": "clean_price_history",
     "tipo": "sync",
-    "linea": 64,
+    "linea": 87,
     "argomenti": [
       "frame"
     ],
@@ -825,7 +970,7 @@
     "percorso": "fair3/engine/etl/cleaning.py",
     "qualifica": "prepare_estimation_copy",
     "tipo": "sync",
-    "linea": 85,
+    "linea": 113,
     "argomenti": [
       "returns"
     ],
@@ -835,29 +980,29 @@
     "percorso": "fair3/engine/etl/fx.py",
     "qualifica": "FXFrame.lookup",
     "tipo": "sync",
-    "linea": 21,
+    "linea": 28,
     "argomenti": [
       "self",
       "currency"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/etl/fx.py",
     "qualifica": "FXFrame.save",
     "tipo": "sync",
-    "linea": 29,
+    "linea": 41,
     "argomenti": [
       "self",
       "path"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/etl/fx.py",
     "qualifica": "load_fx_rates",
     "tipo": "sync",
-    "linea": 37,
+    "linea": 51,
     "argomenti": [
       "records",
       "base_currency"
@@ -868,7 +1013,7 @@
     "percorso": "fair3/engine/etl/fx.py",
     "qualifica": "convert_to_base",
     "tipo": "sync",
-    "linea": 62,
+    "linea": 93,
     "argomenti": [
       "frame"
     ],
@@ -878,7 +1023,7 @@
     "percorso": "fair3/engine/etl/make_tr_panel.py",
     "qualifica": "TRPanelBuilder.__init__",
     "tipo": "sync",
-    "linea": 29,
+    "linea": 40,
     "argomenti": [
       "self"
     ],
@@ -888,62 +1033,62 @@
     "percorso": "fair3/engine/etl/make_tr_panel.py",
     "qualifica": "TRPanelBuilder.build",
     "tipo": "sync",
-    "linea": 43,
+    "linea": 54,
     "argomenti": [
       "self"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/etl/make_tr_panel.py",
     "qualifica": "TRPanelBuilder._load_raw_records",
     "tipo": "sync",
-    "linea": 72,
+    "linea": 87,
     "argomenti": [
       "self"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/etl/make_tr_panel.py",
     "qualifica": "TRPanelBuilder._build_calendar",
     "tipo": "sync",
-    "linea": 90,
+    "linea": 108,
     "argomenti": [
       "self",
       "records"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/etl/make_tr_panel.py",
     "qualifica": "TRPanelBuilder._build_fx_frame",
     "tipo": "sync",
-    "linea": 102,
+    "linea": 122,
     "argomenti": [
       "self",
       "records"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/etl/make_tr_panel.py",
     "qualifica": "TRPanelBuilder._prepare_prices",
     "tipo": "sync",
-    "linea": 108,
+    "linea": 133,
     "argomenti": [
       "self",
       "records",
       "calendar",
       "fx_frame"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/etl/make_tr_panel.py",
     "qualifica": "TRPanelBuilder._compute_returns",
     "tipo": "sync",
-    "linea": 157,
+    "linea": 188,
     "argomenti": [
       "self",
       "prices"
@@ -954,7 +1099,7 @@
     "percorso": "fair3/engine/etl/make_tr_panel.py",
     "qualifica": "TRPanelBuilder._compute_features",
     "tipo": "sync",
-    "linea": 198,
+    "linea": 231,
     "argomenti": [
       "self",
       "returns"
@@ -965,43 +1110,43 @@
     "percorso": "fair3/engine/etl/make_tr_panel.py",
     "qualifica": "TRPanelBuilder._lagged_mean",
     "tipo": "sync",
-    "linea": 202,
+    "linea": 235,
     "argomenti": [
       "series",
       "window",
       "min_periods"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/etl/make_tr_panel.py",
     "qualifica": "TRPanelBuilder._lagged_std",
     "tipo": "sync",
-    "linea": 205,
+    "linea": 240,
     "argomenti": [
       "series",
       "window",
       "min_periods"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/etl/make_tr_panel.py",
     "qualifica": "TRPanelBuilder._write_parquet",
     "tipo": "sync",
-    "linea": 222,
+    "linea": 260,
     "argomenti": [
       "self",
       "frame",
       "name"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/etl/make_tr_panel.py",
     "qualifica": "build_tr_panel",
     "tipo": "sync",
-    "linea": 232,
+    "linea": 272,
     "argomenti": [],
     "ha_docstring": false
   },
@@ -1009,33 +1154,33 @@
     "percorso": "fair3/engine/etl/qa.py",
     "qualifica": "QAReport.to_frame",
     "tipo": "sync",
-    "linea": 30,
+    "linea": 41,
     "argomenti": [
       "self"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/etl/qa.py",
     "qualifica": "QAReport.append",
     "tipo": "sync",
-    "linea": 33,
+    "linea": 46,
     "argomenti": [
       "self",
       "record"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/etl/qa.py",
     "qualifica": "write_qa_log",
     "tipo": "sync",
-    "linea": 37,
+    "linea": 52,
     "argomenti": [
       "report",
       "path"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/execution/costs.py",
@@ -1322,7 +1467,7 @@
     "percorso": "fair3/engine/factors/pipeline.py",
     "qualifica": "_multiindex_to_datetime",
     "tipo": "sync",
-    "linea": 33,
+    "linea": 34,
     "argomenti": [
       "index"
     ],
@@ -1332,7 +1477,7 @@
     "percorso": "fair3/engine/factors/pipeline.py",
     "qualifica": "_load_panel",
     "tipo": "sync",
-    "linea": 43,
+    "linea": 44,
     "argomenti": [
       "clean_root"
     ],
@@ -1342,31 +1487,31 @@
     "percorso": "fair3/engine/factors/pipeline.py",
     "qualifica": "_write_metadata",
     "tipo": "sync",
-    "linea": 60,
+    "linea": 66,
     "argomenti": [
       "library",
       "merged",
       "loadings",
       "condition_number"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/factors/pipeline.py",
     "qualifica": "_write_validation",
     "tipo": "sync",
-    "linea": 83,
+    "linea": 91,
     "argomenti": [
       "factors",
       "returns"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/factors/pipeline.py",
     "qualifica": "run_factor_pipeline",
     "tipo": "sync",
-    "linea": 113,
+    "linea": 123,
     "argomenti": [],
     "ha_docstring": true
   },
@@ -1609,30 +1754,30 @@
       "symbol",
       "start"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/boe.py",
     "qualifica": "BOEFetcher._validate_payload",
     "tipo": "sync",
-    "linea": 41,
+    "linea": 42,
     "argomenti": [
       "self",
       "payload"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/boe.py",
     "qualifica": "BOEFetcher.parse",
     "tipo": "sync",
-    "linea": 47,
+    "linea": 49,
     "argomenti": [
       "self",
       "payload",
       "symbol"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/ecb.py",
@@ -1644,19 +1789,19 @@
       "symbol",
       "start"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/ecb.py",
     "qualifica": "ECBFetcher.parse",
     "tipo": "sync",
-    "linea": 26,
+    "linea": 27,
     "argomenti": [
       "self",
       "payload",
       "symbol"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/fred.py",
@@ -1666,48 +1811,48 @@
     "argomenti": [
       "self"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/fred.py",
     "qualifica": "FREDFetcher.build_url",
     "tipo": "sync",
-    "linea": 50,
+    "linea": 51,
     "argomenti": [
       "self",
       "symbol",
       "start"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/fred.py",
     "qualifica": "FREDFetcher._download",
     "tipo": "sync",
-    "linea": 60,
+    "linea": 62,
     "argomenti": [
       "self",
       "url"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/fred.py",
     "qualifica": "FREDFetcher.parse",
     "tipo": "sync",
-    "linea": 84,
+    "linea": 87,
     "argomenti": [
       "self",
       "payload",
       "symbol"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/registry.py",
     "qualifica": "BaseCSVFetcher.__init__",
     "tipo": "sync",
-    "linea": 48,
+    "linea": 49,
     "argomenti": [
       "self"
     ],
@@ -1717,76 +1862,76 @@
     "percorso": "fair3/engine/ingest/registry.py",
     "qualifica": "BaseCSVFetcher.fetch",
     "tipo": "sync",
-    "linea": 64,
+    "linea": 66,
     "argomenti": [
       "self"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/registry.py",
     "qualifica": "BaseCSVFetcher.build_url",
     "tipo": "sync",
-    "linea": 123,
+    "linea": 150,
     "argomenti": [
       "self",
       "symbol",
       "start"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/registry.py",
     "qualifica": "BaseCSVFetcher.parse",
     "tipo": "sync",
-    "linea": 126,
+    "linea": 154,
     "argomenti": [
       "self",
       "payload",
       "symbol"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/registry.py",
     "qualifica": "BaseCSVFetcher._download",
     "tipo": "sync",
-    "linea": 130,
+    "linea": 159,
     "argomenti": [
       "self",
       "url"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/registry.py",
     "qualifica": "BaseCSVFetcher._simple_frame",
     "tipo": "sync",
-    "linea": 155,
+    "linea": 185,
     "argomenti": [
       "self",
       "payload",
       "symbol"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/registry.py",
     "qualifica": "BaseCSVFetcher._write_csv",
     "tipo": "sync",
-    "linea": 180,
+    "linea": 211,
     "argomenti": [
       "self",
       "data",
       "timestamp"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/registry.py",
     "qualifica": "_fetcher_map",
     "tipo": "sync",
-    "linea": 191,
+    "linea": 223,
     "argomenti": [],
     "ha_docstring": false
   },
@@ -1794,7 +1939,7 @@
     "percorso": "fair3/engine/ingest/registry.py",
     "qualifica": "available_sources",
     "tipo": "sync",
-    "linea": 205,
+    "linea": 237,
     "argomenti": [],
     "ha_docstring": true
   },
@@ -1802,21 +1947,21 @@
     "percorso": "fair3/engine/ingest/registry.py",
     "qualifica": "create_fetcher",
     "tipo": "sync",
-    "linea": 211,
+    "linea": 243,
     "argomenti": [
       "source"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/registry.py",
     "qualifica": "run_ingest",
     "tipo": "sync",
-    "linea": 219,
+    "linea": 252,
     "argomenti": [
       "source"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/stooq.py",
@@ -1828,19 +1973,125 @@
       "symbol",
       "start"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/ingest/stooq.py",
     "qualifica": "StooqFetcher.parse",
     "tipo": "sync",
-    "linea": 23,
+    "linea": 24,
     "argomenti": [
       "self",
       "payload",
       "symbol"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/logging.py",
+    "qualifica": "JsonAuditFormatter.format",
+    "tipo": "sync",
+    "linea": 25,
+    "argomenti": [
+      "self",
+      "record"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/logging.py",
+    "qualifica": "_coerce_number",
+    "tipo": "sync",
+    "linea": 42,
+    "argomenti": [
+      "value"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/logging.py",
+    "qualifica": "_ensure_audit_dir",
+    "tipo": "sync",
+    "linea": 53,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/logging.py",
+    "qualifica": "_resolve_level",
+    "tipo": "sync",
+    "linea": 59,
+    "argomenti": [
+      "level"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/logging.py",
+    "qualifica": "_json_logging_enabled",
+    "tipo": "sync",
+    "linea": 75,
+    "argomenti": [
+      "explicit"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/logging.py",
+    "qualifica": "_ensure_console_handler",
+    "tipo": "sync",
+    "linea": 86,
+    "argomenti": [
+      "logger",
+      "level"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/logging.py",
+    "qualifica": "_ensure_json_handler",
+    "tipo": "sync",
+    "linea": 100,
+    "argomenti": [
+      "logger",
+      "level"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/logging.py",
+    "qualifica": "setup_logger",
+    "tipo": "sync",
+    "linea": 115,
+    "argomenti": [
+      "name",
+      "json_format",
+      "level"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/logging.py",
+    "qualifica": "record_metrics",
+    "tipo": "sync",
+    "linea": 134,
+    "argomenti": [
+      "metric_name",
+      "value",
+      "tags"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/logging.py",
+    "qualifica": "configure_cli_logging",
+    "tipo": "sync",
+    "linea": 148,
+    "argomenti": [
+      "json_logs",
+      "level"
+    ],
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/mapping/beta.py",
@@ -2060,47 +2311,116 @@
     "percorso": "fair3/engine/regime/committee.py",
     "qualifica": "CommitteeWeights.normalised",
     "tipo": "sync",
-    "linea": 20,
+    "linea": 33,
     "argomenti": [
       "self"
-    ],
-    "ha_docstring": false
-  },
-  {
-    "percorso": "fair3/engine/regime/committee.py",
-    "qualifica": "_filter_hmm_prob",
-    "tipo": "sync",
-    "linea": 28,
-    "argomenti": [
-      "ret"
     ],
     "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/regime/committee.py",
-    "qualifica": "_volatility_stress",
+    "qualifica": "CommitteeWeights.from_mapping",
     "tipo": "sync",
-    "linea": 57,
+    "linea": 50,
     "argomenti": [
-      "vol"
+      "cls",
+      "payload"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/regime/committee.py",
-    "qualifica": "_macro_slowdown",
+    "qualifica": "_coerce_mapping",
     "tipo": "sync",
-    "linea": 67,
+    "linea": 69,
     "argomenti": [
-      "macro"
+      "payload"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/committee.py",
+    "qualifica": "_extract_section",
+    "tipo": "sync",
+    "linea": 83,
+    "argomenti": [
+      "panel",
+      "field"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/committee.py",
+    "qualifica": "_ensure_datetime_index",
+    "tipo": "sync",
+    "linea": 103,
+    "argomenti": [
+      "index"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/committee.py",
+    "qualifica": "_fit_hmm",
+    "tipo": "sync",
+    "linea": 111,
+    "argomenti": [
+      "series",
+      "seed"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/committee.py",
+    "qualifica": "_smooth_states",
+    "tipo": "sync",
+    "linea": 149,
+    "argomenti": [
+      "states",
+      "min_duration"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/committee.py",
+    "qualifica": "_volatility_probabilities",
+    "tipo": "sync",
+    "linea": 170,
+    "argomenti": [
+      "vol",
+      "config",
+      "seed"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/committee.py",
+    "qualifica": "_macro_probabilities",
+    "tipo": "sync",
+    "linea": 199,
+    "argomenti": [
+      "macro",
+      "config"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/committee.py",
+    "qualifica": "regime_probability",
+    "tipo": "sync",
+    "linea": 252,
+    "argomenti": [
+      "panel",
+      "cfg",
+      "seed"
+    ],
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/regime/committee.py",
     "qualifica": "crisis_probability",
     "tipo": "sync",
-    "linea": 84,
+    "linea": 415,
     "argomenti": [
       "returns",
       "vol",
@@ -2119,7 +2439,9 @@
       "on",
       "off",
       "dwell_days",
-      "cooldown_days"
+      "cooldown_days",
+      "activate_streak",
+      "deactivate_streak"
     ],
     "ha_docstring": true
   },
@@ -2127,10 +2449,84 @@
     "percorso": "fair3/engine/regime/hysteresis.py",
     "qualifica": "tilt_lambda",
     "tipo": "sync",
-    "linea": 51,
+    "linea": 71,
     "argomenti": [
       "p_t"
     ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/pipeline.py",
+    "qualifica": "_load_thresholds",
+    "tipo": "sync",
+    "linea": 41,
+    "argomenti": [
+      "path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/pipeline.py",
+    "qualifica": "_load_returns",
+    "tipo": "sync",
+    "linea": 51,
+    "argomenti": [
+      "clean_root",
+      "seed"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/pipeline.py",
+    "qualifica": "_load_volatility",
+    "tipo": "sync",
+    "linea": 125,
+    "argomenti": [
+      "clean_root",
+      "returns"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/pipeline.py",
+    "qualifica": "_synthesise_macro",
+    "tipo": "sync",
+    "linea": 182,
+    "argomenti": [
+      "index",
+      "seed"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/pipeline.py",
+    "qualifica": "_load_macro",
+    "tipo": "sync",
+    "linea": 200,
+    "argomenti": [
+      "clean_root",
+      "index",
+      "seed"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/pipeline.py",
+    "qualifica": "_assemble_panel",
+    "tipo": "sync",
+    "linea": 241,
+    "argomenti": [
+      "clean_root",
+      "seed"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/regime/pipeline.py",
+    "qualifica": "run_regime_pipeline",
+    "tipo": "sync",
+    "linea": 257,
+    "argomenti": [],
     "ha_docstring": true
   },
   {
@@ -2333,18 +2729,18 @@
     "percorso": "fair3/engine/robustness/ablation.py",
     "qualifica": "_normalise_flags",
     "tipo": "sync",
-    "linea": 34,
+    "linea": 36,
     "argomenti": [
       "features",
       "base_flags"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/robustness/ablation.py",
     "qualifica": "run_ablation_study",
     "tipo": "sync",
-    "linea": 45,
+    "linea": 51,
     "argomenti": [
       "runner"
     ],
@@ -2368,43 +2764,43 @@
     "argomenti": [
       "returns"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/robustness/bootstrap.py",
     "qualifica": "_block_bootstrap_samples",
     "tipo": "sync",
-    "linea": 41,
+    "linea": 43,
     "argomenti": [
       "arr"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/robustness/bootstrap.py",
     "qualifica": "_max_drawdown",
     "tipo": "sync",
-    "linea": 63,
+    "linea": 68,
     "argomenti": [
       "path"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/robustness/bootstrap.py",
     "qualifica": "_cagr",
     "tipo": "sync",
-    "linea": 73,
+    "linea": 80,
     "argomenti": [
       "path"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/robustness/bootstrap.py",
     "qualifica": "block_bootstrap_metrics",
     "tipo": "sync",
-    "linea": 86,
+    "linea": 95,
     "argomenti": [
       "returns"
     ],
@@ -2420,13 +2816,13 @@
       "scenarios",
       "gates"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/robustness/lab.py",
     "qualifica": "run_robustness_lab",
     "tipo": "sync",
-    "linea": 92,
+    "linea": 94,
     "argomenti": [
       "returns"
     ],
@@ -2436,11 +2832,11 @@
     "percorso": "fair3/engine/robustness/lab.py",
     "qualifica": "runner",
     "tipo": "sync",
-    "linea": 153,
+    "linea": 155,
     "argomenti": [
       "flags"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/robustness/scenarios.py",
@@ -2450,23 +2846,23 @@
     "argomenti": [
       "path"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/robustness/scenarios.py",
     "qualifica": "_scenario_cagr",
     "tipo": "sync",
-    "linea": 34,
+    "linea": 36,
     "argomenti": [
       "path"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/robustness/scenarios.py",
     "qualifica": "default_shock_scenarios",
     "tipo": "sync",
-    "linea": 129,
+    "linea": 133,
     "argomenti": [],
     "ha_docstring": true
   },
@@ -2474,18 +2870,18 @@
     "percorso": "fair3/engine/robustness/scenarios.py",
     "qualifica": "_scale_scenario",
     "tipo": "sync",
-    "linea": 135,
+    "linea": 139,
     "argomenti": [
       "returns",
       "target_vol"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "fair3/engine/robustness/scenarios.py",
     "qualifica": "replay_shocks",
     "tipo": "sync",
-    "linea": 143,
+    "linea": 149,
     "argomenti": [
       "base_returns"
     ],
@@ -2495,7 +2891,7 @@
     "percorso": "fair3/engine/utils/io.py",
     "qualifica": "ensure_dir",
     "tipo": "sync",
-    "linea": 31,
+    "linea": 40,
     "argomenti": [
       "path"
     ],
@@ -2505,7 +2901,7 @@
     "percorso": "fair3/engine/utils/io.py",
     "qualifica": "safe_path_segment",
     "tipo": "sync",
-    "linea": 39,
+    "linea": 50,
     "argomenti": [
       "name"
     ],
@@ -2515,7 +2911,7 @@
     "percorso": "fair3/engine/utils/io.py",
     "qualifica": "artifact_path",
     "tipo": "sync",
-    "linea": 46,
+    "linea": 59,
     "argomenti": [],
     "ha_docstring": true
   },
@@ -2523,7 +2919,7 @@
     "percorso": "fair3/engine/utils/io.py",
     "qualifica": "read_yaml",
     "tipo": "sync",
-    "linea": 70,
+    "linea": 75,
     "argomenti": [
       "path"
     ],
@@ -2533,7 +2929,7 @@
     "percorso": "fair3/engine/utils/io.py",
     "qualifica": "write_yaml",
     "tipo": "sync",
-    "linea": 77,
+    "linea": 82,
     "argomenti": [
       "data",
       "path"
@@ -2544,7 +2940,7 @@
     "percorso": "fair3/engine/utils/io.py",
     "qualifica": "sha256_file",
     "tipo": "sync",
-    "linea": 87,
+    "linea": 93,
     "argomenti": [
       "path"
     ],
@@ -2554,7 +2950,7 @@
     "percorso": "fair3/engine/utils/io.py",
     "qualifica": "compute_checksums",
     "tipo": "sync",
-    "linea": 99,
+    "linea": 106,
     "argomenti": [
       "paths"
     ],
@@ -2564,7 +2960,7 @@
     "percorso": "fair3/engine/utils/io.py",
     "qualifica": "copy_with_timestamp",
     "tipo": "sync",
-    "linea": 111,
+    "linea": 119,
     "argomenti": [
       "src",
       "dest_dir"
@@ -2575,87 +2971,10 @@
     "percorso": "fair3/engine/utils/io.py",
     "qualifica": "write_json",
     "tipo": "sync",
-    "linea": 133,
+    "linea": 142,
     "argomenti": [
       "data",
       "path"
-    ],
-    "ha_docstring": true
-  },
-  {
-    "percorso": "fair3/engine/utils/log.py",
-    "qualifica": "default_log_dir",
-    "tipo": "sync",
-    "linea": 10,
-    "argomenti": [],
-    "ha_docstring": true
-  },
-  {
-    "percorso": "fair3/engine/utils/log.py",
-    "qualifica": "_as_level",
-    "tipo": "sync",
-    "linea": 17,
-    "argomenti": [
-      "level"
-    ],
-    "ha_docstring": false
-  },
-  {
-    "percorso": "fair3/engine/utils/log.py",
-    "qualifica": "_file_handler",
-    "tipo": "sync",
-    "linea": 24,
-    "argomenti": [
-      "path",
-      "level",
-      "max_bytes",
-      "backup_count"
-    ],
-    "ha_docstring": false
-  },
-  {
-    "percorso": "fair3/engine/utils/log.py",
-    "qualifica": "setup_logger",
-    "tipo": "sync",
-    "linea": 45,
-    "argomenti": [
-      "name"
-    ],
-    "ha_docstring": true
-  },
-  {
-    "percorso": "fair3/engine/utils/log.py",
-    "qualifica": "get_logger",
-    "tipo": "sync",
-    "linea": 108,
-    "argomenti": [
-      "name"
-    ],
-    "ha_docstring": true
-  },
-  {
-    "percorso": "fair3/engine/utils/logging.py",
-    "qualifica": "_determine_level",
-    "tipo": "sync",
-    "linea": 21,
-    "argomenti": [],
-    "ha_docstring": true
-  },
-  {
-    "percorso": "fair3/engine/utils/logging.py",
-    "qualifica": "_determine_format",
-    "tipo": "sync",
-    "linea": 40,
-    "argomenti": [],
-    "ha_docstring": true
-  },
-  {
-    "percorso": "fair3/engine/utils/logging.py",
-    "qualifica": "get_stream_logger",
-    "tipo": "sync",
-    "linea": 54,
-    "argomenti": [
-      "name"
     ],
     "ha_docstring": true
   },
@@ -2674,7 +2993,7 @@
     "percorso": "fair3/engine/utils/rand.py",
     "qualifica": "load_seeds",
     "tipo": "sync",
-    "linea": 27,
+    "linea": 29,
     "argomenti": [
       "seed_path"
     ],
@@ -2684,7 +3003,7 @@
     "percorso": "fair3/engine/utils/rand.py",
     "qualifica": "save_seeds",
     "tipo": "sync",
-    "linea": 59,
+    "linea": 61,
     "argomenti": [
       "seeds",
       "seed_path"
@@ -2695,7 +3014,7 @@
     "percorso": "fair3/engine/utils/rand.py",
     "qualifica": "seed_for_stream",
     "tipo": "sync",
-    "linea": 73,
+    "linea": 75,
     "argomenti": [
       "stream"
     ],
@@ -2705,7 +3024,7 @@
     "percorso": "fair3/engine/utils/rand.py",
     "qualifica": "generator_from_seed",
     "tipo": "sync",
-    "linea": 87,
+    "linea": 89,
     "argomenti": [
       "seed"
     ],
@@ -2715,7 +3034,7 @@
     "percorso": "fair3/engine/utils/rand.py",
     "qualifica": "broadcast_seed",
     "tipo": "sync",
-    "linea": 105,
+    "linea": 107,
     "argomenti": [
       "seed"
     ],
@@ -2725,10 +3044,71 @@
     "percorso": "fair3/engine/utils/rand.py",
     "qualifica": "spawn_child_rng",
     "tipo": "sync",
-    "linea": 113,
+    "linea": 115,
     "argomenti": [
       "parent"
     ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/validate.py",
+    "qualifica": "RegimeCommitteeWeights._check_sum",
+    "tipo": "sync",
+    "linea": 157,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/validate.py",
+    "qualifica": "RegimeMacroConfig._check_weights",
+    "tipo": "sync",
+    "linea": 190,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/validate.py",
+    "qualifica": "RegimeThresholds._check_hysteresis",
+    "tipo": "sync",
+    "linea": 228,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/validate.py",
+    "qualifica": "GoalsConfig._check_non_empty",
+    "tipo": "sync",
+    "linea": 303,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/validate.py",
+    "qualifica": "_validate_file",
+    "tipo": "sync",
+    "linea": 312,
+    "argomenti": [
+      "label",
+      "path",
+      "model",
+      "summary"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "fair3/engine/validate.py",
+    "qualifica": "validate_configs",
+    "tipo": "sync",
+    "linea": 348,
+    "argomenti": [],
     "ha_docstring": true
   },
   {
@@ -2930,6 +3310,36 @@
     "ha_docstring": false
   },
   {
+    "percorso": "tests/property/test_sigma_spd_median.py",
+    "qualifica": "spd_covariance_frames",
+    "tipo": "sync",
+    "linea": 14,
+    "argomenti": [
+      "draw"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_sigma_spd_median.py",
+    "qualifica": "test_sigma_spd_median_returns_psd",
+    "tipo": "sync",
+    "linea": 30,
+    "argomenti": [
+      "frames"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/property/test_sigma_spd_median.py",
+    "qualifica": "test_sigma_spd_median_invariant_to_order",
+    "tipo": "sync",
+    "linea": 38,
+    "argomenti": [
+      "frames"
+    ],
+    "ha_docstring": false
+  },
+  {
     "percorso": "tests/unit/test_allocators_primitives.py",
     "qualifica": "test_risk_contributions_sum_to_one",
     "tipo": "sync",
@@ -3031,7 +3441,39 @@
     "percorso": "tests/unit/test_cli_ingest.py",
     "qualifica": "fake_run_ingest",
     "tipo": "sync",
-    "linea": 39,
+    "linea": 40,
+    "argomenti": [
+      "source"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_cli_ingest.py",
+    "qualifica": "test_cli_ingest_respects_global_flags",
+    "tipo": "sync",
+    "linea": 64,
+    "argomenti": [
+      "monkeypatch",
+      "tmp_path",
+      "capsys"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_cli_ingest.py",
+    "qualifica": "fake_configure",
+    "tipo": "sync",
+    "linea": 85,
+    "argomenti": [
+      "json_logs"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_cli_ingest.py",
+    "qualifica": "fake_run_ingest",
+    "tipo": "sync",
+    "linea": 88,
     "argomenti": [
       "source"
     ],
@@ -3070,6 +3512,38 @@
     "ha_docstring": false
   },
   {
+    "percorso": "tests/unit/test_cli_regime.py",
+    "qualifica": "_seed_clean_panel",
+    "tipo": "sync",
+    "linea": 12,
+    "argomenti": [
+      "root"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_cli_regime.py",
+    "qualifica": "_write_thresholds",
+    "tipo": "sync",
+    "linea": 32,
+    "argomenti": [
+      "path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_cli_regime.py",
+    "qualifica": "test_cli_regime_command",
+    "tipo": "sync",
+    "linea": 62,
+    "argomenti": [
+      "tmp_path",
+      "monkeypatch",
+      "capsys"
+    ],
+    "ha_docstring": false
+  },
+  {
     "percorso": "tests/unit/test_cli_report.py",
     "qualifica": "test_cli_report_monthly",
     "tipo": "sync",
@@ -3102,36 +3576,88 @@
     "ha_docstring": false
   },
   {
-    "percorso": "tests/unit/test_etl_cleaning.py",
-    "qualifica": "test_apply_hampel_removes_spike",
+    "percorso": "tests/unit/test_etl_calendar.py",
+    "qualifica": "_make_frame",
     "tipo": "sync",
-    "linea": 16,
+    "linea": 14,
+    "argomenti": [
+      "date_strings"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_etl_calendar.py",
+    "qualifica": "test_build_calendar_valida_colonna_date",
+    "tipo": "sync",
+    "linea": 20,
     "argomenti": [],
-    "ha_docstring": false
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_etl_calendar.py",
+    "qualifica": "test_build_calendar_rispettando_limiti_temporali",
+    "tipo": "sync",
+    "linea": 27,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_etl_calendar.py",
+    "qualifica": "test_reindex_frame_allinea_valori_forward_fill",
+    "tipo": "sync",
+    "linea": 43,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_etl_calendar.py",
+    "qualifica": "test_trading_calendar_save_scrive_csv",
+    "tipo": "sync",
+    "linea": 65,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
   },
   {
     "percorso": "tests/unit/test_etl_cleaning.py",
-    "qualifica": "test_winsorize_series_bounds",
+    "qualifica": "test_hampel_config_valida_parametri",
     "tipo": "sync",
-    "linea": 25,
+    "linea": 12,
     "argomenti": [],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "tests/unit/test_etl_cleaning.py",
-    "qualifica": "test_clean_price_history_applies_per_symbol",
+    "qualifica": "test_apply_hampel_sostituisce_spike",
     "tipo": "sync",
-    "linea": 34,
+    "linea": 21,
     "argomenti": [],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "tests/unit/test_etl_cleaning.py",
-    "qualifica": "test_prepare_estimation_copy_winsorizes",
+    "qualifica": "test_winsorize_series_valida_intervallo",
     "tipo": "sync",
-    "linea": 46,
+    "linea": 29,
     "argomenti": [],
-    "ha_docstring": false
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_etl_cleaning.py",
+    "qualifica": "test_clean_price_history_per_symbol",
+    "tipo": "sync",
+    "linea": 36,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_etl_cleaning.py",
+    "qualifica": "test_prepare_estimation_copy_winsorizza_code",
+    "tipo": "sync",
+    "linea": 57,
+    "argomenti": [],
+    "ha_docstring": true
   },
   {
     "percorso": "tests/unit/test_etl_dedup.py",
@@ -3144,27 +3670,108 @@
     "ha_docstring": false
   },
   {
-    "percorso": "tests/unit/test_etl_panel.py",
-    "qualifica": "_write_raw_series",
+    "percorso": "tests/unit/test_etl_fx.py",
+    "qualifica": "test_load_fx_rates_unisce_tutte_le_serie",
     "tipo": "sync",
-    "linea": 10,
+    "linea": 13,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_etl_fx.py",
+    "qualifica": "test_fx_frame_lookup_valuta_base",
+    "tipo": "sync",
+    "linea": 36,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_etl_fx.py",
+    "qualifica": "test_convert_to_base_applica_forward_fill",
+    "tipo": "sync",
+    "linea": 44,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_etl_fx.py",
+    "qualifica": "test_convert_to_base_convalida_colonne",
+    "tipo": "sync",
+    "linea": 75,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_etl_fx.py",
+    "qualifica": "test_fx_frame_save_scrive_csv",
+    "tipo": "sync",
+    "linea": 84,
     "argomenti": [
-      "path",
-      "symbol",
-      "start",
-      "values"
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_etl_panel.py",
+    "qualifica": "test_tr_panel_builder_senza_file_raw",
+    "tipo": "sync",
+    "linea": 14,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_etl_panel.py",
+    "qualifica": "test_tr_panel_builder_pipeline_minima",
+    "tipo": "sync",
+    "linea": 27,
+    "argomenti": [
+      "tmp_path",
+      "monkeypatch",
+      "capsys"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_etl_panel.py",
+    "qualifica": "finto_write",
+    "tipo": "sync",
+    "linea": 53,
+    "argomenti": [
+      "self",
+      "frame",
+      "name"
     ],
     "ha_docstring": false
   },
   {
-    "percorso": "tests/unit/test_etl_panel.py",
-    "qualifica": "test_tr_panel_builder_creates_artifacts",
+    "percorso": "tests/unit/test_etl_qa.py",
+    "qualifica": "test_qa_report_to_frame_preserva_ordine",
     "tipo": "sync",
-    "linea": 17,
+    "linea": 13,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_etl_qa.py",
+    "qualifica": "test_write_qa_log_crea_intestazione",
+    "tipo": "sync",
+    "linea": 43,
     "argomenti": [
       "tmp_path"
     ],
-    "ha_docstring": false
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_etl_qa.py",
+    "qualifica": "test_write_qa_log_ordina_simbolo_e_sorgente",
+    "tipo": "sync",
+    "linea": 53,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
   },
   {
     "percorso": "tests/unit/test_execution_primitives.py",
@@ -3544,42 +4151,365 @@
     "ha_docstring": false
   },
   {
-    "percorso": "tests/unit/test_logging_utils.py",
-    "qualifica": "ripristina_env",
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "DummyFetcher.__init__",
     "tipo": "sync",
-    "linea": 16,
+    "linea": 24,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "DummyFetcher.build_url",
+    "tipo": "sync",
+    "linea": 29,
+    "argomenti": [
+      "self",
+      "symbol",
+      "start"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "DummyFetcher.parse",
+    "tipo": "sync",
+    "linea": 35,
+    "argomenti": [
+      "self",
+      "payload",
+      "symbol"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "_sample_payload",
+    "tipo": "sync",
+    "linea": 51,
+    "argomenti": [
+      "value"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "test_fetch_filtra_date_e_costruisce_metadati",
+    "tipo": "sync",
+    "linea": 57,
+    "argomenti": [
+      "tmp_path",
+      "monkeypatch"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "test_fetch_con_progress_attiva_tqdm",
+    "tipo": "sync",
+    "linea": 86,
+    "argomenti": [
+      "tmp_path",
+      "monkeypatch"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "fake_tqdm",
+    "tipo": "sync",
+    "linea": 99,
+    "argomenti": [
+      "iterable"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "test_fetch_richiede_almeno_un_simbolo",
+    "tipo": "sync",
+    "linea": 111,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "test_simple_frame_rileva_colonne_mancanti",
+    "tipo": "sync",
+    "linea": 119,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "test_download_apre_sessione_e_la_chiude",
+    "tipo": "sync",
+    "linea": 128,
+    "argomenti": [
+      "monkeypatch"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "FakeResponse.__init__",
+    "tipo": "sync",
+    "linea": 135,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "FakeResponse.raise_for_status",
+    "tipo": "sync",
+    "linea": 140,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "FakeSession.__init__",
+    "tipo": "sync",
+    "linea": 144,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "FakeSession.get",
+    "tipo": "sync",
+    "linea": 147,
+    "argomenti": [
+      "self",
+      "url",
+      "headers",
+      "timeout"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "FakeSession.close",
+    "tipo": "sync",
+    "linea": 151,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "factory",
+    "tipo": "sync",
+    "linea": 154,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "test_run_ingest_delega_ai_fetcher",
+    "tipo": "sync",
+    "linea": 168,
+    "argomenti": [
+      "monkeypatch"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_ingest_registry.py",
+    "qualifica": "FakeFetcher.fetch",
+    "tipo": "sync",
+    "linea": 174,
+    "argomenti": [
+      "self"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_io_utils.py",
+    "qualifica": "test_ensure_dir_crea_cartella_e_restituisce_path",
+    "tipo": "sync",
+    "linea": 14,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_io_utils.py",
+    "qualifica": "test_safe_path_segment_ripulisce_caratteri_illegali",
+    "tipo": "sync",
+    "linea": 31,
+    "argomenti": [
+      "nome",
+      "atteso"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_io_utils.py",
+    "qualifica": "test_artifact_path_puo_evitare_creazione",
+    "tipo": "sync",
+    "linea": 37,
+    "argomenti": [
+      "tmp_path",
+      "monkeypatch"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_io_utils.py",
+    "qualifica": "test_read_write_yaml_roundtrip",
+    "tipo": "sync",
+    "linea": 48,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_io_utils.py",
+    "qualifica": "test_sha256_file_supporta_chunk_personalizzato",
+    "tipo": "sync",
+    "linea": 59,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_io_utils.py",
+    "qualifica": "test_compute_checksums_ignora_file_mancanti",
+    "tipo": "sync",
+    "linea": 69,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_io_utils.py",
+    "qualifica": "test_copy_with_timestamp_copia_file_con_nome_prevedibile",
+    "tipo": "sync",
+    "linea": 78,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_io_utils.py",
+    "qualifica": "test_copy_with_timestamp_percorso_mancante_sollevato",
+    "tipo": "sync",
+    "linea": 91,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_io_utils.py",
+    "qualifica": "test_write_json_scrive_newline_finale",
+    "tipo": "sync",
+    "linea": 99,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_io_utils.py",
+    "qualifica": "test_write_json_crea_directory_intermedie",
+    "tipo": "sync",
+    "linea": 111,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_logging_idempotency.py",
+    "qualifica": "isolate_loggers",
+    "tipo": "sync",
+    "linea": 13,
+    "argomenti": [
+      "monkeypatch",
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_logging_idempotency.py",
+    "qualifica": "test_setup_logger_idempotent_for_same_name",
+    "tipo": "sync",
+    "linea": 29,
     "argomenti": [],
     "ha_docstring": true
   },
   {
-    "percorso": "tests/unit/test_logging_utils.py",
-    "qualifica": "pulisci_logger",
+    "percorso": "tests/unit/test_logging_idempotency.py",
+    "qualifica": "test_separate_loggers_share_json_file",
     "tipo": "sync",
-    "linea": 34,
+    "linea": 42,
     "argomenti": [],
     "ha_docstring": true
   },
   {
-    "percorso": "tests/unit/test_logging_utils.py",
-    "qualifica": "test_get_stream_logger_imposta_handler_e_formato",
+    "percorso": "tests/unit/test_logging_runtime.py",
+    "qualifica": "isolate_logging",
     "tipo": "sync",
-    "linea": 46,
+    "linea": 15,
+    "argomenti": [
+      "monkeypatch",
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_logging_runtime.py",
+    "qualifica": "test_setup_logger_resolves_level_from_environment",
+    "tipo": "sync",
+    "linea": 31,
+    "argomenti": [
+      "monkeypatch"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_logging_runtime.py",
+    "qualifica": "test_setup_logger_emits_json_payload",
+    "tipo": "sync",
+    "linea": 45,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_logging_runtime.py",
+    "qualifica": "test_record_metrics_appends_jsonl",
+    "tipo": "sync",
+    "linea": 74,
     "argomenti": [],
     "ha_docstring": true
   },
   {
-    "percorso": "tests/unit/test_logging_utils.py",
-    "qualifica": "test_get_stream_logger_rispetta_livello_da_env",
+    "percorso": "tests/unit/test_logging_runtime.py",
+    "qualifica": "test_configure_cli_logging_updates_existing_loggers",
     "tipo": "sync",
-    "linea": 58,
-    "argomenti": [],
-    "ha_docstring": true
-  },
-  {
-    "percorso": "tests/unit/test_logging_utils.py",
-    "qualifica": "test_get_stream_logger_valore_env_non_valido",
-    "tipo": "sync",
-    "linea": 66,
+    "linea": 85,
     "argomenti": [],
     "ha_docstring": true
   },
@@ -3717,12 +4647,12 @@
   },
   {
     "percorso": "tests/unit/test_pipeline_verbosity.py",
-    "qualifica": "test_get_stream_logger_respects_environment",
+    "qualifica": "test_setup_logger_respects_environment",
     "tipo": "sync",
-    "linea": 18,
+    "linea": 17,
     "argomenti": [
       "monkeypatch",
-      "caplog"
+      "capsys"
     ],
     "ha_docstring": true
   },
@@ -3730,7 +4660,7 @@
     "percorso": "tests/unit/test_pipeline_verbosity.py",
     "qualifica": "_patch_optimisation_inputs",
     "tipo": "sync",
-    "linea": 37,
+    "linea": 32,
     "argomenti": [
       "monkeypatch"
     ],
@@ -3740,7 +4670,7 @@
     "percorso": "tests/unit/test_pipeline_verbosity.py",
     "qualifica": "test_run_optimization_pipeline_requires_generators",
     "tipo": "sync",
-    "linea": 52,
+    "linea": 47,
     "argomenti": [
       "monkeypatch",
       "tmp_path"
@@ -3751,7 +4681,7 @@
     "percorso": "tests/unit/test_pipeline_verbosity.py",
     "qualifica": "test_run_optimization_pipeline_emits_verbose_logs",
     "tipo": "sync",
-    "linea": 69,
+    "linea": 66,
     "argomenti": [
       "monkeypatch",
       "tmp_path",
@@ -3763,7 +4693,7 @@
     "percorso": "tests/unit/test_pipeline_verbosity.py",
     "qualifica": "_patch_estimate_inputs",
     "tipo": "sync",
-    "linea": 91,
+    "linea": 92,
     "argomenti": [
       "monkeypatch"
     ],
@@ -3773,7 +4703,7 @@
     "percorso": "tests/unit/test_pipeline_verbosity.py",
     "qualifica": "test_run_estimate_pipeline_creates_expected_artifacts",
     "tipo": "sync",
-    "linea": 105,
+    "linea": 106,
     "argomenti": [
       "monkeypatch",
       "tmp_path",
@@ -3782,10 +4712,126 @@
     "ha_docstring": true
   },
   {
+    "percorso": "tests/unit/test_psd_utils.py",
+    "qualifica": "test_project_to_psd_rende_matrice_semidefinita",
+    "tipo": "sync",
+    "linea": 11,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_psd_utils.py",
+    "qualifica": "test_project_to_psd_rispetta_eps_personalizzato",
+    "tipo": "sync",
+    "linea": 21,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_psd_utils.py",
+    "qualifica": "test_project_to_psd_rifiuta_matrici_non_quadrate",
+    "tipo": "sync",
+    "linea": 31,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_rand_utils.py",
+    "qualifica": "test_load_seeds_torna_default_se_file_mancante",
+    "tipo": "sync",
+    "linea": 16,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_rand_utils.py",
+    "qualifica": "test_load_seeds_legge_formato_annidato",
+    "tipo": "sync",
+    "linea": 27,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_rand_utils.py",
+    "qualifica": "test_load_seeds_rileva_formati_non_mappabili",
+    "tipo": "sync",
+    "linea": 40,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_rand_utils.py",
+    "qualifica": "test_save_seeds_scrive_yaml_normalizzato",
+    "tipo": "sync",
+    "linea": 50,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_rand_utils.py",
+    "qualifica": "test_seed_for_stream_usa_mappatura_in_memoria",
+    "tipo": "sync",
+    "linea": 61,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_rand_utils.py",
+    "qualifica": "test_generator_from_seed_riusa_generatore_esistente",
+    "tipo": "sync",
+    "linea": 68,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_rand_utils.py",
+    "qualifica": "test_generator_from_seed_rende_output_deterministico",
+    "tipo": "sync",
+    "linea": 75,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_rand_utils.py",
+    "qualifica": "test_broadcast_seed_sincronizza_python_e_numpy",
+    "tipo": "sync",
+    "linea": 87,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_rand_utils.py",
+    "qualifica": "test_spawn_child_rng_rispetta_jumps_e_sollevamenti",
+    "tipo": "sync",
+    "linea": 102,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
     "percorso": "tests/unit/test_regime_committee.py",
-    "qualifica": "test_crisis_probability_range_and_alignment",
+    "qualifica": "_build_panel",
     "tipo": "sync",
     "linea": 10,
+    "argomenti": [
+      "idx"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_regime_committee.py",
+    "qualifica": "test_regime_probability_generates_expected_columns",
+    "tipo": "sync",
+    "linea": 37,
     "argomenti": [],
     "ha_docstring": false
   },
@@ -3793,7 +4839,7 @@
     "percorso": "tests/unit/test_regime_committee.py",
     "qualifica": "test_committee_weights_normalise_and_validate",
     "tipo": "sync",
-    "linea": 35,
+    "linea": 59,
     "argomenti": [],
     "ha_docstring": false
   },
@@ -3801,7 +4847,15 @@
     "percorso": "tests/unit/test_regime_committee.py",
     "qualifica": "test_crisis_probability_empty_intersection_returns_empty",
     "tipo": "sync",
-    "linea": 44,
+    "linea": 68,
+    "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_regime_committee.py",
+    "qualifica": "test_regime_macro_signal_influences_probability",
+    "tipo": "sync",
+    "linea": 79,
     "argomenti": [],
     "ha_docstring": false
   },
@@ -3817,7 +4871,7 @@
     "percorso": "tests/unit/test_regime_hysteresis.py",
     "qualifica": "test_apply_hysteresis_threshold_validation",
     "tipo": "sync",
-    "linea": 20,
+    "linea": 28,
     "argomenti": [],
     "ha_docstring": false
   },
@@ -3825,8 +4879,39 @@
     "percorso": "tests/unit/test_regime_hysteresis.py",
     "qualifica": "test_tilt_lambda_clamps_range",
     "tipo": "sync",
-    "linea": 31,
+    "linea": 66,
     "argomenti": [],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_regime_pipeline.py",
+    "qualifica": "_write_clean_panel",
+    "tipo": "sync",
+    "linea": 12,
+    "argomenti": [
+      "root"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_regime_pipeline.py",
+    "qualifica": "_write_thresholds",
+    "tipo": "sync",
+    "linea": 38,
+    "argomenti": [
+      "path"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_regime_pipeline.py",
+    "qualifica": "test_run_regime_pipeline_writes_artifacts",
+    "tipo": "sync",
+    "linea": 78,
+    "argomenti": [
+      "tmp_path",
+      "monkeypatch"
+    ],
     "ha_docstring": false
   },
   {
@@ -3925,35 +5010,89 @@
   },
   {
     "percorso": "tests/unit/test_robustness_lab.py",
-    "qualifica": "test_block_bootstrap_metrics_deterministic",
+    "qualifica": "test_block_bootstrap_metrics_deterministico",
     "tipo": "sync",
-    "linea": 17,
+    "linea": 22,
     "argomenti": [],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "tests/unit/test_robustness_lab.py",
-    "qualifica": "test_replay_shocks_sorted_by_drawdown",
+    "qualifica": "test_block_bootstrap_metrics_errori_input",
     "tipo": "sync",
-    "linea": 33,
+    "linea": 40,
     "argomenti": [],
-    "ha_docstring": false
+    "ha_docstring": true
   },
   {
     "percorso": "tests/unit/test_robustness_lab.py",
-    "qualifica": "test_run_robustness_lab_generates_artifacts",
+    "qualifica": "test_run_ablation_study_gestione_flag",
     "tipo": "sync",
-    "linea": 42,
-    "argomenti": [
-      "tmp_path"
-    ],
-    "ha_docstring": false
+    "linea": 51,
+    "argomenti": [],
+    "ha_docstring": true
   },
   {
     "percorso": "tests/unit/test_robustness_lab.py",
     "qualifica": "runner",
     "tipo": "sync",
-    "linea": 46,
+    "linea": 56,
+    "argomenti": [
+      "flags"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_robustness_lab.py",
+    "qualifica": "test_run_ablation_study_errori",
+    "tipo": "sync",
+    "linea": 72,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_robustness_lab.py",
+    "qualifica": "vuoto",
+    "tipo": "sync",
+    "linea": 75,
+    "argomenti": [
+      "_"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_robustness_lab.py",
+    "qualifica": "test_replay_shocks_input_vuoto",
+    "tipo": "sync",
+    "linea": 90,
+    "argomenti": [],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_robustness_lab.py",
+    "qualifica": "test_replay_shocks_scaling",
+    "tipo": "sync",
+    "linea": 97,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_robustness_lab.py",
+    "qualifica": "test_run_robustness_lab_generates_artifacts",
+    "tipo": "sync",
+    "linea": 111,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_robustness_lab.py",
+    "qualifica": "runner",
+    "tipo": "sync",
+    "linea": 117,
     "argomenti": [
       "flags",
       "seed"
@@ -3961,10 +5100,40 @@
     "ha_docstring": false
   },
   {
+    "percorso": "tests/unit/test_robustness_lab.py",
+    "qualifica": "test_run_robustness_lab_senza_ablation",
+    "tipo": "sync",
+    "linea": 152,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_robustness_lab.py",
+    "qualifica": "test_run_ablation_study_percorre_tutte_le_feature",
+    "tipo": "sync",
+    "linea": 169,
+    "argomenti": [
+      "feature_lista"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_robustness_lab.py",
+    "qualifica": "runner",
+    "tipo": "sync",
+    "linea": 174,
+    "argomenti": [
+      "flags"
+    ],
+    "ha_docstring": false
+  },
+  {
     "percorso": "tests/unit/test_sigma.py",
     "qualifica": "sample_returns",
     "tipo": "sync",
-    "linea": 17,
+    "linea": 19,
     "argomenti": [],
     "ha_docstring": false
   },
@@ -3972,7 +5141,7 @@
     "percorso": "tests/unit/test_sigma.py",
     "qualifica": "test_ledoit_wolf_positive_semidefinite",
     "tipo": "sync",
-    "linea": 24,
+    "linea": 26,
     "argomenti": [
       "sample_returns"
     ],
@@ -3982,7 +5151,7 @@
     "percorso": "tests/unit/test_sigma.py",
     "qualifica": "test_graphical_lasso_bic_selects_candidate",
     "tipo": "sync",
-    "linea": 30,
+    "linea": 32,
     "argomenti": [
       "sample_returns"
     ],
@@ -3992,7 +5161,7 @@
     "percorso": "tests/unit/test_sigma.py",
     "qualifica": "test_factor_shrink_structure",
     "tipo": "sync",
-    "linea": 37,
+    "linea": 39,
     "argomenti": [
       "sample_returns"
     ],
@@ -4002,7 +5171,7 @@
     "percorso": "tests/unit/test_sigma.py",
     "qualifica": "test_median_of_covariances_requires_inputs",
     "tipo": "sync",
-    "linea": 44,
+    "linea": 46,
     "argomenti": [],
     "ha_docstring": false
   },
@@ -4010,7 +5179,37 @@
     "percorso": "tests/unit/test_sigma.py",
     "qualifica": "test_median_of_covariances_returns_psd",
     "tipo": "sync",
-    "linea": 49,
+    "linea": 51,
+    "argomenti": [
+      "sample_returns"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_sigma.py",
+    "qualifica": "test_sigma_consensus_psd_preserves_labels",
+    "tipo": "sync",
+    "linea": 61,
+    "argomenti": [
+      "sample_returns"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_sigma.py",
+    "qualifica": "test_sigma_spd_median_fallback_to_consensus",
+    "tipo": "sync",
+    "linea": 76,
+    "argomenti": [
+      "sample_returns"
+    ],
+    "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_sigma.py",
+    "qualifica": "test_sigma_spd_median_positive_definite",
+    "tipo": "sync",
+    "linea": 89,
     "argomenti": [
       "sample_returns"
     ],
@@ -4020,7 +5219,7 @@
     "percorso": "tests/unit/test_sigma.py",
     "qualifica": "test_ewma_regime_convex_combination",
     "tipo": "sync",
-    "linea": 59,
+    "linea": 102,
     "argomenti": [
       "sample_returns"
     ],
@@ -4030,7 +5229,7 @@
     "percorso": "tests/unit/test_sigma.py",
     "qualifica": "test_frobenius_relative_drift_zero_when_equal",
     "tipo": "sync",
-    "linea": 68,
+    "linea": 111,
     "argomenti": [
       "sample_returns"
     ],
@@ -4040,7 +5239,7 @@
     "percorso": "tests/unit/test_sigma.py",
     "qualifica": "test_max_corr_drift_matches_manual",
     "tipo": "sync",
-    "linea": 73,
+    "linea": 116,
     "argomenti": [],
     "ha_docstring": false
   },
@@ -4155,5 +5354,57 @@
     "linea": 43,
     "argomenti": [],
     "ha_docstring": false
+  },
+  {
+    "percorso": "tests/unit/test_validate.py",
+    "qualifica": "_write_yaml",
+    "tipo": "sync",
+    "linea": 14,
+    "argomenti": [
+      "path",
+      "payload"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_validate.py",
+    "qualifica": "_seed_valid_configs",
+    "tipo": "sync",
+    "linea": 22,
+    "argomenti": [
+      "root"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_validate.py",
+    "qualifica": "test_validate_configs_reports_success",
+    "tipo": "sync",
+    "linea": 89,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_validate.py",
+    "qualifica": "test_validate_configs_reports_schema_errors",
+    "tipo": "sync",
+    "linea": 105,
+    "argomenti": [
+      "tmp_path"
+    ],
+    "ha_docstring": true
+  },
+  {
+    "percorso": "tests/unit/test_validate.py",
+    "qualifica": "test_cli_validate_verbose_prints_payload",
+    "tipo": "sync",
+    "linea": 137,
+    "argomenti": [
+      "tmp_path",
+      "capsys"
+    ],
+    "ha_docstring": true
   }
 ]

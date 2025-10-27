@@ -37,7 +37,7 @@ class RecordingLogger:
 TIMESTAMP = datetime(2024, 1, 31, 15, 0, tzinfo=UTC)
 
 
-@pytest.mark.parametrize("source", ["ecb", "fred", "boe", "stooq"])
+@pytest.mark.parametrize("source", ["aqr", "boe", "ecb", "fred", "french", "stooq"])
 def test_available_sources_contains_defaults(source: str) -> None:
     assert source in available_sources()
 
@@ -50,7 +50,8 @@ def test_create_fetcher_returns_instance(tmp_path: Path) -> None:
 def _write_and_validate(result_path: Path, expected_rows: int) -> pd.DataFrame:
     assert result_path.exists()
     frame = pd.read_csv(result_path)
-    assert list(frame.columns) == ["date", "value", "symbol"]
+    for column in ("date", "value", "symbol"):
+        assert column in frame.columns
     assert len(frame) == expected_rows
     return frame
 
@@ -103,4 +104,5 @@ def test_stooq_fetcher(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
     result = fetcher.fetch(symbols=["spx"], as_of=TIMESTAMP)
     frame = _write_and_validate(result.path, 1)
     assert frame.loc[0, "value"] == pytest.approx(2.5)
+    assert frame.loc[0, "tz"] == "Europe/Warsaw"
     assert any("ingest_complete" in msg for msg in logger.messages)

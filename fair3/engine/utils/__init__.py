@@ -1,5 +1,7 @@
 """Utility helpers for FAIR-III."""
 
+from fair3.engine.logging import configure_cli_logging, record_metrics, setup_logger
+
 from .io import (
     ARTIFACTS_ROOT,
     artifact_path,
@@ -12,8 +14,6 @@ from .io import (
     write_json,
     write_yaml,
 )
-from .log import default_log_dir, get_logger, setup_logger
-from .logging import get_stream_logger
 from .psd import project_to_psd
 from .rand import (
     DEFAULT_SEED,
@@ -38,10 +38,9 @@ __all__ = [
     "sha256_file",
     "write_json",
     "write_yaml",
-    "default_log_dir",
-    "get_logger",
+    "configure_cli_logging",
+    "record_metrics",
     "setup_logger",
-    "get_stream_logger",
     "DEFAULT_SEED",
     "DEFAULT_SEED_PATH",
     "DEFAULT_STREAM",

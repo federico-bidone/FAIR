@@ -11,6 +11,8 @@ coperte in questa milestone includono:
   idiosincratico positivo.
 - **Mediana element-wise** e **EWMA regime-aware** per aggregare più matrici
   mantenendo la proprietà PSD.
+- **Mediana geometrica SPD** opzionale (`--sigma-engine spd_median`) con
+  fallback PSD automatico in caso di mancata convergenza.
 - **Ensemble μ**: shrink-to-zero, bagging OLS e gradient boosting combinati via
   stacking ridge deterministico.
 - **Black–Litterman**: recupero di μ_eq dal portafoglio di mercato e blend con
@@ -35,6 +37,8 @@ from fair3.engine.estimates import (
     max_corr_drift,
     run_estimate_pipeline,
     reverse_opt_mu_eq,
+    sigma_consensus_psd,
+    sigma_spd_median,
 )
 ```
 
@@ -48,7 +52,7 @@ salvati automaticamente via `reporting.audit.run_audit_snapshot`.
 Esempio CLI con root personalizzato:
 
 ```powershell
-fair3 estimate --artifacts-root artifacts/demo --thresholds configs/thresholds.yml --cv-splits 5
+fair3 estimate --artifacts-root artifacts/demo --thresholds configs/thresholds.yml --cv-splits 5 --sigma-engine spd_median
 ```
 
 ## Flag `--trace`

@@ -97,9 +97,10 @@ This document will describe the layered design of the FAIR-III engine across ing
 - Contribution schedules grow at a configurable annual rate while glidepaths
   linearly shift allocation from growth to defensive assets over the maximum
   horizon.
-- `run_goal_monte_carlo` writes `summary.csv`, `glidepath.csv`, and a compact
-  PDF dashboard under `artifacts/goals/` (or a custom root) so CI and auditors
-  can inspect probabilities and glidepath assumptions.
+- `run_goal_monte_carlo` scrive `goals_<investor>_summary.csv`,
+  `goals_<investor>_glidepaths.csv`, `goals_<investor>_fan_chart.csv` e un
+  PDF `goals_<investor>.pdf` sotto `reports/` (o root custom) così CI e auditor
+  possono verificare probabilità, fan-chart e glidepath adattivo.
 - CLI wiring (`fair3 goals`) loads `configs/goals.yml`/`configs/params.yml`,
   applies optional overrides, and prints weighted success probabilities for
   quick feedback during tuning.

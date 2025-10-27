@@ -1,3 +1,5 @@
+"""Beta estimation utilities for the mapping pipeline."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -13,13 +15,25 @@ _STREAM_BOOT = "mapping.beta_bootstrap"
 def _prepare_frames(
     returns: pd.DataFrame, factors: pd.DataFrame
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.Index]:
+    """Align return and factor frames on their common date index.
+
+    Args:
+      returns: Instrument returns indexed by ``DatetimeIndex``.
+      factors: Factor returns indexed by ``DatetimeIndex``.
+
+    Returns:
+      Tuple containing aligned returns, aligned factors, and the shared index.
+
+    Raises:
+      ValueError: If the aligned data produces no observations.
+    """
+
     common = returns.index.intersection(factors.index)
     if common.empty:
         raise ValueError("returns and factors must share a non-empty index")
     ret = returns.loc[common].sort_index()
     fac = factors.loc[common].sort_index()
-    combined = ret.join(fac, how="inner")
-    combined = combined.dropna(how="any")
+    combined = ret.join(fac, how="inner").dropna(how="any")
     if combined.empty:
         raise ValueError("returns and factors alignment produced no rows")
     ret_aligned = combined[returns.columns]
@@ -27,8 +41,23 @@ def _prepare_frames(
     return ret_aligned, fac_aligned, combined.index
 
 
-def _enforce_signs(values: np.ndarray, factors: Iterable[str], sign: dict[str, int]) -> None:
-    if not sign:
+def _enforce_signs(
+    values: np.ndarray,
+    factors: Iterable[str],
+    sign: dict[str, int],
+    enforce_sign: bool,
+) -> None:
+    """Apply optional sign constraints to beta estimates in-place.
+
+    Args:
+      values: Matrix of factor loadings with shape (n_factors, n_assets).
+      factors: Iterable of factor identifiers corresponding to the rows of
+        ``values``.
+      sign: Mapping from factor name to expected sign (+1 or -1).
+      enforce_sign: Flag controlling whether the constraints are applied.
+    """
+
+    if not enforce_sign or not sign:
         return
     for j, factor in enumerate(factors):
         desired = sign.get(factor)
@@ -39,6 +68,16 @@ def _enforce_signs(values: np.ndarray, factors: Iterable[str], sign: dict[str, i
 
 
 def _solve_ridge(xtx: np.ndarray, xty: np.ndarray) -> np.ndarray:
+    """Solve ridge-regularised normal equations in a numerically stable way.
+
+    Args:
+      xtx: Symmetric factor scatter matrix with ridge penalty applied.
+      xty: Cross-product between centred factors and centred returns.
+
+    Returns:
+      Estimated loadings matrix solving the normal equations.
+    """
+
     try:
         return np.linalg.solve(xtx, xty)
     except np.linalg.LinAlgError:
@@ -50,15 +89,33 @@ def rolling_beta_ridge(
     factors: pd.DataFrame,
     window: int,
     lambda_beta: float,
-    sign: dict[str, int] | None = None,
+    sign_prior: dict[str, int] | None = None,
+    enforce_sign: bool = True,
 ) -> pd.DataFrame:
-    """Estimate rolling ridge betas with optional sign governance."""
+    """Estimate rolling ridge betas with optional economic sign priors.
+
+    Args:
+      returns: Panel of instrument returns.
+      factors: Panel of factor returns aligned with ``returns``.
+      window: Rolling window length (number of observations).
+      lambda_beta: Ridge penalty added to the factor scatter matrix.
+      sign_prior: Mapping of factor name to expected sign (+1 or -1).
+      enforce_sign: Whether to enforce the sign priors during estimation.
+
+    Returns:
+      DataFrame of rolling betas indexed by date and multi-indexed by instrument
+      and factor.
+
+    Raises:
+      ValueError: If ``window`` or ``lambda_beta`` are invalid or the aligned
+        dataset lacks sufficient rows.
+    """
 
     if window <= 1:
         raise ValueError("window must be greater than one")
     if lambda_beta < 0:
         raise ValueError("lambda_beta must be non-negative")
-    sign_dict = dict(sign or {})
+    sign_dict = dict(sign_prior or {})
     ret, fac, index = _prepare_frames(returns, factors)
     n_obs, n_assets = ret.shape
     n_factors = fac.shape[1]
@@ -81,14 +138,14 @@ def rolling_beta_ridge(
         xtx = factors_centered.T @ factors_centered + lambda_beta * eye
         xty = factors_centered.T @ returns_centered
         beta_window = _solve_ridge(xtx, xty)
-        _enforce_signs(beta_window, fac.columns, sign_dict)
-        row_values = beta_window.T.reshape(-1)
-        betas.iloc[pos] = row_values
+        _enforce_signs(beta_window, fac.columns, sign_dict, enforce_sign)
+        betas.iloc[pos] = beta_window.T.reshape(-1)
 
     betas.attrs["window"] = window
     betas.attrs["ridge_lambda"] = float(lambda_beta)
     if sign_dict:
         betas.attrs["sign_constraints"] = sign_dict
+    betas.attrs["enforce_sign"] = bool(enforce_sign)
     return betas
 
 
@@ -99,7 +156,22 @@ def beta_ci_bootstrap(
     B: int = 1000,  # noqa: N803
     alpha: float = 0.2,
 ) -> pd.DataFrame:
-    """Bootstrap confidence intervals for rolling betas."""
+    """Estimate bootstrap confidence intervals for rolling betas.
+
+    Args:
+      returns: Instrument return panel.
+      factors: Factor panel aligned with ``returns``.
+      beta_ts: Rolling beta time series from :func:`rolling_beta_ridge`.
+      B: Number of bootstrap draws per window.
+      alpha: Two-sided significance level (e.g., 0.2 for CI80).
+
+    Returns:
+      DataFrame indexed by date with MultiIndex columns
+      (instrument, factor, bound).
+
+    Raises:
+      ValueError: If bootstrap parameters are invalid or indices misalign.
+    """
 
     if B <= 0:
         raise ValueError("B must be positive")
@@ -121,6 +193,7 @@ def beta_ci_bootstrap(
     window = max(window, 1)
     lambda_beta = float(beta_ts.attrs.get("ridge_lambda", 0.0))
     sign_dict: dict[str, int] = dict(beta_ts.attrs.get("sign_constraints", {}))
+    enforce_sign = bool(beta_ts.attrs.get("enforce_sign", True))
 
     n_obs, n_assets = ret.shape
     n_factors = fac.shape[1]
@@ -157,11 +230,10 @@ def beta_ci_bootstrap(
             xtx = sampled_factors.T @ sampled_factors + lambda_beta * eye
             xty = sampled_factors.T @ sampled_returns
             beta_sample = _solve_ridge(xtx, xty)
-            _enforce_signs(beta_sample, fac.columns, sign_dict)
+            _enforce_signs(beta_sample, fac.columns, sign_dict, enforce_sign)
             samples[b] = beta_sample.T.reshape(-1)
         lower = np.quantile(samples, lower_q, axis=0)
         upper = np.quantile(samples, upper_q, axis=0)
-        # Build interleaved lower/upper values
         lower_flat = lower.reshape(n_assets, n_factors).reshape(-1)
         upper_flat = upper.reshape(n_assets, n_factors).reshape(-1)
         row = np.empty(lower_flat.size * 2, dtype=float)
@@ -170,3 +242,48 @@ def beta_ci_bootstrap(
         ci.iloc[pos] = row
 
     return ci
+
+
+def cap_weights_by_beta_ci(
+    weights: pd.Series,
+    beta_ci: pd.DataFrame,
+    tau_beta: float,
+) -> pd.Series:
+    """Scale weights when the maximum beta CI width breaches a threshold.
+
+    Args:
+      weights: Candidate instrument weights indexed by instrument identifier.
+      beta_ci: Confidence interval panel from :func:`beta_ci_bootstrap`.
+      tau_beta: Maximum acceptable CI width triggering weight shrinkage.
+
+    Returns:
+      Renormalised instrument weights with uncertain instruments scaled down.
+
+    Raises:
+      ValueError: If ``tau_beta`` is non-positive.
+    """
+
+    if tau_beta <= 0:
+        raise ValueError("tau_beta must be positive")
+    if weights.empty or beta_ci.empty:
+        return weights.astype(float)
+    valid = beta_ci.dropna(how="all")
+    if valid.empty:
+        return weights.astype(float)
+    lower = valid.xs("lower", level="bound", axis=1)
+    upper = valid.xs("upper", level="bound", axis=1)
+    width = (upper - lower).abs()
+    width_by_instrument = width.T.groupby(level="instrument").max().T
+    width_per_instrument = width_by_instrument.max(axis=0)
+
+    scaled = weights.astype(float).copy()
+    for instrument, value in scaled.items():
+        width_value = float(width_per_instrument.get(instrument, 0.0))
+        if width_value > tau_beta and width_value > 0:
+            coeff = max(tau_beta / width_value, 0.0)
+            scaled.loc[instrument] = value * coeff
+
+    total = float(scaled.sum())
+    if total > 0:
+        scaled = scaled / total
+    return scaled

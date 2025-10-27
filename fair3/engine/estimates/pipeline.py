@@ -5,13 +5,14 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 import numpy as np
 import pandas as pd
 
+from fair3.engine.logging import setup_logger
 from fair3.engine.reporting.audit import run_audit_snapshot
 from fair3.engine.utils.io import ARTIFACTS_ROOT, artifact_path, ensure_dir, read_yaml
-from fair3.engine.utils.logging import get_stream_logger
 from fair3.engine.utils.rand import DEFAULT_SEED_PATH
 
 from .bl import blend_mu, reverse_opt_mu_eq
@@ -22,10 +23,11 @@ from .sigma import (
     factor_shrink,
     graphical_lasso_bic,
     ledoit_wolf,
-    median_of_covariances,
+    sigma_consensus_psd,
+    sigma_spd_median,
 )
 
-LOG = get_stream_logger(__name__)
+LOG = setup_logger(__name__)
 
 
 @dataclass(slots=True)
@@ -116,12 +118,33 @@ def run_estimate_pipeline(
     seed_path: Path | str | None = None,
     cv_splits: int = 5,
     seed: int = 0,
+    sigma_engine: Literal["median_psd", "spd_median"] = "median_psd",
 ) -> EstimatePipelineResult:
     """Stima rendimenti attesi e matrici di covarianza di consenso.
 
     La routine coordina l'ensemble deterministico, gli shrinkage, il blending
     Black–Litterman e le diagnostiche di drift emettendo log strutturati utili
-    al debug.
+    al debug. Il parametro ``sigma_engine`` consente di scegliere tra il
+    consenso PSD classico e la mediana geometrica SPD.
+
+    Args:
+      artifacts_root: Directory degli artefatti della pipeline di stima.
+      thresholds_path: Percorso del file YAML con le soglie operative.
+      config_paths: Percorsi opzionali per configurazioni aggiuntive.
+      audit_dir: Directory in cui persistere gli snapshot di audit.
+      seed_path: Percorso del file dei semi deterministici.
+      cv_splits: Numero di fold per l'ensemble dei rendimenti attesi.
+      seed: Seme pseudo-casuale utilizzato nelle stime.
+      sigma_engine: Motore di aggregazione per la covarianza. ``median_psd`` usa
+        la mediana elemento per elemento proiettata in PSD; ``spd_median``
+        calcola la mediana geometrica sulla varietà SPD.
+
+    Returns:
+      ``EstimatePipelineResult`` con i percorsi agli artefatti generati.
+
+    Raises:
+      ValueError: Se il pannello dei fattori è vuoto o l'engine richiesto non è
+        supportato.
     """
 
     artifacts_root = Path(artifacts_root) if artifacts_root is not None else None
@@ -129,6 +152,8 @@ def run_estimate_pipeline(
     factors = _load_factors(artifacts_root)
     if factors.empty:
         raise ValueError("Il pannello dei fattori è vuoto")
+    if sigma_engine not in {"median_psd", "spd_median"}:
+        raise ValueError(f"Sigma engine non supportato: {sigma_engine}")
 
     # Puliamo il pannello per evitare valori mancanti che inquinerebbero le stime
     factors = factors.dropna(how="all").fillna(0.0)
@@ -164,8 +189,17 @@ def run_estimate_pipeline(
         LOG.exception("Factor shrink fallito; ritorno alla stima Ledoit-Wolf")
         cov_factor = cov_lw
     # Combiniamo le diverse stime di covarianza per stabilizzare il risultato finale
-    sigma_median = median_of_covariances([cov_lw, cov_gl, cov_factor])
-    sigma_df = pd.DataFrame(sigma_median, index=factors.columns, columns=factors.columns)
+    covariance_frames = [
+        pd.DataFrame(cov_lw, index=factors.columns, columns=factors.columns),
+        pd.DataFrame(cov_gl, index=factors.columns, columns=factors.columns),
+        pd.DataFrame(cov_factor, index=factors.columns, columns=factors.columns),
+    ]
+    if sigma_engine == "spd_median":
+        LOG.info("Uso della mediana geometrica SPD per la matrice di covarianza")
+        sigma_df = sigma_spd_median(covariance_frames)
+    else:
+        LOG.info("Uso della mediana PSD come consenso della matrice di covarianza")
+        sigma_df = sigma_consensus_psd(covariance_frames)
 
     sigma_path = artifact_path("estimates", "sigma.npy", root=artifacts_root)
     sigma_prev: np.ndarray | None = None

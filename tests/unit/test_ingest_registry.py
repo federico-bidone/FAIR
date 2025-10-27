@@ -83,12 +83,57 @@ def test_fetch_filtra_date_e_costruisce_metadati(
     assert written[-1].endswith(",BBB")
 
 
+def test_fetch_con_progress_attiva_tqdm(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Quando progress=True il fetcher deve invocare tqdm con descrizione coerente."""
+
+    payloads = {"AAA": _sample_payload(1.0)}
+    fetcher = DummyFetcher(payloads=payloads, raw_root=tmp_path)
+    monkeypatch.setattr(
+        fetcher,
+        "_download",
+        lambda url, session=None: fetcher._payloads[url.split("/")[-1]],
+    )
+
+    captured: dict[str, object] = {}
+
+    def fake_tqdm(iterable: list[str], **kwargs: object) -> list[str]:
+        captured.update(kwargs)
+        return iterable
+
+    monkeypatch.setattr(registry, "tqdm", fake_tqdm)
+    fetcher.fetch(symbols=["AAA"], progress=True)
+
+    assert captured["disable"] is False
+    assert captured["desc"] == "ingest:dummy"
+    assert captured["unit"] == "symbol"
+
+
 def test_fetch_richiede_almeno_un_simbolo(tmp_path: Path) -> None:
     """Lancia un errore chiaro quando la lista dei simboli è vuota."""
 
     fetcher = DummyFetcher(payloads={}, raw_root=tmp_path)
     with pytest.raises(ValueError, match="At least one symbol must be provided"):
         fetcher.fetch(symbols=[])
+
+
+def test_available_sources_includes_manual_and_alpha_sources() -> None:
+    """L'elenco delle sorgenti deve includere i dataset manuali (AQR, Alpha)."""
+
+    sources = registry.available_sources()
+    assert "aqr" in sources
+    assert "alpha" in sources
+    assert "oecd" in sources
+    assert "bis" in sources
+    assert "worldbank" in sources
+    assert "cboe" in sources
+    assert "nareit" in sources
+    assert "alphavantage_fx" in sources
+    assert "lbma" in sources
+    assert "yahoo" in sources
+    assert "tiingo" in sources
+    assert "coingecko" in sources
+    assert "binance" in sources
+    assert "portviz" in sources
 
 
 def test_simple_frame_rileva_colonne_mancanti(tmp_path: Path) -> None:
@@ -146,8 +191,22 @@ def test_run_ingest_delega_ai_fetcher(monkeypatch: pytest.MonkeyPatch) -> None:
     captured: dict[str, object] = {}
 
     class FakeFetcher:
-        def fetch(self, *, symbols: object, start: object, as_of: object) -> str:
-            captured.update({"symbols": symbols, "start": start, "as_of": as_of})
+        def fetch(
+            self,
+            *,
+            symbols: object,
+            start: object,
+            as_of: object,
+            progress: bool,
+        ) -> str:
+            captured.update(
+                {
+                    "symbols": symbols,
+                    "start": start,
+                    "as_of": as_of,
+                    "progress": progress,
+                }
+            )
             return "ok"
 
     monkeypatch.setattr(registry, "create_fetcher", lambda source, raw_root=None: FakeFetcher())
@@ -158,9 +217,11 @@ def test_run_ingest_delega_ai_fetcher(monkeypatch: pytest.MonkeyPatch) -> None:
         start=datetime(2023, 12, 31, tzinfo=UTC),
         raw_root=Path("/tmp"),
         as_of=datetime(2024, 1, 1, tzinfo=UTC),
+        progress=True,
     )
 
     assert result == "ok"
     assert captured["symbols"] == ["X"]
     assert captured["start"].isoformat().startswith("2023-12-31")
     assert captured["as_of"].isoformat().startswith("2024-01-01")
+    assert captured["progress"] is True

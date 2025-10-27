@@ -11,6 +11,8 @@ from .sigma import (
     graphical_lasso_bic,
     ledoit_wolf,
     median_of_covariances,
+    sigma_consensus_psd,
+    sigma_spd_median,
 )
 
 __all__ = [
@@ -21,6 +23,8 @@ __all__ = [
     "graphical_lasso_bic",
     "ledoit_wolf",
     "median_of_covariances",
+    "sigma_consensus_psd",
+    "sigma_spd_median",
     "estimate_mu_ensemble",
     "reverse_opt_mu_eq",
     "blend_mu",

@@ -1,9 +1,11 @@
 # FAIR-III (Unified) Portfolio Engine
 
+> Strumento informativo/educational; non costituisce consulenza finanziaria o raccomandazione.
+
 > **Educational only** — This repository provides a research and learning implementation of the FAIR-III portfolio construction framework. It is **not** an investment recommendation, financial promotion, or personalised advice under MiFID II.
 
 ## Overview
-FAIR-III (Unified) is a Windows-first, Python-only portfolio research stack that ingests free macro and market data (ECB, FRED, BoE, Stooq), builds point-in-time panels, estimates expected returns and covariance matrices, constructs factor-aware allocations with strong retail implementability constraints, and produces auditable execution and reporting artefacts. The system emphasises parsimony, replicability, and compliance with UCITS/EU/IT constraints, including deterministic seeding, audit trails, and realistic cost/tax handling.
+FAIR-III (Unified) is a Windows-first, Python-only portfolio research stack that ingests free macro and market data (ECB, FRED, BoE, Stooq, French Data Library, BIS, OECD, World Bank, CBOE, Nareit, LBMA, Yahoo fallback via yfinance), builds point-in-time panels, estimates expected returns and covariance matrices, constructs factor-aware allocations with strong retail implementability constraints, and produces auditable execution and reporting artefacts. The system emphasises parsimony, replicability, and compliance with UCITS/EU/IT constraints, including deterministic seeding, audit trails, and realistic cost/tax handling.
 
 ### Key Features
 - Deterministic, auditable pipeline with central seed management and checksum logging.
@@ -14,7 +16,7 @@ FAIR-III (Unified) is a Windows-first, Python-only portfolio research stack that
 - Mapping from factor allocations to instruments with rolling ridge betas, intra-factor HRP, and liquidity/ADV caps.
 - Regime overlay using a committee of signals with hysteresis and cool-down controls.
 - Execution layer with lot sizing, Almgren–Chriss transaction costs, Italian tax heuristics, and no-trade safeguards.
-- Monthly reporting, robustness lab (bootstrap/replay), ablation studies, and comprehensive audit artefacts.
+- Monthly reporting with fan charts, acceptance gates, PDF dashboards, robustness lab (bootstrap/replay), ablation studies, and comprehensive audit artefacts.
 - Goal-based Monte Carlo engine producing regime-aware success probabilities and glidepath artefacts.
 
 ## Installation (Windows 11)
@@ -30,29 +32,89 @@ FAIR-III (Unified) is a Windows-first, Python-only portfolio research stack that
 4. Confirm the setup:
    ```powershell
    ruff check .
-   ruff format --check .
    black --check .
    pytest -q
    ```
 
-## Quickstart Pipeline
+## What's new in v0.2
+- Version bump to **0.2.0** with repository scaffolding for FAIR-III v0.2 milestones (regime v2, Σ SPD-median, bootstrap v2,
+  execution & tax v2, mapping v2, goals v2, reporting v2, ingest multi-source, optional mini GUI).
+- Centralised deterministic configuration via `audit/seeds.yml` and placeholder checksum registry in `audit/checksums.json`.
+- Data lake layout prepared with tracked `data/raw/` and `data/clean/` folders for PIT artefacts (Parquet + SQLite).
+- Tooling aligned to the Google Python Style Guide: `black` with 100-column limit, `ruff` with Google docstring checks, and
+  pre-commit hooks running lint, formatters, and pytest.
+- README refreshed with Quickstart v0.2, CLI reference table, UCITS/EU/IT compliance reminders, and deterministic setup tips.
+
+## Quickstart v0.2
 Run the CLI end-to-end on a machine with internet access for data downloads. Each command logs activity under `artifacts/` and audit metadata under `artifacts/audit/`.
 
 ```powershell
-fair3 ingest --source ecb --from 1999-01-04
-fair3 ingest --source fred --symbols DGS10 DCOILWTICO
-fair3 ingest --source boe  --from 1980-01-01
-fair3 ingest --source stooq --symbols spx usdeur.v
+python -m venv .venv
+. .venv/Scripts/activate  # su Windows; usa 'source .venv/bin/activate' su Linux/Mac
+pip install -e .[dev]
+pre-commit install
 
+fair3 validate
+fair3 ingest --source ecb --from 1999-01-04
+fair3 ingest --source fred --symbols DGS10 T10YIE CPIAUCNS
 fair3 etl --rebuild
 fair3 factors --validate --oos-splits 5
-fair3 estimate --cv-splits 5
-fair3 optimize --generators A,B,C --meta
-fair3 map --hrp-intra --adv-cap 0.05
-fair3 execute --rebalance-date 2025-10-20 --dry-run
-fair3 report --period 2025-01:2025-10 --monthly
-fair3 goals --draws 12000 --seed 21 --output-dir artifacts/goals_demo
+fair3 estimate --cv-splits 5 --sigma-engine spd_median
+fair3 optimize --generators A,B,C,D --meta
+fair3 map --hrp-intra --adv-cap 0.05 --te-factor-max 0.02 --tau-beta 0.25
+fair3 regime --dry-run --trace
+fair3 execute --rebalance-date 2025-11-01 --dry-run --tax-method min_tax
+fair3 report --period 2025-01:2025-11 --monthly
+fair3 goals --simulate
+fair3 gui
 ```
+
+## CLI command reference (v0.2)
+All commands accept `--progress/--no-progress` to toggle tqdm bars and `--json-logs/--no-json-logs` to mirror structured audit
+logs.
+| Command | Purpose | Key options |
+| --- | --- | --- |
+| `fair3 validate` | Validate YAML configuration schemas before running the pipeline. | `--verbose`, `--json-logs`, `--no-progress` |
+| `fair3 ingest` | Download raw data into `data/raw/` with full audit logging. | `--source`, `--symbols`, `--from`, `--throttle`, `--dry-run` |
+| `fair3 etl` | Build PIT Parquet/SQLite panels from raw ingest artefacts. | `--rebuild`, `--dry-run`, `--json-logs` |
+| `fair3 factors` | Compute factor library with validation splits and QA reports. | `--validate`, `--oos-splits`, `--dry-run` |
+| `fair3 estimate` | Estimate μ/Σ using ensemble and PSD/SPD engines. | `--cv-splits`, `--sigma-engine`, `--dry-run` |
+| `fair3 optimize` | Run allocation generators and meta-mix with TO/TE penalties. | `--generators`, `--meta`, `--dry-run` |
+| `fair3 map` | Map factor weights to instruments with β guards. | `--hrp-intra`, `--adv-cap`, `--te-factor-max`, `--tau-beta`, `--dry-run` |
+| `fair3 regime` | Compute crisis probabilities with HMM/committee. | `--clean-root`, `--thresholds`, `--seed`, `--dry-run`, `--output-dir`, `--trace` |
+| `fair3 execute` | Size orders, apply costs and Italian tax heuristics. | `--rebalance-date`, `--tax-method`, `--dry-run` |
+| `fair3 report` | Produce monthly PDF/CSV dashboards with acceptance gates. | `--period`, `--monthly`, `--dry-run` |
+| `fair3 goals` | Run regime-aware Monte Carlo with glidepath guidance. | `--simulate`, `--dry-run`, `--json-logs` |
+| `fair3 gui` | Launch the optional PySide6 orchestration GUI. | `--dry-run`, `--raw-root`, `--clean-root`, `--artifacts-root`, `--audit-root`, `--thresholds`, `--params`, `--goals`, `--report` |
+
+## Optional GUI (PySide6)
+Install `PySide6` to enable the graphical orchestrator:
+
+```bash
+pip install PySide6
+```
+
+The GUI surfaces three tabs:
+
+- **Ingest:** choose a registered source, optional symbols, and start date to
+  trigger `run_ingest`. The GUI appends status updates, including row counts and
+  raw CSV paths, to the log panel.
+- **Pipeline:** execute ETL, factor, estimate, mapping, regime, and goal
+  pipelines using the configured roots/thresholds. Errors are caught and printed
+  in the log area without crashing the application.
+- **Reports:** provide a PDF path and open it with the default system viewer.
+
+Use CLI overrides such as `--raw-root`, `--clean-root`, or `--report` to seed the
+interface with non-default directories. When `PySide6` is missing the CLI and
+`launch_gui` helper emit an informational log and exit gracefully so headless
+deployments remain unaffected.
+
+## UCITS/EU/IT compliance guardrails
+- **Universe:** limit portfolios to UCITS-compliant ETFs/futures for EU retail investors; track KID metadata in `instrument`.
+- **Taxes:** enforce Italian tax regime (26% capital gains, 12.5% pro-rata on govies ≥51%, 0.2% stamp duty, four-year loss offset).
+- **Point-in-time:** every dataset, feature, and panel must respect PIT alignment and avoid look-ahead bias with appropriate lags.
+- **Currency:** store values in EUR base, using ECB FX at 16:00 CET; capture original timezone and license metadata per row.
+- **Auditability:** preserve deterministic seeds, ingest checksums, and CLI dry-run options to evidence compliance readiness.
 
 `fair3 factors` now writes deterministic factor panels (`artifacts/factors/*.parquet`),
 validation diagnostics, and metadata (including economic sign governance). `fair3 estimate`
@@ -77,13 +139,13 @@ PY
 ```
 
 `fair3 execute` currently surfaces the deterministic decision breakdown (drift,
-expected benefit, cost, tax) without submitting orders. `fair3 report --period
+EB_LB, cost, tax) without submitting orders. `fair3 report --period
 ... --monthly` emits deterministic CSV/JSON summaries and PNG plots inside
 `artifacts/reports/<period>/`; synthetic fixtures back the CLI until the full
 pipeline wires real PIT artefacts through the reporting layer. `fair3 goals`
 reads `configs/goals.yml`/`configs/params.yml`, runs a regime-aware Monte Carlo
 simulation, and writes `summary.csv`, `glidepath.csv`, e un PDF in
-`artifacts/goals_demo/goals/` (o directory custom) per auditare le probabilità
+`reports/` (o directory custom) per auditare le probabilità
 di successo.
 
 ## Data Sources & Licensing
@@ -91,13 +153,27 @@ di successo.
 | --- | --- | --- |
 | ECB | Euro area rates, macro | Uses SDW REST CSV endpoint with logged license/URL per request. |
 | FRED | US macro/market | Public CSV interface (`fredgraph.csv`) without API key; missing data coerced to NaN. |
+| OECD | Leading indicators, PMI, macro composites | SDMX endpoint (`stats.oecd.org/sdmx-json/data`) requested as CSV with `dimensionAtObservation=TimeDimension`. |
 | Bank of England | Rates, balance sheet | CSV download interface (`_iadb-getTDDownloadCSV`) with attribution logged. |
-| Stooq | Market indices, FX | Daily CSV feed (`q/d/l`) respecting personal-use policy. |
+| BIS | Real/nominal effective exchange rates | SDMX CSV endpoint (`/api/v1/data/REER`) with `startPeriod` rounding and rate-limit guards. |
+| CBOE | Volatility (VIX) and SKEW indices | Direct CSV download (`cdn.cboe.com/api/global/us_indices/daily_prices`) with HTML guardrails and license notice. |
+| LBMA | Gold & Silver PM fix (EUR converted) | HTML tables scraped at 15:00 London, converted to EUR via ECB FX with `pit_flag` at 16:00 CET. |
+| Nareit | FTSE Nareit REIT indices (monthly) | Manual Excel drop (`data/nareit_manual/NAREIT_AllSeries.xlsx`) parsed via `fair3 ingest --source nareit`; licenza “for informational purposes only”. |
+| Portfolio Visualizer (manual) | Synthetic asset class references (monthly) | Manual CSV drops in `data/portfolio_visualizer_manual/` parsed via `fair3 ingest --source portviz`; educational/informational use only. |
+| Stooq | Market indices, FX | Daily CSV feed (`q/d/l`) with `.us/.pl` normalisation, in-process caching, and timezone metadata. |
+| Yahoo (fallback) | Equities/ETF adjusted closes | Requires optional `yfinance`; limited to five-year window with two-second throttle and personal-use license notice. |
+| AQR (manual) | Factors (QMJ, BAB, VALUE) | Manual CSV drop in `data/aqr_manual/`; license requires educational use only. |
+| Alpha / q-Factors / Novy-Marx | Quality, profitability, value spreads | HTTP CSV (Alpha Architect, q5) with manual HTML drops in `data/alpha_manual/` for Novy-Marx tables; educational-use license only. |
+| Alpha Vantage FX | Daily FX EUR crosses (USD, GBP, CHF) | REST API `function=FX_DAILY` (`ALPHAVANTAGE_API_KEY` env var) with automatic throttling (5 calls/min) and CSV normalisation. |
+| Tiingo | Equities/ETF adjusted closes | Requires `TIINGO_API_KEY`; REST JSON endpoint (`/tiingo/daily/<symbol>/prices`) with Authorization header and deterministic throttling. |
+| CoinGecko | Crypto spot prices (EUR) | REST endpoint `coins/<id>/market_chart/range` sampled at 15:00 UTC (16:00 CET) with one-second throttle and PIT flagging. |
+| Binance Data Portal | Crypto spot klines (1d/1h) | Daily ZIP archives `data/binance.vision/data/spot/daily/klines/<symbol>/<interval>/<symbol>-<interval>-<date>.zip` parsed with quote-currency metadata and redistribution guardrails. |
+| World Bank | Macro indicators (GDP, population, debt) | JSON API (`api.worldbank.org/v2/country/<ISO3>/indicator/<series>`) with auto-pagination and ISO3-normalised symbols. |
 
 Ogni esecuzione di `fair3 ingest` produce file CSV timestampati (`<source>_YYYYMMDDTHHMMSSZ.csv`) con colonne standard (`date`, `value`, `symbol`) salvati in `data/raw/<source>/`. Le informazioni di licenza e gli URL vengono registrati nei log rotanti sotto `artifacts/audit/` per supportare la conformità UCITS/EU/IT. Il passo ETL ricostruisce un pannello PIT salvando `prices.parquet`, `returns.parquet`, `features.parquet` in `data/clean/` e il QA log in `audit/qa_data_log.csv`. Do not redistribute third-party datasets without permission.
 
 ## Core Concepts
-- **μ/Σ estimation:** Expected returns come from a shrink-to-zero + bagging OLS + gradient boosting ensemble stacked via ridge and blended with Black–Litterman equilibrium views (ω:=1 fallback when IR<τ). Covariances are blended (Ledoit–Wolf, graphical lasso, factor shrinkage, element-wise mediana) and projected to PSD via Higham (2002).
+- **μ/Σ estimation:** Expected returns come from a shrink-to-zero + bagging OLS + gradient boosting ensemble stacked via ridge and blended con le viste Black–Litterman (ω:=1 fallback when IR<τ). Le covarianze combinano Ledoit–Wolf, graphical lasso e factor shrink; l'utente può scegliere tra il consenso PSD (mediana elemento per elemento + Higham) o la mediana geometrica SPD (`--sigma-engine spd_median`).
 - **Σ drift guards:** Relative Frobenius and max-correlation diagnostics trigger acceptance gates and execution overlays when structural breaks emerge.
 - **Black–Litterman fallback:** Views blend with equilibrium unless the view information ratio drops below `τ_IR=0.15`, in which case the system reverts to market equilibrium (ω=1).
 - **Higham PSD projection:** Ensures covariance matrices remain positive semi-definite before optimisation.
@@ -108,10 +184,10 @@ Ogni esecuzione di `fair3 ingest` produce file CSV timestampati (`<source>_YYYYM
 - **Regime tilt:** A committee (two-state Gaussian HMM, volatility stress, macro slowdown) produces crisis probabilities that drive a tilt parameter λ with hysteresis (on=0.65, off=0.45, dwell=20 days, cooldown=10 days).
 - **Factor-to-instrument mapping:** Rolling ridge betas with bootstrap caps feed intra-factor HRP, tracking-error budgets, and ADV-aware trade sizing.
 - **Liquidity & Compliance:** Tracking-error budgets, turnover caps, and ADV/lot size constraints ensure retail implementability.
-- **No-trade rule:** Trades execute only when drift bands are breached **and** expected benefit minus costs and taxes remains positive.
-- **Monthly reporting:** Aggregates PIT artefacts into compliance-ready CSV/JSON summaries, factor/instrument attribution, turnover/cost dashboards, and fan charts stored under `artifacts/reports/<period>/`.
+- **No-trade rule:** Trades execute only when drift bands are breached **and** the block-bootstrap EB_LB minus costs and taxes remains positive.
+- **Monthly reporting:** Aggregates PIT artefacts into compliance-ready CSV/JSON summaries, factor/instrument attribution, turnover/cost dashboards, acceptance gate diagnostics, metric fan charts, and PDF snapshots stored under `artifacts/reports/<period>/`.
 - **Robustness lab & ablation:** Block bootstraps (60-day) and stylised shocks (1973, 2008, 2020, stagflation) assess acceptance gates; governance toggles run via ablation harness to document the lift of PSD, BL fallback, drift triggers, meta TO/TE, regime tilt, and the no-trade rule.
-- **Goal-based planning:** Monte Carlo simulation blends base/crisis regimes with deterministic glidepaths and contribution schedules, emitting weighted success probabilities and PDF dashboards under `artifacts/goals/`.
+- **Goal-based planning:** Monte Carlo simulation blends base/crisis regimes with deterministic glidepaths and contribution schedules, emitting weighted success probabilities and PDF dashboards under `reports/`.
 
 ## Repository Layout
 ```
@@ -120,7 +196,6 @@ README.md
 LICENSE
 PLAN.md
 .pre-commit-config.yaml
-.ruff.toml
 .github/
   workflows/ci.yml
   ISSUE_TEMPLATE/
@@ -130,7 +205,12 @@ SECURITY.md
 CONTRIBUTING.md
 docs/
 configs/
+audit/
+  seeds.yml
+  checksums.json
 data/
+  raw/
+  clean/
 artifacts/
 fair3/
   cli/main.py
@@ -149,7 +229,7 @@ fair3/
     utils/
 tests/
 ```
-Each engine submodule will ship with its own README detailing APIs, CLI usage, common errors, and tracing flags as functionality lands in later milestones. Il piano dettagliato degli interventi è consultabile in [`docs/roadmap.md`](docs/roadmap.md).
+Each engine submodule will ship with its own README detailing APIs, CLI usage, common errors, and tracing flags as functionality lands in later milestones. Il piano dettagliato degli interventi è consultabile in [`docs/roadmap.md`](docs/roadmap.md) mentre la guida all'osservabilità vive in [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md).
 
 ### Module Guide
 The following table summarises the most important packages so that new contributors can orient themselves quickly:
@@ -157,7 +237,7 @@ The following table summarises the most important packages so that new contribut
 | Package | Purpose | Key Entry Points |
 | --- | --- | --- |
 | `fair3.cli` | Command line interface definitions and argument parsing. | `fair3/cli/main.py` orchestrates sub-commands such as `fair3 factors` or `fair3 optimize`. |
-| `fair3.engine.ingest` | Downloaders for ECB, FRED, BoE, and Stooq data sources with offline fixtures. | `run_ingest` pipeline, fetcher classes like `FREDFetcher`. |
+| `fair3.engine.ingest` | Downloaders for ECB, FRED, BoE, BIS, OECD, World Bank, CBOE, Nareit, LBMA, Stooq, French Data Library, and Yahoo fallback (yfinance) sources with offline fixtures. | `run_ingest` pipeline, fetcher classes like `FREDFetcher`, `YahooFetcher`. |
 | `fair3.engine.etl` | Point-in-time panel construction and TR cleaning utilities. | `TRPanelBuilder`, ETL CLI invoked via `fair3 etl`. |
 | `fair3.engine.factors` | Factor library, orthogonalisation, validation harness. | `FactorLibrary`, `run_factor_pipeline`, CLI `fair3 factors`. |
 | `fair3.engine.estimates` | Mean/variance estimation stack, Black–Litterman blending, drift diagnostics. | `run_estimate_pipeline`, `estimate_mu_ensemble`. |
@@ -166,20 +246,19 @@ The following table summarises the most important packages so that new contribut
 | `fair3.engine.execution` | Trade sizing, cost/tax modelling, and summarised decisions. | `summarise_decision`, execution primitives. |
 | `fair3.engine.reporting` | Monthly reporting, audit snapshots, plotting utilities. | `generate_monthly_report`, `run_audit_snapshot`. |
 | `fair3.engine.robustness` | Bootstrap lab, replay experiments, ablation toggles. | `run_robustness_lab`, `RobustnessConfig`. |
-| `fair3.engine.utils` | Shared helpers (I/O, logging, seeds, PSD projection). | `artifact_path`, `get_stream_logger`, `generator_from_seed`. |
+| `fair3.engine.utils` | Shared helpers (I/O, logging, seeds, PSD projection). | `artifact_path`, `setup_logger`, `generator_from_seed`. |
 
 ### Testing & Quality Assurance
 - **Pytest harness:** The default entry point is `pytest -q`. The new `tests/conftest.py` ensures the repository root is always on `PYTHONPATH`, prints the active log level in the test header, and enables INFO-level pipeline logs so failing tests surface the last executed step.
 - **Property-based tests:** Hypothesis-based suites live under `tests/property/`. Install the optional dependency via `pip install hypothesis` (already listed in `pyproject.toml` extras) to enable them locally.
-- **Verbosity controls:** Pipelines log via `fair3.engine.utils.logging.get_stream_logger`. Tweak verbosity with `FAIR_LOG_LEVEL=DEBUG` or customise formatting using `FAIR_LOG_FORMAT`. These variables are honoured both by the CLI and under pytest thanks to an autouse fixture.
+- **Verbosity controls:** Pipelines log via `fair3.engine.logging.setup_logger`. Tweak verbosity with `FAIR_LOG_LEVEL=DEBUG` and mirror structured JSON logs using `--json-logs` or `FAIR_JSON_LOGS=1`; the CLI and pytest share the same configuration helpers.
 - **Focused smoke tests:** `tests/unit/test_pipeline_verbosity.py` exercises the factor, estimate, and optimiser pipelines with lightweight fixtures. The suite stubs expensive I/O and still asserts that artefacts are produced and log statements include the expected context, making regressions easier to diagnose.
 - **Audit snapshots:** Audit routines run automatically; in tests they are monkeypatched for performance. When running end-to-end, verify `artifacts/audit/` contains `seeds.yml`, `checksums.json`, and change logs for compliance review.
 
-For deterministic reproduction ensure you export `FAIR_LOG_LEVEL` and `FAIR_LOG_FORMAT` before invoking the CLI or tests. Example:
+For deterministic reproduction ensure you export `FAIR_LOG_LEVEL` (and optionally `FAIR_JSON_LOGS=1`) before invoking the CLI or tests. Example:
 
 ```bash
 export FAIR_LOG_LEVEL=DEBUG
-export FAIR_LOG_FORMAT='[%(asctime)s] %(levelname)s %(name)s - %(message)s'
 pytest tests/unit/test_pipeline_verbosity.py -vv
 ```
 

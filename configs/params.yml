@@ -1,10 +1,25 @@
 currency_base: EUR
 household:
+  investor: famiglia_rossi
   age: 32
   contrib_monthly: 500
   horizon_years: 30
   cvar_cap_1m: 0.10
   edar_cap_3y: 0.20
+  initial_wealth: 15000
+  contribution_growth: 0.02
+  contribution_plan:
+    - start_year: 0
+      end_year: 20
+      amount: 500
+      frequency: monthly
+    - start_year: 20
+      end_year: 30
+      amount: 350
+      frequency: monthly
+  withdrawals:
+    - year: 30
+      amount: 300000
 filters:
   esg_exclusions: []
   allowed_instruments: ["UCITS_ETF","FUT","CASH","BOND_IDX"]

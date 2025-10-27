@@ -4,12 +4,27 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+try:  # pragma: no cover - optional dependency shim
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.utils import ImageReader
+    from reportlab.pdfgen import canvas
+
+    _HAS_REPORTLAB = True
+except ModuleNotFoundError:  # pragma: no cover - fallback
+    A4 = (595.0, 842.0)  # type: ignore[assignment]
+    ImageReader = None  # type: ignore[assignment]
+    canvas = None  # type: ignore[assignment]
+    _HAS_REPORTLAB = False
+
+from fair3.engine.reporting.analytics import acceptance_gates, attribution_ic
 from fair3.engine.reporting.plots import (
     plot_attribution,
     plot_fan_chart,
+    plot_fanchart,
     plot_turnover_costs,
 )
 from fair3.engine.utils.io import artifact_path, ensure_dir, safe_path_segment, write_json
@@ -26,7 +41,24 @@ __all__ = [
 
 @dataclass
 class MonthlyReportInputs:
-    """Inputs required to build the monthly report."""
+    """Inputs required to build the monthly report.
+
+    Attributes:
+      returns: Series of portfolio returns indexed by date.
+      weights: Instrument weights aligned with ``returns``.
+      factor_contributions: Factor attribution series indexed by date.
+      instrument_contributions: Instrument attribution series indexed by date.
+      turnover: Realised turnover series.
+      costs: Trading cost series.
+      taxes: Tax series aligned with ``costs``.
+      compliance_flags: Mapping of compliance checks to boolean flags.
+      cluster_map: Optional mapping of cluster names to instrument lists.
+      instrument_returns: Optional instrument return panel for attribution IC.
+      factor_returns: Optional factor return panel for attribution IC.
+      bootstrap_metrics: Optional bootstrap metrics DataFrame with columns
+        such as ``max_drawdown`` and ``cagr``.
+      thresholds: Optional acceptance gate thresholds.
+    """
 
     returns: pd.Series
     weights: pd.DataFrame
@@ -37,11 +69,31 @@ class MonthlyReportInputs:
     taxes: pd.Series
     compliance_flags: Mapping[str, bool]
     cluster_map: Mapping[str, Sequence[str]] | None = None
+    instrument_returns: pd.DataFrame | None = None
+    factor_returns: pd.DataFrame | None = None
+    bootstrap_metrics: pd.DataFrame | None = None
+    thresholds: Mapping[str, float] | None = None
 
 
 @dataclass
 class MonthlyReportArtifacts:
-    """Artifacts produced by :func:`generate_monthly_report`."""
+    """Artifacts produced by :func:`generate_monthly_report`.
+
+    Attributes:
+      metrics_csv: Path to the CSV containing summary metrics.
+      metrics_json: Path to the JSON file with the same metrics.
+      attribution_csv: CSV with factor and instrument attribution tables.
+      compliance_json: JSON file encoding compliance flags.
+      fan_chart: PNG chart showing the wealth fan chart.
+      attribution_plot: PNG chart with factor attribution.
+      turnover_plot: PNG chart with turnover and costs.
+      cluster_csv: CSV with cluster-level weights.
+      summary_json: JSON summary with cost and turnover totals.
+      metric_fan_charts: Mapping of metric name to PNG artefact path.
+      acceptance_json: JSON file with acceptance gate evaluation.
+      report_pdf: PDF summarising metrics, compliance, and charts.
+      attribution_ic_csv: Optional CSV with attribution and IC statistics.
+    """
 
     metrics_csv: Path
     metrics_json: Path
@@ -52,6 +104,10 @@ class MonthlyReportArtifacts:
     turnover_plot: Path
     cluster_csv: Path
     summary_json: Path
+    metric_fan_charts: dict[str, Path]
+    acceptance_json: Path
+    report_pdf: Path
+    attribution_ic_csv: Path | None = None
 
 
 def _annualisation_factor(index: pd.DatetimeIndex) -> float:
@@ -98,6 +154,70 @@ def _edar(returns: pd.Series, window: int = 36, alpha: float = 0.95) -> float:
     return float(np.mean(tail))
 
 
+def _metric_paths(
+    draw_matrix: np.ndarray,
+    *,
+    periods_per_year: int = 12,
+    alpha: float = 0.95,
+    edar_window: int = 36,
+) -> dict[str, np.ndarray]:
+    """Compute rolling statistics for each bootstrap path.
+
+    Args:
+      draw_matrix: Matrix of bootstrap returns shaped ``(n_periods, n_paths)``.
+      periods_per_year: Number of periods per year (12 for monthly data).
+      alpha: Tail probability used for CVaR and EDaR calculations.
+      edar_window: Window, in periods, used when computing EDaR.
+
+    Returns:
+      Dictionary mapping metric names to arrays shaped
+      ``(n_periods, n_paths)`` containing the evolution of each metric.
+    """
+
+    n_obs, n_paths = draw_matrix.shape
+    counts = np.arange(1, n_obs + 1, dtype="float64").reshape(-1, 1)
+
+    cumulative = np.cumsum(draw_matrix, axis=0)
+    cumulative_sq = np.cumsum(draw_matrix**2, axis=0)
+    mean = cumulative / counts
+    variance = np.maximum(cumulative_sq / counts - mean**2, 0.0)
+    std = np.sqrt(variance)
+    sharpe = np.zeros_like(draw_matrix)
+    valid = std > 0
+    sharpe[valid] = mean[valid] / std[valid] * np.sqrt(periods_per_year)
+
+    wealth = np.cumprod(1.0 + draw_matrix, axis=0)
+    years = counts / float(periods_per_year)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        cagr = np.where(years > 0, wealth ** (1.0 / years) - 1.0, 0.0)
+
+    peaks = np.maximum.accumulate(wealth, axis=0)
+    drawdowns = wealth / peaks - 1.0
+    max_drawdown = np.minimum.accumulate(drawdowns, axis=0)
+
+    cvar = np.zeros_like(draw_matrix)
+    for idx in range(n_obs):
+        horizon = np.sort(draw_matrix[: idx + 1, :], axis=0)
+        cutoff = max(1, int(np.ceil((1 - alpha) * (idx + 1))))
+        tail = horizon[:cutoff, :]
+        cvar[idx, :] = tail.mean(axis=0)
+
+    edar = np.zeros_like(draw_matrix)
+    for path_idx in range(n_paths):
+        series = pd.Series(draw_matrix[:, path_idx])
+        for idx in range(n_obs):
+            subset = series.iloc[: idx + 1]
+            edar[idx, path_idx] = _edar(subset, window=edar_window, alpha=alpha)
+
+    return {
+        "sharpe": sharpe,
+        "max_drawdown": max_drawdown,
+        "cvar": cvar,
+        "edar": edar,
+        "cagr": cagr,
+    }
+
+
 def compute_monthly_metrics(returns: pd.Series) -> dict[str, float]:
     """Compute performance statistics from monthly returns."""
 
@@ -134,8 +254,29 @@ def _aggregate_monthly(series: pd.Series, method: str) -> pd.Series:
     raise ValueError(f"Unknown aggregation method: {method}")
 
 
-def simulate_fan_chart(returns: pd.Series, *, seed: int, paths: int = 256) -> pd.DataFrame:
-    """Simulate bootstrap wealth paths for fan chart plotting."""
+def simulate_fan_chart(
+    returns: pd.Series,
+    *,
+    seed: int,
+    paths: int = 256,
+    return_paths: bool = False,
+) -> pd.DataFrame | tuple[pd.DataFrame, pd.DataFrame]:
+    """Simulate bootstrap wealth paths for fan chart plotting.
+
+    Args:
+      returns: Series of returns sampled to build the wealth paths.
+      seed: Deterministic seed used for the pseudo-random generator.
+      paths: Number of bootstrap paths to generate.
+      return_paths: When ``True`` the function also returns the sampled
+        returns alongside the wealth paths.
+
+    Returns:
+      Either a DataFrame with wealth paths or a tuple ``(wealth, returns)``
+      when ``return_paths`` is set.
+
+    Raises:
+      ValueError: If ``returns`` is empty.
+    """
 
     rng = generator_from_seed(seed)
     if returns.empty:
@@ -146,7 +287,11 @@ def simulate_fan_chart(returns: pd.Series, *, seed: int, paths: int = 256) -> pd
     wealth = np.cumprod(1 + draws, axis=0)
     index = returns.index
     columns = [f"path_{i}" for i in range(paths)]
-    return pd.DataFrame(wealth, index=index, columns=columns)
+    wealth_df = pd.DataFrame(wealth, index=index, columns=columns)
+    if return_paths:
+        draw_df = pd.DataFrame(draws, index=index, columns=columns)
+        return wealth_df, draw_df
+    return wealth_df
 
 
 def _cluster_weights(
@@ -165,6 +310,205 @@ def _cluster_weights(
     if not result:
         result["total"] = weights.sum(axis=1)
     return pd.DataFrame(result, index=weights.index)
+
+
+def _render_metric_fan_chart(
+    matrix: np.ndarray,
+    dates: pd.DatetimeIndex,
+    *,
+    name: str,
+    report_root: Path,
+    ylabel: str,
+) -> Path:
+    """Render a metric fan chart and return the artefact path.
+
+    Args:
+      matrix: Metric values shaped ``(n_periods, n_paths)``.
+      dates: Date index aligned with the first axis of ``matrix``.
+      name: Base name used to build the output filename.
+      report_root: Directory where artefacts will be stored.
+      ylabel: Label used for the y-axis.
+
+    Returns:
+      Path pointing to the generated PNG chart.
+    """
+
+    quantiles = np.quantile(matrix, [0.05, 0.5, 0.95], axis=1)
+    output = report_root / f"{name}_fan.png"
+    fig, axis = plt.subplots(figsize=(8.0, 4.5), constrained_layout=True)
+    plot_fanchart(
+        axis,
+        dates.to_pydatetime(),
+        quantiles[1],
+        quantiles[0],
+        quantiles[2],
+        title=f"{name.upper()} fan",
+        ylabel=ylabel,
+    )
+    fig.savefig(output, dpi=150)
+    plt.close(fig)
+    return output
+
+
+def _escape_pdf_text(text: str) -> str:
+    """Escape characters that are special in PDF text streams."""
+
+    return text.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
+
+
+def _write_fallback_pdf(path: Path, lines: Sequence[str]) -> Path:
+    """Generate a minimal PDF document without relying on reportlab.
+
+    The PDF writer is intentionally small: it renders the provided lines using a
+    single Helvetica font on one page.  The structure follows the PDF 1.4
+    specification and is sufficient for unit tests that check the existence and
+    non-zero size of the produced file.
+    """
+
+    ensure_dir(path.parent)
+    content: list[str] = ["BT", "/F1 12 Tf", "72 800 Td"]
+    for index, line in enumerate(lines):
+        if index > 0:
+            content.append("0 -14 Td")
+        content.append(f"({_escape_pdf_text(line)}) Tj")
+    content.append("ET")
+    stream_bytes = ("\n".join(content) + "\n").encode("latin-1", "replace")
+
+    page_entry = (
+        b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] "
+        b"/Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>"
+    )
+    objects = [
+        b"<< /Type /Catalog /Pages 2 0 R >>",
+        b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        page_entry,
+        b"<< /Length %d >>\nstream\n" % len(stream_bytes) + stream_bytes + b"endstream",
+        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+    ]
+
+    with path.open("wb") as handle:
+        handle.write(b"%PDF-1.4\n")
+        offsets: list[int] = []
+        for index, body in enumerate(objects, start=1):
+            offsets.append(handle.tell())
+            handle.write(f"{index} 0 obj\n".encode("ascii"))
+            handle.write(body)
+            handle.write(b"\nendobj\n")
+        xref_offset = handle.tell()
+        handle.write(b"xref\n0 6\n")
+        handle.write(b"0000000000 65535 f \n")
+        for offset in offsets:
+            handle.write(f"{offset:010d} 00000 n \n".encode("ascii"))
+        handle.write(b"trailer << /Size 6 /Root 1 0 R >>\n")
+        handle.write(f"startxref\n{xref_offset}\n%%EOF\n".encode("ascii"))
+    return path
+
+
+def _build_pdf_report(
+    period_label: str,
+    metrics: Mapping[str, float],
+    compliance: Mapping[str, bool],
+    acceptance: Mapping[str, bool | float],
+    charts: Sequence[Path],
+    *,
+    path: Path,
+) -> Path:
+    """Generate a compact PDF summary combining metrics and charts.
+
+    Args:
+      period_label: Human readable period label (e.g., ``"2024-01:2024-06"``).
+      metrics: Mapping of scalar metrics included in the PDF summary.
+      compliance: Compliance flags reported as booleans.
+      acceptance: Acceptance gate evaluation containing boolean flags.
+      charts: Sequence of chart artefacts that will be embedded in the PDF.
+      path: Destination path for the PDF.
+
+    Returns:
+      Path to the generated PDF artefact.
+    """
+
+    ensure_dir(path.parent)
+    if not _HAS_REPORTLAB:
+        lines = [f"FAIR-III Monthly Report: {period_label}", "Metrics:"]
+        for key, value in metrics.items():
+            lines.append(f"  {key}: {value:.4f}")
+        lines.append("Compliance:")
+        for key, value in compliance.items():
+            lines.append(f"  {key}: {'PASS' if value else 'FAIL'}")
+        lines.append("Acceptance gates:")
+        drawdown_status = "PASS" if acceptance["max_drawdown_gate"] else "FAIL"
+        lines.append(
+            f"  MaxDD prob={acceptance['max_drawdown_probability']:.3f} gate={drawdown_status}"
+        )
+        cagr_status = "PASS" if acceptance["cagr_gate"] else "FAIL"
+        lines.append(f"  CAGR LB={acceptance['cagr_lower_bound']:.3%} gate={cagr_status}")
+        if charts:
+            lines.append("Charts:")
+            lines.extend(f"  {chart.name}" for chart in charts)
+        return _write_fallback_pdf(path, lines)
+
+    page_width, page_height = A4
+    pdf = canvas.Canvas(str(path), pagesize=A4)
+    margin_x = 40
+    y = page_height - 50
+
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(margin_x, y, f"FAIR-III Monthly Report: {period_label}")
+    y -= 28
+
+    pdf.setFont("Helvetica", 10)
+    for key, value in metrics.items():
+        pdf.drawString(margin_x, y, f"{key}: {value:.4f}")
+        y -= 14
+
+    y -= 8
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.drawString(margin_x, y, "Compliance flags")
+    y -= 18
+    pdf.setFont("Helvetica", 10)
+    for key, value in compliance.items():
+        pdf.drawString(margin_x, y, f"{key}: {'PASS' if value else 'FAIL'}")
+        y -= 14
+
+    y -= 8
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.drawString(margin_x, y, "Acceptance gates")
+    y -= 18
+    pdf.setFont("Helvetica", 10)
+    drawdown_status = "PASS" if acceptance["max_drawdown_gate"] else "FAIL"
+    pdf.drawString(
+        margin_x,
+        y,
+        f"MaxDD prob={acceptance['max_drawdown_probability']:.3f} gate={drawdown_status}",
+    )
+    y -= 14
+    cagr_status = "PASS" if acceptance["cagr_gate"] else "FAIL"
+    pdf.drawString(
+        margin_x,
+        y,
+        f"CAGR LB={acceptance['cagr_lower_bound']:.3%} gate={cagr_status}",
+    )
+    y -= 20
+
+    for chart in charts:
+        image = ImageReader(str(chart))
+        height = 180
+        width = page_width - 2 * margin_x
+        if y - height < 60:
+            pdf.showPage()
+            y = page_height - 60
+        pdf.drawImage(
+            image,
+            margin_x,
+            y - height,
+            width=width,
+            height=height,
+            preserveAspectRatio=True,
+        )
+        y -= height + 24
+
+    pdf.save()
+    return path
 
 
 def generate_monthly_report(
@@ -198,12 +542,31 @@ def generate_monthly_report(
     compliance_json = report_root / "compliance.json"
     write_json({k: bool(v) for k, v in inputs.compliance_flags.items()}, compliance_json)
 
-    wealth_paths = simulate_fan_chart(returns_monthly, seed=seed)
+    wealth_result = simulate_fan_chart(returns_monthly, seed=seed, return_paths=True)
+    wealth_paths, return_paths = wealth_result
     fan_chart = plot_fan_chart(
         wealth_paths,
         title=f"Portfolio wealth fan ({period_label})",
         path=report_root,
     )
+
+    metric_paths = _metric_paths(return_paths.to_numpy(copy=False))
+    metric_labels = {
+        "sharpe": "Sharpe",
+        "max_drawdown": "Max drawdown",
+        "cvar": "CVaR",
+        "edar": "EDaR",
+        "cagr": "CAGR",
+    }
+    metric_fans: dict[str, Path] = {}
+    for key, label in metric_labels.items():
+        metric_fans[key] = _render_metric_fan_chart(
+            metric_paths[key],
+            returns_monthly.index,
+            name=key,
+            report_root=report_root,
+            ylabel=label,
+        )
 
     attribution_plot = plot_attribution(
         attribution,
@@ -236,6 +599,59 @@ def generate_monthly_report(
     summary_json = report_root / "summary.json"
     write_json(summary, summary_json)
 
+    thresholds = {
+        "max_drawdown_threshold": -0.25,
+        "cagr_target": 0.03,
+    }
+    if inputs.thresholds:
+        thresholds.update({k: float(v) for k, v in inputs.thresholds.items()})
+
+    acceptance_payload = {
+        "max_drawdown": metric_paths["max_drawdown"][-1, :],
+        "cagr": metric_paths["cagr"][-1, :],
+    }
+    if inputs.bootstrap_metrics is not None:
+        frame = inputs.bootstrap_metrics
+        if "max_drawdown" in frame.columns:
+            acceptance_payload["max_drawdown"] = frame["max_drawdown"].to_numpy()
+        if "cagr" in frame.columns:
+            acceptance_payload["cagr"] = frame["cagr"].to_numpy()
+
+    acceptance_summary = acceptance_gates(acceptance_payload, thresholds)
+    acceptance_json = report_root / "acceptance.json"
+    write_json(
+        {
+            "max_drawdown_probability": acceptance_summary["max_drawdown_probability"],
+            "max_drawdown_gate": acceptance_summary["max_drawdown_gate"],
+            "cagr_lower_bound": acceptance_summary["cagr_lower_bound"],
+            "cagr_gate": acceptance_summary["cagr_gate"],
+            "passes": acceptance_summary["passes"],
+        },
+        acceptance_json,
+    )
+
+    attribution_ic_path: Path | None = None
+    if inputs.instrument_returns is not None and inputs.factor_returns is not None:
+        ic_frame = attribution_ic(
+            inputs.weights.sort_index(),
+            inputs.instrument_returns.sort_index(),
+            inputs.factor_returns.sort_index(),
+        )
+        attribution_ic_path = report_root / "attribution_ic.csv"
+        ic_frame.to_csv(attribution_ic_path)
+
+    charts_for_pdf = [fan_chart]
+    charts_for_pdf.extend(metric_fans.values())
+    charts_for_pdf.extend([attribution_plot, turnover_plot])
+    report_pdf = _build_pdf_report(
+        period_label,
+        metrics,
+        {k: bool(v) for k, v in inputs.compliance_flags.items()},
+        acceptance_summary,
+        charts_for_pdf,
+        path=report_root / "monthly_report.pdf",
+    )
+
     return MonthlyReportArtifacts(
         metrics_csv=metrics_csv,
         metrics_json=metrics_json,
@@ -246,4 +662,8 @@ def generate_monthly_report(
         turnover_plot=turnover_plot,
         cluster_csv=cluster_csv,
         summary_json=summary_json,
+        metric_fan_charts=metric_fans,
+        acceptance_json=acceptance_json,
+        report_pdf=report_pdf,
+        attribution_ic_csv=attribution_ic_path,
     )

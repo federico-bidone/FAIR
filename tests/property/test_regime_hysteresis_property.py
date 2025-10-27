@@ -2,6 +2,10 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+import pytest
+
+pytest.importorskip("hypothesis")
+
 from hypothesis import given
 from hypothesis import strategies as st
 
@@ -13,7 +17,15 @@ def test_hysteresis_cooldown_blocks_reentry(probabilities: list[float]) -> None:
     idx = pd.date_range("2020-01-01", periods=len(probabilities), freq="B")
     series = pd.Series(probabilities, index=idx)
 
-    state = apply_hysteresis(series, on=0.6, off=0.4, dwell_days=2, cooldown_days=3)
+    state = apply_hysteresis(
+        series,
+        on=0.6,
+        off=0.4,
+        dwell_days=2,
+        cooldown_days=3,
+        activate_streak=2,
+        deactivate_streak=2,
+    )
     values = state.to_numpy()
 
     assert set(np.unique(values)).issubset({0.0, 1.0})
