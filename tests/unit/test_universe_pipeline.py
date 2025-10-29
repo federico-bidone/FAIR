@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pandas as pd
+from pytest import MonkeyPatch
 
 from fair3.engine.brokers.base import BaseBrokerFetcher, BrokerUniverseArtifact
 from fair3.engine.universe.models import InstrumentListing
@@ -30,8 +31,8 @@ class _StubFetcher(BaseBrokerFetcher):
         )
 
 
-def test_run_universe_pipeline_aggregates(monkeypatch, tmp_path: Path) -> None:
-    as_of = datetime(2024, 1, 1, tzinfo=timezone.utc)
+def test_run_universe_pipeline_aggregates(monkeypatch: MonkeyPatch, tmp_path: Path) -> None:
+    as_of = datetime(2024, 1, 1, tzinfo=UTC)
     broker_frames = {
         "broker_a": pd.DataFrame(
             [
@@ -67,7 +68,7 @@ def test_run_universe_pipeline_aggregates(monkeypatch, tmp_path: Path) -> None:
         def __init__(self) -> None:
             super().__init__(broker_frames[self.BROKER], as_of=as_of)
 
-    def fake_fetcher_map():
+    def fake_fetcher_map() -> dict[str, type[BaseBrokerFetcher]]:
         return {
             "broker_a": BrokerAFetcher,
             "broker_b": BrokerBFetcher,
@@ -78,7 +79,7 @@ def test_run_universe_pipeline_aggregates(monkeypatch, tmp_path: Path) -> None:
     monkeypatch.setattr(registry, "_fetcher_map", fake_fetcher_map)
 
     class DummyOpenFIGI:
-        def map_isins(self, isins):
+        def map_isins(self, isins: list[str]) -> dict[str, list[InstrumentListing]]:
             return {
                 "IE00B0M62Q58": [
                     InstrumentListing(

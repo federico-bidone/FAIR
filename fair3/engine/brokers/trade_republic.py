@@ -4,12 +4,16 @@ from __future__ import annotations
 
 import io
 import re
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from typing import Iterable, Mapping
 
 import pandas as pd
-import pdfplumber
 import requests
+
+try:  # pragma: no cover - dipendenza opzionale gestita a runtime
+    import pdfplumber
+except ModuleNotFoundError:  # pragma: no cover - ambiente senza extra
+    pdfplumber = None  # type: ignore[assignment]
 
 from .base import BaseBrokerFetcher, BrokerUniverseArtifact
 
@@ -113,6 +117,11 @@ class TradeRepublicFetcher(BaseBrokerFetcher):
             DataFrame con colonne ``isin``, ``name``, ``section`` e ``asset_class``
             ripulite e deduplicate.
         """
+        if pdfplumber is None:  # pragma: no cover - ambiente senza pdfplumber
+            raise RuntimeError(
+                "pdfplumber non è installato. Installa il pacchetto opzionale per analizzare i PDF."
+            )
+
         instruments: list[dict[str, object]] = []
         allowed = self._allowed_sections
         section_map: Mapping[str, TradeRepublicSection] = {

@@ -12,6 +12,7 @@ import pandas as pd
 import yaml
 
 from fair3.engine.allocators import run_optimization_pipeline
+from fair3.engine.brokers import available_brokers
 from fair3.engine.estimates import run_estimate_pipeline
 from fair3.engine.etl import TRPanelBuilder
 from fair3.engine.execution import summarise_decision
@@ -22,7 +23,6 @@ from fair3.engine.goals import (
     run_goal_monte_carlo,
 )
 from fair3.engine.gui import launch_gui
-from fair3.engine.brokers import available_brokers
 from fair3.engine.ingest import available_sources, run_ingest
 from fair3.engine.logging import configure_cli_logging, record_metrics
 from fair3.engine.mapping import run_mapping_pipeline

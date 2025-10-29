@@ -4,9 +4,13 @@ from __future__ import annotations
 
 import io
 
+import pytest
+from pytest import MonkeyPatch
 from reportlab.pdfgen import canvas
 
 from fair3.engine.brokers import TradeRepublicFetcher
+
+pytest.importorskip("pdfplumber")
 
 
 def _make_pdf(lines: list[str]) -> bytes:
@@ -20,7 +24,7 @@ def _make_pdf(lines: list[str]) -> bytes:
     return buffer.getvalue()
 
 
-def test_trade_republic_fetcher_parses_pdf(monkeypatch) -> None:
+def test_trade_republic_fetcher_parses_pdf(monkeypatch: MonkeyPatch) -> None:
     lines = [
         "TRADING UNIVERSE 2024",
         "Stocks",
@@ -42,7 +46,7 @@ def test_trade_republic_fetcher_parses_pdf(monkeypatch) -> None:
     )
 
 
-def test_trade_republic_fetcher_respects_allowed_sections(monkeypatch) -> None:
+def test_trade_republic_fetcher_respects_allowed_sections(monkeypatch: MonkeyPatch) -> None:
     lines = [
         "Stocks",
         "ISIN Name",

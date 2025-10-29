@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import time
 from collections import defaultdict
-from typing import Sequence
+from collections.abc import Sequence
 
 import requests
 
@@ -68,7 +68,7 @@ class OpenFIGIClient:
                     continue
                 try:
                     response.raise_for_status()
-                except requests.RequestException as exc:  # pragma: no cover - network failure
+                except requests.RequestException:  # pragma: no cover - network failure
                     attempt += 1
                     if attempt > self._max_retries:
                         raise
@@ -76,7 +76,7 @@ class OpenFIGIClient:
                     backoff = min(backoff * 2, 60)
                     continue
                 results = response.json()
-                for request_payload, result_payload in zip(payload, results):
+                for request_payload, result_payload in zip(payload, results, strict=False):
                     isin = request_payload["idValue"]
                     for entry in (result_payload or {}).get("data", []) or []:
                         mapping[isin].append(

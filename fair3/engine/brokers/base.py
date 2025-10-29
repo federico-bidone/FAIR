@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, ClassVar, Mapping
+from datetime import UTC, datetime
+from typing import Any, ClassVar
 
 import pandas as pd
+from requests import Session
 
 
 @dataclass(slots=True)
@@ -38,7 +40,7 @@ class BaseBrokerFetcher(ABC):
     SOURCE_URL: ClassVar[str]
     LICENSE: ClassVar[str | None] = None
 
-    def __init__(self, *, session: Any | None = None) -> None:
+    def __init__(self, *, session: Session | None = None) -> None:
         self._session = session
 
     @abstractmethod
@@ -46,7 +48,7 @@ class BaseBrokerFetcher(ABC):
         """Scarica e interpreta l'universo investibile del broker."""
 
     def _now(self) -> datetime:
-        return datetime.now(timezone.utc)
+        return datetime.now(UTC)
 
 
 __all__ = ["BaseBrokerFetcher", "BrokerInstrument", "BrokerUniverseArtifact"]
