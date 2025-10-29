@@ -127,7 +127,7 @@ class EODHDFetcher(BaseCSVFetcher):
         normalized_symbol = symbol.strip()
         stripped = payload.lstrip()
         if stripped.startswith("<"):
-            msg = "EODHD returned HTML payload; check API token, license status, " "or rate limits."
+            msg = "EODHD returned HTML payload; check API token, license status, or rate limits."
             raise ValueError(msg)
 
         if normalized_symbol in self._manual_overrides:

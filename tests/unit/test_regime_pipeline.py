@@ -1,6 +1,6 @@
+import hashlib
 from pathlib import Path
 
-import hashlib
 import numpy as np
 import pandas as pd
 import pytest
@@ -51,9 +51,7 @@ def _write_clean_panel(root: Path) -> None:
     panel["revision_tag"] = "qa_regime"
     panel["checksum"] = panel.apply(
         lambda row: hashlib.sha256(
-            f"{row['symbol']}|{row['field']}|{row['date'].isoformat()}|{float(row['value']):.12f}".encode(
-                "utf-8"
-            )
+            f"{row['symbol']}|{row['field']}|{row['date'].isoformat()}|{float(row['value']):.12f}".encode()
         ).hexdigest(),
         axis=1,
     )

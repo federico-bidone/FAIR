@@ -18,8 +18,6 @@ from .nareit import NareitFetcher
 from .oecd import OECDFetcher
 from .portfolio_visualizer import PortfolioVisualizerFetcher
 from .portfoliocharts import PortfolioChartsFetcher
-from .testfolio import TestfolioPresetFetcher
-from .us_market_data import USMarketDataFetcher
 from .registry import (
     BaseCSVFetcher,
     IngestArtifact,
@@ -28,7 +26,9 @@ from .registry import (
     run_ingest,
 )
 from .stooq import StooqFetcher
+from .testfolio import TestfolioPresetFetcher
 from .tiingo import TiingoFetcher
+from .us_market_data import USMarketDataFetcher
 from .worldbank import WorldBankFetcher
 from .yahoo import YahooFetcher
 
@@ -49,12 +49,12 @@ __all__ = [
     "LBMAFetcher",
     "NareitFetcher",
     "OECDFetcher",
-    "PortfolioVisualizerFetcher",
     "PortfolioChartsFetcher",
-    "TestfolioPresetFetcher",
-    "USMarketDataFetcher",
-    "TiingoFetcher",
+    "PortfolioVisualizerFetcher",
     "StooqFetcher",
+    "TestfolioPresetFetcher",
+    "TiingoFetcher",
+    "USMarketDataFetcher",
     "WorldBankFetcher",
     "YahooFetcher",
     "BaseCSVFetcher",

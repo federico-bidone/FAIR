@@ -363,8 +363,8 @@ def _fetcher_map() -> Mapping[str, type[BaseCSVFetcher]]:
     from .oecd import OECDFetcher
     from .portfolio_visualizer import PortfolioVisualizerFetcher
     from .portfoliocharts import PortfolioChartsFetcher
-    from .testfolio import TestfolioPresetFetcher
     from .stooq import StooqFetcher
+    from .testfolio import TestfolioPresetFetcher
     from .tiingo import TiingoFetcher
     from .us_market_data import USMarketDataFetcher
     from .worldbank import WorldBankFetcher

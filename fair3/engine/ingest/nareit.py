@@ -91,8 +91,7 @@ class NareitFetcher(BaseCSVFetcher):
         manual_path = self.manual_root / spec.filename
         if not manual_path.exists():
             msg = (
-                "File Nareit mancante. Scarica l'Excel dal sito Nareit e copialo in "
-                f"{manual_path}."
+                f"File Nareit mancante. Scarica l'Excel dal sito Nareit e copialo in {manual_path}."
             )
             raise FileNotFoundError(msg)
         return f"manual://{manual_path}"
@@ -125,10 +124,7 @@ class NareitFetcher(BaseCSVFetcher):
         spec = self._series_spec(symbol)
         frame = pd.read_excel(buffer, sheet_name=spec.sheet_name)
         if spec.date_column not in frame.columns or spec.value_column not in frame.columns:
-            msg = (
-                "Colonne attese mancanti nel file Nareit: "
-                f"{spec.date_column}/{spec.value_column}"
-            )
+            msg = f"Colonne attese mancanti nel file Nareit: {spec.date_column}/{spec.value_column}"
             raise ValueError(msg)
 
         dates = pd.to_datetime(frame[spec.date_column], errors="coerce")

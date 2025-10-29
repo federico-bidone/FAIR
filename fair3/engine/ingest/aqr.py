@@ -104,9 +104,7 @@ class AQRFetcher(BaseCSVFetcher):
             return spec.url
         manual_path = self.manual_root / spec.filename
         if not manual_path.exists():
-            msg = (
-                "Manual dataset missing. Download it from AQR and place it under " f"{manual_path}."
-            )
+            msg = f"Manual dataset missing. Download it from AQR and place it under {manual_path}."
             raise FileNotFoundError(msg)
         return f"manual://{manual_path}"
 
@@ -130,10 +128,7 @@ class AQRFetcher(BaseCSVFetcher):
         spec = self._dataset_spec(symbol)
         frame = pd.read_csv(StringIO(payload))
         if spec.date_column not in frame.columns or spec.value_column not in frame.columns:
-            msg = (
-                "Missing expected columns in AQR dataset: "
-                f"{spec.date_column}/{spec.value_column}"
-            )
+            msg = f"Missing expected columns in AQR dataset: {spec.date_column}/{spec.value_column}"
             raise ValueError(msg)
         if spec.date_format:
             dates = pd.to_datetime(

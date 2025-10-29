@@ -69,7 +69,7 @@ def import_us_market_data_local(root: Path | str) -> pd.DataFrame:
         frame = pd.read_csv(csv_path)
         normalized = _normalize_columns(frame)
         if "date" not in normalized.columns:
-            msg = "us-market-data CSV missing 'Date' column; " f"file={csv_path.name}"
+            msg = f"us-market-data CSV missing 'Date' column; file={csv_path.name}"
             raise ValueError(msg)
         normalized["date"] = pd.to_datetime(normalized["date"], errors="coerce")
         frames.append(normalized)

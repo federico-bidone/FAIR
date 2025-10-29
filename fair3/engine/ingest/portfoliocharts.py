@@ -34,11 +34,13 @@ DEFAULT_SHEET_COLUMN_MAPPING: Final[dict[str, dict[str, str]]] = {
 }
 
 SIMBA_DEFAULT_SYMBOLS: Final[tuple[str, ...]] = tuple(
-    sorted({
-        symbol
-        for column_map in DEFAULT_SHEET_COLUMN_MAPPING.values()
-        for symbol in column_map.values()
-    })
+    sorted(
+        {
+            symbol
+            for column_map in DEFAULT_SHEET_COLUMN_MAPPING.values()
+            for symbol in column_map.values()
+        }
+    )
 )
 
 DEFAULT_WORKBOOK_NAME: Final[str] = "PortfolioCharts_Simba.xlsx"
@@ -67,10 +69,7 @@ def parse_portfoliocharts_simba(
     """
 
     if not xlsx_path.exists():
-        msg = (
-            "PortfolioCharts Simba workbook not found. "
-            f"Expected file at {xlsx_path}."
-        )
+        msg = f"PortfolioCharts Simba workbook not found. Expected file at {xlsx_path}."
         raise FileNotFoundError(msg)
     column_mapping = mapping or DEFAULT_SHEET_COLUMN_MAPPING
     frames: list[pd.DataFrame] = []
@@ -100,9 +99,7 @@ def parse_portfoliocharts_simba(
             missing_columns = required_columns.difference(sheet_df.columns)
             if missing_columns:
                 missing_fmt = ", ".join(sorted(missing_columns))
-                msg = (
-                    f"Sheet '{sheet_name}' is missing expected columns: {missing_fmt}"
-                )
+                msg = f"Sheet '{sheet_name}' is missing expected columns: {missing_fmt}"
                 raise ValueError(msg)
 
             subset = sheet_df[[date_column, *sheet_map.keys()]].copy()
@@ -140,9 +137,7 @@ class PortfolioChartsFetcher(BaseCSVFetcher):
     """Fetcher manuale per la Simba Backtesting Spreadsheet di PortfolioCharts."""
 
     SOURCE = "portfoliocharts"
-    LICENSE = (
-        "PortfolioCharts Simba Backtesting Spreadsheet — informational/educational use"
-    )
+    LICENSE = "PortfolioCharts Simba Backtesting Spreadsheet — informational/educational use"
     BASE_URL = (
         "https://portfoliocharts.com/portfolio/portfolio-charts-simba-backtesting-spreadsheet"
     )
@@ -260,4 +255,3 @@ class PortfolioChartsFetcher(BaseCSVFetcher):
             data=combined,
             metadata=metadata,
         )
-

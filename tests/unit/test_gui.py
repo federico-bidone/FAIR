@@ -309,9 +309,7 @@ def gui_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, object
         def __init__(self, **kwargs: object) -> None:
             builder_calls.append({"init": kwargs})
 
-        def build(
-            self, *, seed: int, trace: bool
-        ) -> SimpleNamespace:  # noqa: D401 - interface parity
+        def build(self, *, seed: int, trace: bool) -> SimpleNamespace:  # noqa: D401 - interface parity
             builder_calls[-1]["build"] = {"seed": seed, "trace": trace}
             return SimpleNamespace(
                 panel_path=Path("asset_panel.parquet"),

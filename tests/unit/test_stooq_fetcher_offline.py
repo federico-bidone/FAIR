@@ -30,9 +30,7 @@ def test_stooq_html_error(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_stooq_caches_payload(monkeypatch: pytest.MonkeyPatch) -> None:
     calls = 0
 
-    def fake_download(
-        self: BaseCSVFetcher, url: str, *, session: object | None = None
-    ) -> str:  # type: ignore[override]
+    def fake_download(self: BaseCSVFetcher, url: str, *, session: object | None = None) -> str:  # type: ignore[override]
         nonlocal calls
         calls += 1
         return CSV
@@ -45,15 +43,9 @@ def test_stooq_caches_payload(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_stooq_start_filter(monkeypatch: pytest.MonkeyPatch) -> None:
-    sample = (
-        "Date,Open,High,Low,Close,Volume\n"
-        "2023-12-29,1,1,1,1.5,100\n"
-        "2024-01-02,1,1,1,2.5,100\n"
-    )
+    sample = "Date,Open,High,Low,Close,Volume\n2023-12-29,1,1,1,1.5,100\n2024-01-02,1,1,1,2.5,100\n"
 
-    def fake_download(
-        self: StooqFetcher, url: str, *, session: object | None = None
-    ) -> str:  # type: ignore[override]
+    def fake_download(self: StooqFetcher, url: str, *, session: object | None = None) -> str:  # type: ignore[override]
         return sample
 
     fetcher = StooqFetcher()

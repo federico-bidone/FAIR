@@ -90,7 +90,7 @@ def test_eodhd_fetcher_api_json(monkeypatch: pytest.MonkeyPatch, tmp_path: Path)
 
     captured_urls: list[str] = []
 
-    def fake_download(url: str, session=None) -> str:
+    def fake_download(url: str, session: object | None = None) -> str:
         captured_urls.append(url)
         payload = [
             {"date": "2020-01-31", "adjusted_close": 300.0},
