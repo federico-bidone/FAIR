@@ -86,6 +86,7 @@ logs.
 | `fair3 report` | Produce monthly PDF/CSV dashboards with acceptance gates. | `--period`, `--monthly`, `--dry-run` |
 | `fair3 goals` | Run regime-aware Monte Carlo with glidepath guidance. | `--simulate`, `--dry-run`, `--json-logs` |
 | `fair3 gui` | Launch the optional PySide6 orchestration GUI. | `--dry-run`, `--raw-root`, `--clean-root`, `--artifacts-root`, `--audit-root`, `--thresholds`, `--params`, `--goals`, `--report` |
+| `fair3 qa` | Execute the deterministic QA demo pipeline and emit audit artefacts. | `--label`, `--output-dir`, `--start`, `--end`, `--draws`, `--block-size`, `--cv-splits`, `--validate-factors`, `--seed` |
 
 ## Optional GUI (PySide6)
 Install `PySide6` to enable the graphical orchestrator:
@@ -125,18 +126,21 @@ and ERC diagnostics inside `artifacts/weights/`. `fair3 map` translates factor w
 instrument exposures with rolling betas, CI80 bands, tracking-error summaries, and liquidity
 adjustments persisted under `artifacts/mapping/` and `artifacts/weights/`.
 
-To stress test the latest allocations, invoke the robustness lab (temporary script until a CLI subcommand lands):
+To stress test the latest allocations end-to-end, run the deterministic QA
+pipeline:
 
-```powershell
-python - <<'PY'
-from pathlib import Path
-import pandas as pd
-from fair3.engine.robustness import RobustnessConfig, run_robustness_lab
-
-returns = pd.Series([0.001] * 252)  # replace with portfolio returns
-run_robustness_lab(returns, config=RobustnessConfig(draws=256, block_size=60), seed=42)
-PY
+```bash
+fair3 qa --label demo --draws 256 --block-size 45
 ```
+
+The command synthesises a PIT dataset, executes ETL → factors → estimates →
+optimize → map → regime → report, and finally runs the robustness lab with
+ablation. Artefacts are written to `artifacts/qa/<label>/` (or the directory
+provided via `--output-dir`) including:
+
+- Monthly PDF report with acceptance gates (`reports/<period>/monthly_report.pdf`).
+- `robustness/robustness_report.pdf`, `summary.json`, and `ablation.csv`.
+- Audit snapshots (`audit/`) capturing seeds, configs, and checksums.
 
 `fair3 execute` currently surfaces the deterministic decision breakdown (drift,
 EB_LB, cost, tax) without submitting orders. `fair3 report --period
@@ -160,6 +164,9 @@ di successo.
 | LBMA | Gold & Silver PM fix (EUR converted) | HTML tables scraped at 15:00 London, converted to EUR via ECB FX with `pit_flag` at 16:00 CET. |
 | Nareit | FTSE Nareit REIT indices (monthly) | Manual Excel drop (`data/nareit_manual/NAREIT_AllSeries.xlsx`) parsed via `fair3 ingest --source nareit`; licenza “for informational purposes only”. |
 | Portfolio Visualizer (manual) | Synthetic asset class references (monthly) | Manual CSV drops in `data/portfolio_visualizer_manual/` parsed via `fair3 ingest --source portviz`; educational/informational use only. |
+| PortfolioCharts Simba (manual) | US equity style & bond composites (monthly) | Manual Excel workbook `data/portfoliocharts/PortfolioCharts_Simba.xlsx` parsed via `fair3 ingest --source portfoliocharts`; educational/informational use only. |
+| Curvo.eu (manual) | European UCITS equity/bond backtests (daily) | Manual CSV drops in `data/curvo/` più file FX BCE `fx/<CCY>_EUR.csv`; `fair3 ingest --source curvo` calcola total return in EUR con licenza “informational/educational use only”. |
+| EOD Historical Data / backtes.to | Monthly EOD prices (API/manual) | Manual CSVs in `data/eodhd/` (e.g. `SPY.US.csv`) or API calls to `https://eodhistoricaldata.com/api/eod/<symbol>?period=m&fmt=json` with `EODHD_API_TOKEN`; license “EOD Historical Data — commercial API; manual excerpts from backtes.to (educational use only)”. |
 | Stooq | Market indices, FX | Daily CSV feed (`q/d/l`) with `.us/.pl` normalisation, in-process caching, and timezone metadata. |
 | Yahoo (fallback) | Equities/ETF adjusted closes | Requires optional `yfinance`; limited to five-year window with two-second throttle and personal-use license notice. |
 | AQR (manual) | Factors (QMJ, BAB, VALUE) | Manual CSV drop in `data/aqr_manual/`; license requires educational use only. |
@@ -170,7 +177,7 @@ di successo.
 | Binance Data Portal | Crypto spot klines (1d/1h) | Daily ZIP archives `data/binance.vision/data/spot/daily/klines/<symbol>/<interval>/<symbol>-<interval>-<date>.zip` parsed with quote-currency metadata and redistribution guardrails. |
 | World Bank | Macro indicators (GDP, population, debt) | JSON API (`api.worldbank.org/v2/country/<ISO3>/indicator/<series>`) with auto-pagination and ISO3-normalised symbols. |
 
-Ogni esecuzione di `fair3 ingest` produce file CSV timestampati (`<source>_YYYYMMDDTHHMMSSZ.csv`) con colonne standard (`date`, `value`, `symbol`) salvati in `data/raw/<source>/`. Le informazioni di licenza e gli URL vengono registrati nei log rotanti sotto `artifacts/audit/` per supportare la conformità UCITS/EU/IT. Il passo ETL ricostruisce un pannello PIT salvando `prices.parquet`, `returns.parquet`, `features.parquet` in `data/clean/` e il QA log in `audit/qa_data_log.csv`. Do not redistribute third-party datasets without permission.
+Ogni esecuzione di `fair3 ingest` produce file CSV timestampati (`<source>_YYYYMMDDTHHMMSSZ.csv`) con colonne standard (`date`, `value`, `symbol`) salvati in `data/raw/<source>/`. Le informazioni di licenza e gli URL vengono registrati nei log rotanti sotto `artifacts/audit/` per supportare la conformità UCITS/EU/IT. Il passo ETL ricostruisce un pannello PIT salvando `asset_panel.parquet` in `data/clean/` (campo `field` con valori `adj_close`, `ret`, `lag_*`, ecc.) e il QA log in `audit/qa_data_log.csv`. Do not redistribute third-party datasets without permission.
 
 ## Core Concepts
 - **μ/Σ estimation:** Expected returns come from a shrink-to-zero + bagging OLS + gradient boosting ensemble stacked via ridge and blended con le viste Black–Litterman (ω:=1 fallback when IR<τ). Le covarianze combinano Ledoit–Wolf, graphical lasso e factor shrink; l'utente può scegliere tra il consenso PSD (mediana elemento per elemento + Higham) o la mediana geometrica SPD (`--sigma-engine spd_median`).

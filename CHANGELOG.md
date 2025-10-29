@@ -82,6 +82,10 @@
   concatenazione multi-day con inferenza valuta quotata, gestione dei 404 con
   metadati `status` e aggiornamenti a documentazione/registry/test.
 - Ingest Portfolio Visualizer references: `PortfolioVisualizerFetcher` per CSV mensili scaricati manualmente (US Total Stock Market, International Developed Market, US Total Bond Market, Gold Total Return) con scaling percentuale→decimale, directory `data/portfolio_visualizer_manual/` documentata e test su parsing/start/html/colonne.
+- QA demo pipeline: comando `fair3 qa`, modulo `fair3.engine.qa`, artefatti deterministici (report mensile, robustezza, ablation) e test/documentazione dedicati per audit end-to-end.
+- Cleanup finale: README modulari per `fair3/`, CLI ed engine, docstring
+  aggiornate per il modulo QA, screenshot concettuale della GUI in `docs/GUI.md`
+  e chiusura roadmap PR-50 nel changelog/documentazione.
 
 ### Changed
 - Bumped package version to `0.2.0` in `pyproject.toml` and exposed the version in `fair3.__init__` for runtime introspection.

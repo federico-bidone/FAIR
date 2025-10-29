@@ -42,6 +42,14 @@ All actions catch exceptions and record them in the on-screen log so the
 application remains responsive even if a pipeline stage fails. When PySide6 is
 not installed the GUI quietly skips execution after logging a hint.
 
+## Interface layout
+
+The GUI window is partitioned into three tabs—**Ingest**, **Pipeline**, and
+**Reports**—stacked across the top of the frame. A persistent log panel sits at
+the bottom and mirrors CLI status updates in chronological order. Each tab
+exposes dry-run toggles and path selectors so that the GUI mirrors CLI semantics
+without relying on an embedded screenshot.
+
 ## Troubleshooting
 
 - **Missing PySide6:** install the package or rely on the CLI (`launch_gui`

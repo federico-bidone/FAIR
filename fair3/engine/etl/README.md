@@ -4,7 +4,7 @@
 Il modulo ETL costruisce un pannello point-in-time (PIT) di prezzi totali, rendimenti e feature laggate a partire dagli snapshot raw generati dall'ingest. L'obiettivo è ottenere serie pulite e riproducibili per l'intera pipeline (`factors`, `estimate`, `optimize`, ...), rispettando i vincoli anti-look-ahead e mantenendo tracciabilità completa (QA log, FX applicato, seed).
 
 ## API pubbliche
-- `build_tr_panel(**kwargs)` / `TRPanelBuilder`: orchestration principale. Scrive `prices.parquet`, `returns.parquet`, `features.parquet` in `data/clean/` e `audit/qa_data_log.csv`.
+- `build_tr_panel(**kwargs)` / `TRPanelBuilder`: orchestration principale. Scrive `asset_panel.parquet` in `data/clean/` rispettando lo schema FAIR e `audit/qa_data_log.csv` per la QA.
 - `TradingCalendar`, `build_calendar`, `reindex_frame`: utility per calendarizzare e allineare serie multi-sorgente.
 - `apply_hampel`, `clean_price_history`, `winsorize_series`, `prepare_estimation_copy`: funzioni di pulizia e preparazione per le fasi di stima.
 - `FXFrame`, `load_fx_rates`, `convert_to_base`: normalizzazione valutaria verso la base (`EUR` di default).
@@ -18,7 +18,7 @@ from fair3.engine.etl import TRPanelBuilder
 
 builder = TRPanelBuilder(raw_root="data/raw", clean_root="data/clean", audit_root="audit", base_currency="EUR")
 artifacts = builder.build(seed=0, trace=True)
-print(artifacts.prices_path)
+print(artifacts.panel_path)
 ```
 
 CLI equivalente:
@@ -28,9 +28,7 @@ fair3 etl --rebuild --base-currency EUR
 Flag aggiuntivi per test/local-dev (nascosti nel `--help`): `--raw-root`, `--clean-root`, `--audit-root`, `--seed`, `--trace`.
 
 ## Artefatti generati
-- `data/clean/prices.parquet`: prezzi armonizzati, colonne `price`, `currency`, `currency_original`, `fx_rate`, `source`.
-- `data/clean/returns.parquet`: `ret`, `log_ret`, `log_ret_estimation` (winsorised per sola stima).
-- `data/clean/features.parquet`: feature laggate (`lag_ma_5`, `lag_ma_21`, `lag_vol_21`).
+- `data/clean/asset_panel.parquet`: pannello long con campi `field`, `value`, `currency`, `source`, `license`, `tz`, `quality_flag`, `revision_tag`, `checksum`, `pit_flag`.
 - `audit/qa_data_log.csv`: QA per simbolo (copertura, nulls, outliers, currency applied).
 
 ## Tracing e logging

@@ -35,7 +35,5 @@ def test_cli_etl_rebuild(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> 
     cli_main(argv)
     captured = capsys.readouterr().out
     assert "[fair3] etl" in captured
-    assert (clean_root / "prices.parquet").exists()
-    assert (clean_root / "returns.parquet").exists()
-    assert (clean_root / "features.parquet").exists()
+    assert (clean_root / "asset_panel.parquet").exists()
     assert (audit_root / "qa_data_log.csv").exists()

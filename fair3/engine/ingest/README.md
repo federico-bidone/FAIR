@@ -15,7 +15,7 @@ Tutti i fetcher accettano `raw_root` opzionale per redirigere l'output (utile ne
 ```bash
 fair3 ingest --source ecb --symbols USD GBP --from 2020-01-01
 ```
-- `--source`: uno tra `ecb`, `fred`, `oecd`, `boe`, `bis`, `cboe`, `stooq`, `french`, `aqr`, `alpha`, `worldbank`, `nareit`, `lbma`, `portviz`, `yahoo`, `alphavantage_fx`, `tiingo`, `coingecko`, `binance`.
+- `--source`: uno tra `ecb`, `fred`, `oecd`, `boe`, `bis`, `cboe`, `stooq`, `french`, `aqr`, `alpha`, `worldbank`, `nareit`, `lbma`, `portviz`, `portfoliocharts`, `testfolio`, `usmarket`, `eodhd`, `yahoo`, `alphavantage_fx`, `tiingo`, `coingecko`, `binance`.
 - `--symbols`: lista opzionale di simboli specifici della sorgente (default codificati per ogni fetcher).
 - `--from`: data minima (ISO `YYYY-MM-DD`) per filtrare le osservazioni.
 
@@ -65,6 +65,16 @@ paginação riportata nel metadata e normalizza i valori in colonne `date`, `val
 Per `nareit` bisogna scaricare manualmente l'Excel `NAREIT_AllSeries.xlsx` e copiarlo in `data/nareit_manual/`. Il fetcher legge il foglio mensile, converte le date a fine mese e normalizza gli indici Total Return (All Equity e Mortgage REIT) in formato FAIR, includendo la licenza “for informational purposes only” nei metadati.
 
 Per `portviz` è necessario scaricare manualmente i CSV (es. US Total Stock Market, International Developed Market) dal sito Portfolio Visualizer e copiarli in `data/portfolio_visualizer_manual/` mantenendo i nomi documentati nel modulo. Il parser scala automaticamente le percentuali contenute nella colonna `Return`, allinea le date a fine mese e riporta nei metadati la licenza “Portfolio Visualizer — informational/educational use”.
+
+Per `portfoliocharts` occorre scaricare il file Excel `PortfolioCharts Simba Backtesting Spreadsheet` e copiarlo in `data/portfoliocharts/PortfolioCharts_Simba.xlsx`. Il fetcher legge i fogli `Data_Series` e `Stocks`, seleziona le colonne per Large/Mid/Small Cap, Value/Growth e bond aggregate, converte le date a fine mese e restituisce simboli normalizzati (es. `US_LARGE_CAP`, `INTL_TOTAL_BOND`). I metadati riportano foglio e colonna origine per ogni serie oltre alla licenza “PortfolioCharts.com — educational/informational use”.
+
+Per `curvo` bisogna salvare nella directory `data/curvo/` i CSV ottenuti dal backtester Curvo.eu (MSCI, FTSE, STOXX, ICE) insieme ai cambi BCE in `data/curvo/fx/<CCY>_EUR.csv` con colonne `date`/`rate`. Il fetcher converte automaticamente prezzi e dividendi nella base EUR alle 16:00 CET, calcola il total return reinvestito e registra nei metadati file sorgente, valuta, timezone e percorso FX.
+
+Per `testfolio` occorre compilare la directory `data/testfolio_manual/` con i CSV indicati in `configs/testfolio_presets.yml`. Ogni preset (SPYSIM, VTISIM, GLDSIM) è definito come sequenza di segmenti manuali con scaling e aggiustamenti annualizzati; il fetcher concatena i segmenti, applica l'allineamento end-of-month e restituisce la serie normalizzata in formato FAIR. I metadati includono il percorso del file YAML utilizzato e il numero di righe risultanti per ciascun preset. Licenza: “testfol.io synthetic presets — informational/educational use”.
+
+Per `usmarket` è necessario clonare il repository [SteelCerberus/us-market-data](https://github.com/SteelCerberus/us-market-data) e copiare i CSV (es. `full_data.csv`) nella cartella `data/us_market_data/`. Il fetcher aggrega automaticamente i segmenti storici, calcola il total return reinvestendo i dividendi e produce quattro serie (`sp500_price`, `sp500_total_return`, `sp500_dividend`, `sp500_return`). I metadati riportano la licenza “Bill Schwert & Robert Shiller data — academic/informational use”.
+
+Per `eodhd` sono supportati due flussi: (1) posizionare i CSV manuali (es. `SPY.US.csv`) nella cartella `data/eodhd/`, tipicamente scaricati dal repository [backtester-dani/backtests-to](https://github.com/backtester-dani/backtests-to) che redistribuisce estratti EODHD fino al 2024; (2) fornire un token API commerciale `EODHD_API_TOKEN` o passato al costruttore e lasciare che il fetcher richiami `https://eodhistoricaldata.com/api/eod/<symbol>?period=m&fmt=json`. In entrambi i casi il parser seleziona la colonna `Adjusted Close` (fallback `Close`), filtra la data minima richiesta e registra nei metadati la licenza “EOD Historical Data — commercial API; manual excerpts from backtes.to (educational use only)”.
 
 Per `lbma` i simboli `gold_pm` e `silver_pm` estraggono la tabella HTML dei fixing delle 15:00 London, convertono i prezzi da USD a EUR tramite i cambi BCE e impostano `pit_flag=1` quando l'orario corrisponde alle 16:00 CET. Se i cambi non sono disponibili localmente il fetcher richiama automaticamente `ECBFetcher`.
 

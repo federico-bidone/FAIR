@@ -9,7 +9,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from pandas.api.types import is_categorical_dtype, is_object_dtype
 
 from fair3.engine.logging import setup_logger
 from fair3.engine.regime.committee import regime_probability
@@ -48,73 +47,43 @@ def _load_thresholds(path: Path) -> Mapping[str, Any]:
     return {}
 
 
-def _load_returns(clean_root: Path, seed: int) -> pd.DataFrame:
-    """Load returns from the clean panel or synthesise deterministic data."""
+def _read_asset_panel(clean_root: Path) -> pd.DataFrame | None:
+    """Read the asset panel from disk returning None when unavailable."""
 
-    returns_path = clean_root / "returns.parquet"
-    if returns_path.exists():
-        returns = pd.read_parquet(returns_path)
-        if isinstance(returns.index, pd.MultiIndex):
-            index_names = [name or f"level_{idx}" for idx, name in enumerate(returns.index.names)]
-            returns_reset = returns.reset_index()
-            date_col = index_names[0]
-            if date_col not in returns_reset.columns:
-                date_col = returns_reset.columns[0]
-            returns_reset[date_col] = pd.to_datetime(returns_reset[date_col])
+    asset_path = clean_root / "asset_panel.parquet"
+    if not asset_path.exists():
+        LOG.warning("asset_panel.parquet missing at %s", asset_path)
+        return None
 
-            symbol_col: str
-            if len(index_names) > 1 and index_names[1] in returns_reset.columns:
-                symbol_col = index_names[1]
-            else:
-                symbol_candidates = [col for col in returns_reset.columns if col not in {date_col}]
-                if not symbol_candidates:
-                    raise ValueError("Returns parquet missing symbol column")
-                symbol_col = next(
-                    (
-                        col
-                        for col in symbol_candidates
-                        if is_object_dtype(returns_reset[col])
-                        or is_categorical_dtype(returns_reset[col])
-                    ),
-                    symbol_candidates[0],
-                )
+    panel = pd.read_parquet(asset_path)
+    if {"date", "symbol", "field", "value"} - set(panel.columns):
+        raise ValueError("asset_panel.parquet must include date, symbol, field, value columns")
 
-            preferred_fields = ["log_ret", "ret", "return"]
-            value_col = next(
-                (field for field in preferred_fields if field in returns_reset.columns),
-                None,
-            )
-            if value_col is None:
-                candidate_fields = [
-                    col for col in returns_reset.columns if col not in {date_col, symbol_col}
-                ]
-                if not candidate_fields:
-                    raise ValueError("Returns parquet missing value columns")
-                value_col = candidate_fields[0]
+    dates = pd.to_datetime(panel["date"], utc=True, errors="coerce")
+    missing_dates = dates.isna().sum()
+    if missing_dates:
+        LOG.warning("Dropping %s rows with invalid dates from asset panel", missing_dates)
+    panel = panel.loc[~dates.isna()].copy()
+    panel["date"] = dates.loc[~dates.isna()].dt.tz_convert("Europe/Rome").dt.tz_localize(None)
+    panel["value"] = pd.to_numeric(panel["value"], errors="coerce")
+    panel = panel.dropna(subset=["value"])
+    return panel
 
-            try:
-                wide = returns_reset.pivot(index=date_col, columns=symbol_col, values=value_col)
-            except ValueError:
-                wide = returns_reset.pivot_table(
-                    index=date_col,
-                    columns=symbol_col,
-                    values=value_col,
-                    aggfunc="last",
-                )
-            wide = wide.sort_index()
-            return wide
 
-        returns.index = pd.to_datetime(returns.index)
-        if isinstance(returns.columns, pd.MultiIndex):
-            preferred_fields = ["log_ret", "ret", "return"]
-            for field in preferred_fields:
-                if field in returns.columns.get_level_values(0):
-                    return returns[field]
-            first_field = returns.columns.get_level_values(0)[0]
-            return returns[first_field]
-        return returns
+def _load_returns(asset_panel: pd.DataFrame | None, seed: int) -> pd.DataFrame:
+    """Load returns from the asset panel or synthesise deterministic data."""
 
-    LOG.warning("returns.parquet missing at %s; creating synthetic panel", returns_path)
+    if asset_panel is not None:
+        for field in ("ret", "log_ret"):
+            subset = asset_panel.loc[asset_panel["field"] == field]
+            if subset.empty:
+                continue
+            wide = subset.pivot(index="date", columns="symbol", values="value").sort_index()
+            if field == "log_ret":
+                wide = np.expm1(wide)
+            return wide.fillna(0.0)
+
+    LOG.warning("Returns not found in asset panel; creating synthetic panel")
     idx = pd.date_range("2015-01-01", periods=252, freq="B")
     rng = generator_from_seed(seed)
     columns = ["SYN_EQ", "SYN_BND", "SYN_ALT"]
@@ -122,58 +91,19 @@ def _load_returns(clean_root: Path, seed: int) -> pd.DataFrame:
     return pd.DataFrame(data, index=idx, columns=columns)
 
 
-def _load_volatility(clean_root: Path, returns: pd.DataFrame) -> pd.Series:
-    """Load realised volatility proxy from features or derive from returns."""
+def _load_volatility(asset_panel: pd.DataFrame | None, returns: pd.DataFrame) -> pd.Series:
+    """Load realised volatility proxy from the asset panel or derive it."""
 
-    features_path = clean_root / "features.parquet"
-    if features_path.exists():
-        features = pd.read_parquet(features_path)
-        if isinstance(features.index, pd.MultiIndex):
-            index_names = [name or f"level_{idx}" for idx, name in enumerate(features.index.names)]
-            features_reset = features.reset_index()
-            date_col = index_names[0]
-            if date_col not in features_reset.columns:
-                date_col = features_reset.columns[0]
-            features_reset[date_col] = pd.to_datetime(features_reset[date_col])
-            if "lag_vol_21" in features_reset.columns:
-                symbol_col = None
-                if len(index_names) > 1 and index_names[1] in features_reset.columns:
-                    symbol_col = index_names[1]
-                else:
-                    symbol_candidates = [
-                        col for col in features_reset.columns if col not in {date_col, "lag_vol_21"}
-                    ]
-                    if symbol_candidates:
-                        symbol_col = next(
-                            (
-                                col
-                                for col in symbol_candidates
-                                if is_object_dtype(features_reset[col])
-                                or is_categorical_dtype(features_reset[col])
-                            ),
-                            symbol_candidates[0],
-                        )
-                if symbol_col is not None:
-                    try:
-                        vol_frame = features_reset.pivot(
-                            index=date_col, columns=symbol_col, values="lag_vol_21"
-                        )
-                    except ValueError:
-                        vol_frame = features_reset.pivot_table(
-                            index=date_col,
-                            columns=symbol_col,
-                            values="lag_vol_21",
-                            aggfunc="last",
-                        )
-                    vol_frame = vol_frame.sort_index()
-                    return vol_frame.mean(axis=1)
-                series = features_reset.set_index(date_col)["lag_vol_21"]
-                return series.sort_index()
-        elif "lag_vol_21" in features.columns:
-            features.index = pd.to_datetime(features.index)
-            return features["lag_vol_21"]
+    if asset_panel is not None:
+        vol_subset = asset_panel.loc[asset_panel["field"].isin({"lag_vol_21", "vol", "volatility"})]
+        if not vol_subset.empty:
+            vol_frame = vol_subset.pivot_table(
+                index="date", columns="symbol", values="value", aggfunc="mean"
+            ).sort_index()
+            if not vol_frame.empty:
+                return vol_frame.mean(axis=1).astype(float)
 
-    LOG.info("lag_vol_21 not available; estimating realised volatility from returns")
+    LOG.info("lag_vol_21 not available in panel; estimating realised volatility from returns")
     window = 21
     vol = returns.rolling(window=window, min_periods=max(5, window // 2)).std()
     return vol.mean(axis=1) * (252**0.5)
@@ -197,43 +127,30 @@ def _synthesise_macro(index: pd.DatetimeIndex, seed: int) -> pd.DataFrame:
     )
 
 
-def _load_macro(clean_root: Path, index: pd.DatetimeIndex, seed: int) -> pd.DataFrame:
-    """Load macro features if present or synthesise deterministic placeholders."""
+def _load_macro(
+    asset_panel: pd.DataFrame | None, index: pd.DatetimeIndex, seed: int
+) -> pd.DataFrame:
+    """Load macro features from the asset panel or synthesise placeholders."""
 
-    features_path = clean_root / "features.parquet"
-    if features_path.exists():
-        features = pd.read_parquet(features_path)
-        if isinstance(features.index, pd.MultiIndex):
-            index_names = [name or f"level_{idx}" for idx, name in enumerate(features.index.names)]
-            features_reset = features.reset_index()
-            date_col = index_names[0]
-            if date_col not in features_reset.columns:
-                date_col = features_reset.columns[0]
-            features_reset[date_col] = pd.to_datetime(features_reset[date_col])
-            selected = [
-                col
-                for col in features_reset.columns
-                if col in {"inflation_yoy", "pmi", "real_rate"}
-            ]
+    macro_fields = {"inflation_yoy", "pmi", "real_rate"}
+    if asset_panel is not None:
+        macro_subset = asset_panel.loc[asset_panel["field"].isin(macro_fields)]
+        if not macro_subset.empty:
+            frame = macro_subset.pivot_table(
+                index="date", columns="field", values="value", aggfunc="mean"
+            ).sort_index()
+            if not frame.empty:
+                return frame
+
+        generic_macro = asset_panel.loc[asset_panel["field"] == "macro_field"]
+        if not generic_macro.empty:
+            pivot = generic_macro.pivot_table(
+                index="date", columns="symbol", values="value", aggfunc="mean"
+            ).sort_index()
+            selected = [col for col in pivot.columns if col in macro_fields]
             if selected:
-                grouped = (
-                    features_reset[[date_col] + selected]
-                    .groupby(date_col, sort=True)
-                    .mean(numeric_only=True)
-                )
-                if not grouped.empty:
-                    grouped.index.name = "date"
-                    return grouped
-        else:
-            features.index = pd.to_datetime(features.index)
-            if not isinstance(features.columns, pd.MultiIndex):
-                selected = [
-                    col for col in features.columns if col in {"inflation_yoy", "pmi", "real_rate"}
-                ]
-                if selected:
-                    subset = features[selected]
-                    if not subset.empty:
-                        return subset
+                return pivot[selected]
+
     LOG.info("Macro features unavailable; using synthetic deterministic series")
     return _synthesise_macro(index, seed)
 
@@ -241,9 +158,10 @@ def _load_macro(clean_root: Path, index: pd.DatetimeIndex, seed: int) -> pd.Data
 def _assemble_panel(clean_root: Path, seed: int) -> pd.DataFrame:
     """Assemble the multi-field panel consumed by the regime engine."""
 
-    returns = _load_returns(clean_root, seed)
-    vol = _load_volatility(clean_root, returns)
-    macro = _load_macro(clean_root, returns.index, seed)
+    asset_panel = _read_asset_panel(clean_root)
+    returns = _load_returns(asset_panel, seed)
+    vol = _load_volatility(asset_panel, returns)
+    macro = _load_macro(asset_panel, returns.index, seed)
 
     frames = [pd.concat({"returns": returns}, axis=1)]
     if not vol.empty:

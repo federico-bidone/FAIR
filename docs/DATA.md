@@ -12,6 +12,11 @@
 | `lbma` | London Bullion Market Association (PM fix) | `https://www.lbma.org.uk/prices-and-data/precious-metal-prices` (HTML) | LBMA data — informational use only |
 | `nareit` | FTSE Nareit REIT indices (manual Excel) | `data/nareit_manual/NAREIT_AllSeries.xlsx` | FTSE Nareit — informational use only |
 | `portviz` | Portfolio Visualizer synthetic asset references | `data/portfolio_visualizer_manual/<dataset>.csv` | Portfolio Visualizer — educational/informational use |
+| `portfoliocharts` | PortfolioCharts Simba Backtesting Spreadsheet | `data/portfoliocharts/PortfolioCharts_Simba.xlsx` | PortfolioCharts.com — educational/informational use |
+| `curvo` | Curvo.eu UCITS backtests (manual CSV + FX) | `data/curvo/<dataset>.csv` + `data/curvo/fx/<CCY>_EUR.csv` | Curvo.eu & underlying index providers — informational/educational use |
+| `testfolio` | testfol.io presets (SPYSIM, VTISIM, GLDSIM) | `configs/testfolio_presets.yml` + `data/testfolio_manual/*.csv` | testfol.io synthetic presets — informational/educational use |
+| `usmarket` | SteelCerberus us-market-data (S&P 500 storico) | `data/us_market_data/*.csv` | Bill Schwert & Robert Shiller data — academic/informational use |
+| `eodhd` | EOD Historical Data (API o CSV manuali) | `https://eodhistoricaldata.com/api/eod/<symbol>?period=m` oppure `data/eodhd/<symbol>.csv` | EOD Historical Data — commercial API; manual excerpts from backtes.to (educational use only) |
 | `stooq` | Stooq.com EOD | `https://stooq.com/q/d/l/` (cache in-process, supporto `.us/.pl`) | [Stooq data policy](https://stooq.com/db/en/) |
 | `yahoo` | Yahoo Finance fallback (`yfinance`) | `yfinance://<symbol>` (finestra 5 anni, ritardo 2s) | [Yahoo Terms of Service](https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html) — uso personale/non commerciale |
 | `alphavantage_fx` | Alpha Vantage FX daily | `https://www.alphavantage.co/query?function=FX_DAILY` (richiede `ALPHAVANTAGE_API_KEY`, throttle 5/min) | [Alpha Vantage Terms](https://www.alphavantage.co/terms_of_service/) |
@@ -47,13 +52,11 @@ Questi file costituiscono l'input per il successivo step ETL (`fair3 etl`) che c
 ```
 data/
   clean/
-    prices.parquet
-    returns.parquet
-    features.parquet
+    asset_panel.parquet
 audit/
   qa_data_log.csv
 ```
-`prices.parquet` contiene prezzi armonizzati (FX applicato) e metadati (`source`, `currency`, `currency_original`, `fx_rate`). `returns.parquet` espone rendimenti semplici/log e la versione winsorizzata per la stima, mentre `features.parquet` salva feature laggate calcolate senza look-ahead. `audit/qa_data_log.csv` registra copertura, null, outlier e currency finale per simbolo/sorgente, fungendo da acceptance evidence per la milestone ETL.
+`asset_panel.parquet` è un pannello long con colonne `date` (UTC), `symbol`, `field`, `value`, `currency`, `source`, `license`, `tz`, `quality_flag`, `revision_tag`, `checksum`, `pit_flag`. I campi principali sono `adj_close`, `ret`, `log_ret`, `log_ret_estimation` e le feature laggate (`lag_ma_5`, `lag_ma_21`, `lag_vol_21`). `audit/qa_data_log.csv` registra copertura, null, outlier e currency finale per simbolo/sorgente, fungendo da acceptance evidence per la milestone ETL.
 
 
 ## Utilizzo CLI e filtraggio

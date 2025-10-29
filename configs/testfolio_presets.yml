@@ -1,0 +1,74 @@
+# Testfol.io synthetic preset definitions (manual curation required).
+#
+# Ogni preset rappresenta una serie storica composita utilizzata da testfol.io
+# (es. SPYSIM, VTISIM, GLDSIM). I file sorgente devono essere scaricati
+# manualmente seguendo le istruzioni del sito testfol.io, Portfolio Visualizer,
+# us-market-data e delle fonti accademiche (Shiller, Schwert, Fama-French).
+# Copiare i CSV nella directory ``data/testfolio_manual/`` mantenendo i nomi
+# riportati nella sezione ``path`` di ciascun segmento.
+#
+# Le percentuali devono essere espresse come numeri decimali (0.01 = 1%). Il
+# campo ``annualized_adjustment`` rappresenta il rendimento extra annuo da
+# aggiungere a ogni periodo per replicare i costi/benefici indicati da
+# testfol.io (es. +0.0945% annuo per SPYSIM). Tutti i segmenti sono soggetti alle
+# condizioni di licenza delle rispettive fonti; questo file fornisce solo un
+# mapping dichiarativo per uso informativo/educational.
+
+presets:
+  SPYSIM:
+    symbol: SPYSIM
+    frequency: monthly
+    description: "Synthetic US equity index reconstruction used by testfol.io"
+    segments:
+      - loader: manual_csv
+        path: spysim_pre_1957.csv
+        date_column: Date
+        value_column: Return
+        scale: 0.01
+        month_end_align: true
+        notes: "Pre-ETF segment composed from Dow Jones, Shiller, Schwert data"
+      - loader: manual_csv
+        path: spysim_modern.csv
+        date_column: date
+        value_column: total_return
+        annualized_adjustment: 0.000945
+        month_end_align: true
+        notes: "Modern segment based on SPY ETF adjusted returns"
+
+  VTISIM:
+    symbol: VTISIM
+    frequency: monthly
+    description: "Synthetic global equity portfolio used by testfol.io"
+    segments:
+      - loader: manual_csv
+        path: vtisim_pre_2004.csv
+        date_column: Date
+        value_column: Return
+        scale: 0.01
+        month_end_align: true
+        notes: "Pre-ETF history stitched from MSCI World/ACWI proxies"
+      - loader: manual_csv
+        path: vtisim_modern.csv
+        date_column: date
+        value_column: total_return
+        month_end_align: true
+        notes: "Post-ETF history based on Vanguard Total International"
+
+  GLDSIM:
+    symbol: GLDSIM
+    frequency: monthly
+    description: "Synthetic gold total return series used by testfol.io"
+    segments:
+      - loader: manual_csv
+        path: gldsim_pre_2004.csv
+        date_column: Date
+        value_column: Return
+        scale: 0.01
+        month_end_align: true
+        notes: "Long-term gold proxy (London fixing + CPI adjustments)"
+      - loader: manual_csv
+        path: gldsim_modern.csv
+        date_column: date
+        value_column: total_return
+        month_end_align: true
+        notes: "Modern GLD ETF adjusted returns"

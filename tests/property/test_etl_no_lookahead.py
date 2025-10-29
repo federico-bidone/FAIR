@@ -26,24 +26,21 @@ def test_features_use_only_past_observations(tmp_path: Path) -> None:
     builder = TRPanelBuilder(raw_root=raw_root, clean_root=clean_root, audit_root=audit_root)
     artifacts = builder.build(seed=0)
 
-    returns = pd.read_parquet(artifacts.returns_path)
-    features = pd.read_parquet(artifacts.features_path)
+    panel = pd.read_parquet(artifacts.panel_path)
+    pivot = panel.pivot_table(index=["date", "symbol"], columns="field", values="value")
+    pivot.index = pd.MultiIndex.from_tuples(
+        [
+            (
+                pd.to_datetime(idx[0]).tz_convert("Europe/Rome").tz_localize(None),
+                idx[1],
+            )
+            for idx in pivot.index
+        ],
+        names=["date", "symbol"],
+    )
 
-    # Convert index level 0 back to datetime for calculations
-    returns.index = pd.MultiIndex.from_arrays(
-        [
-            pd.to_datetime(returns.index.get_level_values(0)),
-            returns.index.get_level_values(1),
-        ],
-        names=returns.index.names,
-    )
-    features.index = pd.MultiIndex.from_arrays(
-        [
-            pd.to_datetime(features.index.get_level_values(0)),
-            features.index.get_level_values(1),
-        ],
-        names=features.index.names,
-    )
+    returns = pivot[["ret", "log_ret", "log_ret_estimation"]]
+    features = pivot[["lag_ma_5", "lag_ma_21", "lag_vol_21"]]
 
     grouped = returns.groupby(level="symbol")["log_ret"]
     expected_ma5 = grouped.transform(lambda s: s.shift(1).rolling(5, min_periods=1).mean())

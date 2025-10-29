@@ -8,13 +8,18 @@ from .bis import BISFetcher
 from .boe import BOEFetcher
 from .cboe import CBOEFetcher
 from .coingecko import CoinGeckoFetcher
+from .curvo import CurvoFetcher
 from .ecb import ECBFetcher
+from .eodhd import EODHDFetcher
 from .fred import FREDFetcher
 from .french import FrenchFetcher
 from .lbma import LBMAFetcher
 from .nareit import NareitFetcher
 from .oecd import OECDFetcher
 from .portfolio_visualizer import PortfolioVisualizerFetcher
+from .portfoliocharts import PortfolioChartsFetcher
+from .testfolio import TestfolioPresetFetcher
+from .us_market_data import USMarketDataFetcher
 from .registry import (
     BaseCSVFetcher,
     IngestArtifact,
@@ -36,13 +41,18 @@ __all__ = [
     "BOEFetcher",
     "CBOEFetcher",
     "CoinGeckoFetcher",
+    "CurvoFetcher",
     "ECBFetcher",
+    "EODHDFetcher",
     "FREDFetcher",
     "FrenchFetcher",
     "LBMAFetcher",
     "NareitFetcher",
     "OECDFetcher",
     "PortfolioVisualizerFetcher",
+    "PortfolioChartsFetcher",
+    "TestfolioPresetFetcher",
+    "USMarketDataFetcher",
     "TiingoFetcher",
     "StooqFetcher",
     "WorldBankFetcher",

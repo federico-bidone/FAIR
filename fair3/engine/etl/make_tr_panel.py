@@ -1,8 +1,10 @@
-"""Costruzione del pannello prezzi-rendimenti con pipeline tracciata."""
+"""Construct the FAIR asset panel from raw ingest artefacts."""
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
@@ -12,18 +14,19 @@ from fair3.engine.etl.calendar import TradingCalendar, build_calendar, reindex_f
 from fair3.engine.etl.cleaning import clean_price_history, prepare_estimation_copy
 from fair3.engine.etl.fx import FXFrame, convert_to_base, load_fx_rates
 from fair3.engine.etl.qa import QARecord, QAReport, write_qa_log
+from fair3.engine.ingest.registry import source_licenses
 from fair3.engine.utils.io import ensure_dir
+from fair3.engine.utils.storage import ASSET_PANEL_SCHEMA, persist_parquet
 
 __all__ = ["TRPanelArtifacts", "TRPanelBuilder", "PanelBuilder", "build_tr_panel"]
 
 
 @dataclass(slots=True)
 class TRPanelArtifacts:
-    """Percorsi degli artefatti generati dall'ETL e metadati di riepilogo."""
+    """Percorsi e metadati del pannello asset normalizzato dall'ETL."""
 
-    prices_path: Path
-    returns_path: Path
-    features_path: Path
+    panel_path: Path
+    checksum: str
     qa_path: Path
     symbols: list[str]
     rows: int
@@ -49,11 +52,13 @@ class TRPanelBuilder:
         self.clean_root = Path(clean_root)
         self.audit_root = Path(audit_root)
         self.base_currency = base_currency
+        self._license_map = source_licenses()
 
     # ------------------------------------------------------------------
     def build(self, *, seed: int | None = None, trace: bool = False) -> TRPanelArtifacts:
         """Esegue l'intera pipeline e ritorna i percorsi degli output."""
 
+        run_ts = datetime.now(UTC)
         raw_records = self._load_raw_records()
         if not raw_records:
             raise FileNotFoundError(
@@ -68,19 +73,20 @@ class TRPanelBuilder:
         prices, qa_report = self._prepare_prices(raw_records, calendar, fx_frame)
         returns = self._compute_returns(prices, trace=trace)
         features = self._compute_features(returns, seed=seed)
-
-        prices_path = self._write_parquet(prices, "prices.parquet")
-        returns_path = self._write_parquet(returns, "returns.parquet")
-        features_path = self._write_parquet(features, "features.parquet")
+        panel = self._assemble_panel(prices, returns, features, run_ts)
+        panel_path, checksum = persist_parquet(
+            panel,
+            self.clean_root / "asset_panel.parquet",
+            ASSET_PANEL_SCHEMA,
+        )
         qa_path = write_qa_log(qa_report, self.audit_root / "qa_data_log.csv")
 
         return TRPanelArtifacts(
-            prices_path=prices_path,
-            returns_path=returns_path,
-            features_path=features_path,
+            panel_path=panel_path,
+            checksum=checksum,
             qa_path=qa_path,
             symbols=sorted({idx[1] for idx in prices.index}),
-            rows=len(prices),
+            rows=len(panel),
         )
 
     # ------------------------------------------------------------------
@@ -142,6 +148,7 @@ class TRPanelBuilder:
         qa_report = QAReport(records=[])
         for frame in records:
             source = frame["source"].iat[0]
+            license_label = self._license_map.get(source, "see_source")
             for symbol, sub in frame.groupby("symbol"):
                 if "/" in symbol:
                     # I file FX vengono gestiti separatamente e non partecipano
@@ -164,7 +171,7 @@ class TRPanelBuilder:
                     value_column="price",
                     currency_column="currency",
                 )
-                working = working.assign(source=source)
+                working = working.assign(source=source, license=license_label)
                 start = working["date"].min().to_pydatetime() if not working.empty else None
                 end = working["date"].max().to_pydatetime() if not working.empty else None
                 qa_record = QARecord(
@@ -257,16 +264,92 @@ class TRPanelBuilder:
         )
         return features
 
-    def _write_parquet(self, frame: pd.DataFrame, name: str) -> Path:
-        """Serializza il `DataFrame` su parquet con indice normalizzato."""
+    def _assemble_panel(
+        self,
+        prices: pd.DataFrame,
+        returns: pd.DataFrame,
+        features: pd.DataFrame,
+        run_ts: datetime,
+    ) -> pd.DataFrame:
+        """Converte prezzi, rendimenti e feature nel pannello lungo richiesto."""
 
         ensure_dir(self.clean_root)
-        path = self.clean_root / name
-        frame = frame.copy()
-        tuples = [(idx[0].strftime("%Y-%m-%d"), idx[1]) for idx in frame.index]
-        frame.index = pd.MultiIndex.from_tuples(tuples, names=["date", "symbol"])
-        frame.to_parquet(path)
-        return path
+        base = prices.reset_index()
+        base["date"] = pd.to_datetime(base["date"])  # type: ignore[arg-type]
+        base["date"] = base["date"].dt.tz_localize("Europe/Rome").dt.tz_convert("UTC")
+        base["currency"] = self.base_currency
+        base["tz"] = "Europe/Rome"
+        base["quality_flag"] = "clean"
+        base["license"] = base["license"].fillna("see_source")
+        revision_tag = f"etl_{run_ts.strftime('%Y%m%dT%H%M%SZ')}"
+        base["revision_tag"] = revision_tag
+
+        returns_frame = returns.reset_index()
+        returns_frame["date"] = pd.to_datetime(returns_frame["date"])
+        returns_frame["date"] = (
+            returns_frame["date"].dt.tz_localize("Europe/Rome").dt.tz_convert("UTC")
+        )
+
+        features_frame = features.reset_index()
+        features_frame["date"] = pd.to_datetime(features_frame["date"])
+        features_frame["date"] = (
+            features_frame["date"].dt.tz_localize("Europe/Rome").dt.tz_convert("UTC")
+        )
+
+        combined = base.merge(returns_frame, on=["date", "symbol"], how="left")
+        combined = combined.merge(features_frame, on=["date", "symbol"], how="left")
+
+        def _build_field(field_name: str, column: str) -> pd.DataFrame:
+            values = pd.to_numeric(combined[column], errors="coerce")
+            frame = combined[
+                [
+                    "date",
+                    "symbol",
+                    "currency",
+                    "source",
+                    "license",
+                    "tz",
+                    "quality_flag",
+                    "revision_tag",
+                ]
+            ].copy()
+            frame["field"] = field_name
+            frame["value"] = values.astype(float)
+            frame["pit_flag"] = np.int8(1)
+            return frame
+
+        field_map = {
+            "adj_close": "price",
+            "ret": "ret",
+            "log_ret": "log_ret",
+            "log_ret_estimation": "log_ret_estimation",
+            "lag_ma_5": "lag_ma_5",
+            "lag_ma_21": "lag_ma_21",
+            "lag_vol_21": "lag_vol_21",
+        }
+        frames: list[pd.DataFrame] = []
+        for field_name, column in field_map.items():
+            if column not in combined.columns:
+                continue
+            field_frame = _build_field(field_name, column)
+            frames.append(field_frame.dropna(subset=["value"]))
+        panel = pd.concat(frames, ignore_index=True)
+        panel = panel.sort_values(["date", "symbol", "field"]).reset_index(drop=True)
+
+        def _checksum(row: pd.Series) -> str:
+            payload = "|".join(
+                [
+                    row["symbol"],
+                    row["field"],
+                    row["date"].isoformat(),
+                    f"{row['value']:.12f}",
+                ]
+            )
+            return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+        panel["checksum"] = panel.apply(_checksum, axis=1)
+        panel["currency"] = panel["currency"].fillna(self.base_currency)
+        return panel
 
 
 def build_tr_panel(**kwargs: object) -> TRPanelArtifacts:

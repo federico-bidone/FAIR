@@ -39,15 +39,21 @@ def _load_factor_allocation(artifacts_root: Path | None) -> pd.Series:
 
 
 def _load_returns(clean_root: Path) -> pd.DataFrame:
-    returns = pd.read_parquet(clean_root / "returns.parquet")
-    if not isinstance(returns.index, pd.MultiIndex) or returns.index.nlevels != 2:
-        raise TypeError("returns parquet must be indexed by (date, symbol)")
-    dates = pd.to_datetime(returns.index.get_level_values(0))
-    symbols = returns.index.get_level_values(1)
-    panel = returns.copy()
-    panel.index = pd.MultiIndex.from_arrays([dates, symbols], names=["date", "symbol"])
-    pivot = panel["ret"].unstack(level="symbol").sort_index()
-    return pivot.fillna(0.0)
+    panel = pd.read_parquet(clean_root / "asset_panel.parquet")
+    pivot = panel.pivot_table(index=["date", "symbol"], columns="field", values="value")
+    if "ret" not in pivot.columns:
+        raise KeyError("Missing ret field in asset_panel.parquet")
+    pivot.index = pd.MultiIndex.from_tuples(
+        [
+            (
+                pd.to_datetime(idx[0]).tz_convert("Europe/Rome").tz_localize(None),
+                idx[1],
+            )
+            for idx in pivot.index
+        ],
+        names=["date", "symbol"],
+    )
+    return pivot["ret"].unstack(level="symbol").sort_index().fillna(0.0)
 
 
 def _load_factors(artifacts_root: Path | None) -> pd.DataFrame:
