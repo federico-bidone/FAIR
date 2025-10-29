@@ -102,7 +102,9 @@ def run_universe_pipeline(
             listings.append(listing)
     listing_frame = build_listing_frame(listings)
 
-    preferences = tuple(provider_preferences) if provider_preferences else default_provider_preferences()
+    preferences = (
+        tuple(provider_preferences) if provider_preferences else default_provider_preferences()
+    )
     selections: list[ProviderSelection] = []
     for isin, group in broker_frame.groupby("isin", sort=True):
         listings_for_isin = listing_map.get(isin, [])

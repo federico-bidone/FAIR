@@ -605,10 +605,7 @@ def _handle_universe(args: argparse.Namespace) -> None:
         "providers": provider_usage or "none",
         "output": result.broker_universe_path,
     }
-    print(
-        "[fair3] universe "
-        + " ".join(f"{key}={value}" for key, value in summary.items())
-    )
+    print("[fair3] universe " + " ".join(f"{key}={value}" for key, value in summary.items()))
     record_metrics(
         "universe_instruments",
         float(result.metadata.get("instrument_count", 0)),

@@ -36,7 +36,10 @@ def test_trade_republic_fetcher_parses_pdf(monkeypatch) -> None:
     assert artifact.broker == fetcher.BROKER
     assert {"isin", "name", "section", "asset_class"}.issubset(artifact.frame.columns)
     assert set(artifact.frame["isin"]) == {"DE0001234560", "IE00B0M62Q58"}
-    assert artifact.frame.loc[artifact.frame["isin"] == "DE0001234560", "asset_class"].iloc[0] == "Equity"
+    assert (
+        artifact.frame.loc[artifact.frame["isin"] == "DE0001234560", "asset_class"].iloc[0]
+        == "Equity"
+    )
 
 
 def test_trade_republic_fetcher_respects_allowed_sections(monkeypatch) -> None:

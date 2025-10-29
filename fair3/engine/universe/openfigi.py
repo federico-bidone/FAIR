@@ -54,7 +54,9 @@ class OpenFIGIClient:
             attempt = 0
             backoff = self._initial_backoff
             while True:
-                response = self._session.post(self.BASE_URL, json=payload, headers=headers, timeout=60)
+                response = self._session.post(
+                    self.BASE_URL, json=payload, headers=headers, timeout=60
+                )
                 if response.status_code == 429:
                     retry_after = response.headers.get("Retry-After")
                     delay = float(retry_after) if retry_after is not None else backoff

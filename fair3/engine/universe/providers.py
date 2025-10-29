@@ -11,6 +11,7 @@ from .models import InstrumentListing, ProviderSelection
 @dataclass(slots=True)
 class ProviderPreference:
     """Regola di preferenza per una combinazione asset class/valuta."""
+
     source: str
     is_free: bool
     asset_classes: frozenset[str] | None = None

@@ -13,6 +13,7 @@ import pandas as pd
 @dataclass(slots=True)
 class InstrumentListing:
     """Descrive un singolo listing/ticker ottenuto da OpenFIGI."""
+
     isin: str
     ticker: str | None
     mic: str | None
@@ -24,6 +25,7 @@ class InstrumentListing:
 @dataclass(slots=True)
 class ProviderSelection:
     """Riepiloga la scelta del data provider per uno specifico ISIN."""
+
     isin: str
     primary_source: str
     is_free: bool
@@ -34,6 +36,7 @@ class ProviderSelection:
 @dataclass(slots=True)
 class UniversePipelineResult:
     """Puntatori ai file generati e metadati di sintesi."""
+
     broker_universe_path: Path
     listings_path: Path
     providers_path: Path
@@ -55,7 +58,9 @@ def build_listing_frame(listings: Iterable[InstrumentListing]) -> pd.DataFrame:
         }
         for listing in listings
     ]
-    frame = pd.DataFrame(records, columns=["isin", "ticker", "mic", "currency", "exchange", "exch_code"])
+    frame = pd.DataFrame(
+        records, columns=["isin", "ticker", "mic", "currency", "exchange", "exch_code"]
+    )
     return frame
 
 
