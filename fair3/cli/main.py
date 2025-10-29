@@ -22,12 +22,14 @@ from fair3.engine.goals import (
     run_goal_monte_carlo,
 )
 from fair3.engine.gui import launch_gui
+from fair3.engine.brokers import available_brokers
 from fair3.engine.ingest import available_sources, run_ingest
 from fair3.engine.logging import configure_cli_logging, record_metrics
 from fair3.engine.mapping import run_mapping_pipeline
 from fair3.engine.qa import DemoQAConfig, run_demo_qa
 from fair3.engine.regime import run_regime_pipeline
 from fair3.engine.reporting import MonthlyReportInputs, generate_monthly_report
+from fair3.engine.universe import run_universe_pipeline
 from fair3.engine.utils.rand import generator_from_seed
 from fair3.engine.validate import validate_configs
 
@@ -82,6 +84,37 @@ def _add_ingest_subparser(
         dest="start_date",
         type=_parse_date,
         help="Earliest observation date (YYYY-MM-DD)",
+    )
+
+
+def _add_universe_subparser(
+    subparsers: argparse._SubParsersAction[argparse.ArgumentParser],
+) -> None:
+    universe = subparsers.add_parser(
+        "universe",
+        help="Aggrega universi broker, mapping OpenFIGI e suggerimenti sui provider",
+    )
+    universe.add_argument(
+        "--brokers",
+        nargs="+",
+        choices=available_brokers(),
+        help="Elenco opzionale di broker da includere (predefinito: tutti)",
+    )
+    universe.add_argument(
+        "--output-dir",
+        type=Path,
+        default=Path("data") / "clean" / "universe",
+        help="Cartella in cui salvare gli artefatti aggregati della pipeline",
+    )
+    universe.add_argument(
+        "--openfigi-key",
+        dest="openfigi_key",
+        help="Chiave API OpenFIGI facoltativa per arricchire i listing degli ISIN",
+    )
+    universe.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Esegue la scoperta senza scrivere su disco",
     )
 
 
@@ -519,6 +552,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="cmd", required=True)
     _add_validate_subparser(sub)
     _add_ingest_subparser(sub)
+    _add_universe_subparser(sub)
     _add_etl_subparser(sub)
     _add_report_subparser(sub)
     _add_goals_subparser(sub)
@@ -551,6 +585,34 @@ def _handle_ingest(args: argparse.Namespace) -> None:
         "ingest_rows",
         float(len(result.data)),
         {"source": result.source, "symbols": symbol_str or "default"},
+    )
+
+
+def _handle_universe(args: argparse.Namespace) -> None:
+    brokers = tuple(args.brokers) if args.brokers else None
+    result = run_universe_pipeline(
+        brokers=brokers,
+        output_dir=args.output_dir,
+        openfigi_api_key=args.openfigi_key,
+        dry_run=args.dry_run,
+    )
+    provider_usage = ",".join(
+        f"{source}:{count}" for source, count in result.metadata.get("provider_usage", ())
+    )
+    summary = {
+        "brokers": ",".join(result.brokers),
+        "instruments": result.metadata.get("instrument_count", 0),
+        "providers": provider_usage or "none",
+        "output": result.broker_universe_path,
+    }
+    print(
+        "[fair3] universe "
+        + " ".join(f"{key}={value}" for key, value in summary.items())
+    )
+    record_metrics(
+        "universe_instruments",
+        float(result.metadata.get("instrument_count", 0)),
+        {"brokers": summary["brokers"], "providers": summary["providers"]},
     )
 
 
@@ -926,6 +988,8 @@ def main(argv: list[str] | None = None) -> None:
     configure_cli_logging(json_logs=bool(args.json_logs))
     if args.cmd == "ingest":
         _handle_ingest(args)
+    elif args.cmd == "universe":
+        _handle_universe(args)
     elif args.cmd == "etl":
         _handle_etl(args)
     elif args.cmd == "report":

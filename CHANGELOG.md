@@ -1,5 +1,10 @@
 # Log delle modifiche
 
+## [Unreleased]
+### Modificato
+- Raffinata la CI con workflow multi-job, controlli statici, build pacchetti e audit
+  giornalieri sui fetcher dell'universo dati.
+
 ## [0.2.0] - 2024-09-18
 ### Aggiunto
 - Struttura del repository per la roadmap di FAIR-III v0.2 (cartelle data Lake, segnaposto di checksum di audit, README aggiornato con
@@ -34,6 +39,8 @@
 - Mini GUI opzionale: `launch_gui`, comando `fair3 gui` con flag di percorso,
   fallback quando PySide6 manca, documentazione dedicata e test smoke con
   stub/assenza dipendenza.
+- Pipeline dell'universo investibile: fetcher `TradeRepublicFetcher`, orchestratore `run_universe_pipeline`,
+  integrazione OpenFIGI e comando CLI `fair3 universe` con metriche di audit dei provider.
 - Ingest FRED esteso: default con curva Treasury 1-30Y, DTB3, CPI, breakeven
   5Y/10Y e TIPS 5Y/10Y, con test offline JSON/ZIP e documentazione aggiornata.
 - Ingest Kenneth French: fetcher dedicato con fattorimensili, pacchetto 5x5,

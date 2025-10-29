@@ -11,6 +11,9 @@ mantenendo la disciplina point-in-time e il seeding deterministico.
 ## Mappa dei sottomoduli
 - `ingest/`: fetcher specifici dell'origine derivati da `BaseCSVFetcher`, SQLite/Parquet
   helper di persistenza e cablaggio del registro.
+- `brokers/`: fetcher degli universi investibili dei broker (es. `TradeRepublicFetcher`).
+  Vedi `brokers/README.md` per la checklist su come registrarne di nuovi.
+- `universe/`: orchestrazione dell'aggregatore broker→OpenFIGI→data provider.
 - `etl/`: pulizia PIT, applicazione dello schema Parquet e upsert SQLite.
 - `factors/`: generatori di fattori, cablaggi di convalida e metadatigovernance.
 - `estimates/`: motori media/varianza, proiezioni PSD/SPD e log di blend.
