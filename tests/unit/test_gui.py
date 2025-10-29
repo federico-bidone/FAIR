@@ -314,8 +314,11 @@ def gui_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, object
         ) -> SimpleNamespace:  # noqa: D401 - interface parity
             builder_calls[-1]["build"] = {"seed": seed, "trace": trace}
             return SimpleNamespace(
-                prices_path=Path("prices.parquet"),
-                returns_path=Path("returns.parquet"),
+                panel_path=Path("asset_panel.parquet"),
+                checksum="deadbeef",
+                qa_path=Path("qa.csv"),
+                symbols=["AAA"],
+                rows=10,
             )
 
     monkeypatch.setattr(gui, "TRPanelBuilder", _Builder)

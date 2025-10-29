@@ -25,6 +25,7 @@ from fair3.engine.gui import launch_gui
 from fair3.engine.ingest import available_sources, run_ingest
 from fair3.engine.logging import configure_cli_logging, record_metrics
 from fair3.engine.mapping import run_mapping_pipeline
+from fair3.engine.qa import DemoQAConfig, run_demo_qa
 from fair3.engine.regime import run_regime_pipeline
 from fair3.engine.reporting import MonthlyReportInputs, generate_monthly_report
 from fair3.engine.utils.rand import generator_from_seed
@@ -38,6 +39,27 @@ def _parse_date(value: str) -> date:
         return datetime.strptime(value, "%Y-%m-%d").date()
     except ValueError as exc:  # pragma: no cover - argparse validation
         raise argparse.ArgumentTypeError("Expected YYYY-MM-DD date format") from exc
+
+
+def _parse_timestamp(value: str) -> pd.Timestamp:
+    """Parse CLI-provided timestamps with descriptive errors.
+
+    Args:
+        value: String value provided on the command line.
+
+    Returns:
+        Parsed :class:`pandas.Timestamp` value.
+
+    Raises:
+        argparse.ArgumentTypeError: If ``value`` cannot be interpreted as a timestamp.
+    """
+
+    try:
+        return pd.Timestamp(value)
+    except (TypeError, ValueError) as exc:  # pragma: no cover - argparse validation
+        raise argparse.ArgumentTypeError(
+            "Invalid timestamp. Use YYYY-MM-DD or ISO format."
+        ) from exc
 
 
 def _add_ingest_subparser(
@@ -421,6 +443,65 @@ def _add_gui_subparser(
     )
 
 
+def _add_qa_subparser(
+    subparsers: argparse._SubParsersAction[argparse.ArgumentParser],
+) -> None:
+    """Attach the qa command that runs the deterministic QA pipeline.
+
+    Args:
+        subparsers: Collection of CLI subparsers to which the QA command is added.
+
+    Returns:
+        None.
+    """
+
+    qa = subparsers.add_parser("qa", help="Run deterministic end-to-end QA")
+    qa.add_argument("--label", default="demo", help="Label used for QA artefact folders")
+    qa.add_argument(
+        "--output-dir",
+        type=Path,
+        help="Optional directory where QA artefacts will be stored",
+    )
+    qa.add_argument(
+        "--start",
+        type=_parse_timestamp,
+        default=pd.Timestamp("2018-01-01"),
+        help="Start date for the synthetic QA dataset (YYYY-MM-DD)",
+    )
+    qa.add_argument(
+        "--end",
+        type=_parse_timestamp,
+        default=pd.Timestamp("2021-12-31"),
+        help="End date for the synthetic QA dataset (YYYY-MM-DD)",
+    )
+    qa.add_argument("--seed", type=int, help="Optional seed override for QA runs")
+    qa.add_argument(
+        "--draws",
+        type=int,
+        default=256,
+        help="Number of bootstrap draws for robustness QA",
+    )
+    qa.add_argument(
+        "--block-size",
+        dest="block_size",
+        type=int,
+        default=45,
+        help="Bootstrap block size for robustness QA",
+    )
+    qa.add_argument(
+        "--cv-splits",
+        type=int,
+        default=3,
+        help="Cross-validation folds for stochastic estimators",
+    )
+    qa.add_argument(
+        "--validate-factors",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Toggle factor validation during QA (disabled by default)",
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="fair3", description=DESCRIPTION)
     parser.add_argument(
@@ -448,6 +529,7 @@ def build_parser() -> argparse.ArgumentParser:
     _add_map_subparser(sub)
     _add_regime_subparser(sub)
     _add_gui_subparser(sub)
+    _add_qa_subparser(sub)
     return parser
 
 
@@ -484,8 +566,8 @@ def _handle_etl(args: argparse.Namespace) -> None:
     artifacts = builder.build(seed=args.seed, trace=args.trace)
     summary = (
         f"[fair3] etl rows={artifacts.rows} symbols={len(artifacts.symbols)} "
-        f"prices={artifacts.prices_path} returns={artifacts.returns_path} "
-        f"features={artifacts.features_path} qa={artifacts.qa_path}"
+        f"panel={artifacts.panel_path} checksum={artifacts.checksum} "
+        f"qa={artifacts.qa_path}"
     )
     print(summary)
 
@@ -768,6 +850,41 @@ def _handle_gui(args: argparse.Namespace) -> None:
     launch_gui(config)
 
 
+def _handle_qa(args: argparse.Namespace) -> None:
+    """Run the deterministic QA pipeline and display artefact locations.
+
+    Args:
+        args: Parsed CLI arguments produced by :func:`_add_qa_subparser`.
+
+    Returns:
+        None. The function prints a human-readable summary and records metrics.
+    """
+
+    if args.start > args.end:
+        raise SystemExit("--start must be on or before --end")
+    config = DemoQAConfig(
+        label=args.label,
+        start=pd.Timestamp(args.start),
+        end=pd.Timestamp(args.end),
+        output_dir=args.output_dir,
+        seed=args.seed,
+        validate_factors=args.validate_factors,
+        cv_splits=max(2, args.cv_splits),
+        robustness_draws=max(1, args.draws),
+        robustness_block_size=max(1, args.block_size),
+    )
+    result = run_demo_qa(config=config)
+    record_metrics("qa_acceptance_passed", float(result.acceptance_passed), {"label": config.label})
+    record_metrics("qa_robustness_passed", float(result.robustness_passed), {"label": config.label})
+    status = "PASS" if result.acceptance_passed and result.robustness_passed else "CHECK"
+    print(
+        "[fair3] qa "
+        f"label={config.label} status={status} "
+        f"report={result.report_pdf} acceptance={result.acceptance_passed} "
+        f"robustness={result.robustness_passed}"
+    )
+
+
 def _handle_goals(args: argparse.Namespace) -> None:
     goals = load_goal_configs_from_yaml(args.goals_config)
     if not goals:
@@ -829,6 +946,8 @@ def main(argv: list[str] | None = None) -> None:
         _handle_regime(args)
     elif args.cmd == "gui":
         _handle_gui(args)
+    elif args.cmd == "qa":
+        _handle_qa(args)
     elif args.cmd == "validate":
         _handle_validate(args)
     else:

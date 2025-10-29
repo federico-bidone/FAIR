@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+
+"""Pipeline utilities to compute and validate factor libraries."""
+
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -42,12 +45,15 @@ def _multiindex_to_datetime(index: pd.MultiIndex) -> pd.MultiIndex:
 
 
 def _load_panel(clean_root: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame | None]:
-    """Carica i pannelli point-in-time prodotti dall'ETL."""
+    """Carica il pannello asset e separa rendimenti e feature richiesti."""
 
-    returns = pd.read_parquet(clean_root / "returns.parquet")
-    features = pd.read_parquet(clean_root / "features.parquet")
-    returns.index = _multiindex_to_datetime(returns.index)
-    features.index = _multiindex_to_datetime(features.index)
+    asset_panel = pd.read_parquet(clean_root / "asset_panel.parquet")
+    pivot = asset_panel.pivot_table(index=["date", "symbol"], columns="field", values="value")
+    pivot.index = _multiindex_to_datetime(pivot.index)
+    returns_cols = [col for col in ("ret", "log_ret", "log_ret_estimation") if col in pivot.columns]
+    feature_cols = [col for col in ("lag_ma_5", "lag_ma_21", "lag_vol_21") if col in pivot.columns]
+    returns = pivot[returns_cols].copy()
+    features = pivot[feature_cols].copy()
     macro_path = clean_root / "macro.parquet"
     macro = None
     if macro_path.exists():

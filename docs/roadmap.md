@@ -150,12 +150,16 @@ le funzionalità da implementare, i file principali da toccare e i rischi da mon
 - Directory `data/portfolio_visualizer_manual/` documentata nel README ingest, registrazione della nuova sorgente `portviz` nel registry/CLI e licenza “Portfolio Visualizer — informational/educational use”.
 - Test unitari su parsing, filtro `start`, errori di colonne mancanti/HTML e aggiornamento di README, docs/DATA.md, roadmap e changelog.
 
-## PR-49 — QA end-to-end
-- Esecuzione completa pipeline su dataset ridotto, verifica artefatti, acceptance gates, ablation.
-- Aggiornare README, docs e seeds/checksum snapshot.
+## PR-49 — QA end-to-end ✅
+- Comando `fair3 qa` che genera dataset sintetico, esegue la pipeline completa,
+  produce report mensile, robustezza (bootstrap+ablation) e snapshot di audit.
+- Documentazione aggiornata (`README`, `docs/QA.md`) e test di integrazione sul
+  percorso QA con parametrizzazione rapida per CI.
 
-## PR-50 — Cleanup finale
-- Revisione docstring Google-style, README modulari, template issue/PR, screenshot GUI, CHANGELOG finale.
+## PR-50 — Cleanup finale ✅
+- Revisione docstring Google-style nei moduli QA, README modulari per `fair3/`,
+  CLI ed engine, screenshot GUI nella documentazione, template confermati e
+  CHANGELOG aggiornato per chiudere la roadmap v0.2.
 
 ### Rischi e mitigazioni
 - **Rate limit / licenze:** implementare retry/backoff, caching ETag, log licenza esplicito.

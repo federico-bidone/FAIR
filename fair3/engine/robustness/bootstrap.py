@@ -1,3 +1,5 @@
+"""Bootstrap utilities for robustness analysis in FAIR-III."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable

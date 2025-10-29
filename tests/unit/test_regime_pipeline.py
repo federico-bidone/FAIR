@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import hashlib
 import numpy as np
 import pandas as pd
 import pytest
@@ -31,8 +32,33 @@ def _write_clean_panel(root: Path) -> None:
         },
         index=index,
     )
-    returns.to_parquet(root / "returns.parquet")
-    features.to_parquet(root / "features.parquet")
+    panel_frames: list[pd.DataFrame] = []
+    for field_name in returns.columns:
+        part = returns[field_name].rename("value").reset_index()
+        part["field"] = field_name
+        panel_frames.append(part)
+    for field_name in features.columns:
+        part = features[field_name].rename("value").reset_index()
+        part["field"] = field_name
+        panel_frames.append(part)
+    panel = pd.concat(panel_frames, ignore_index=True)
+    panel["date"] = pd.to_datetime(panel["date"]).dt.tz_localize("Europe/Rome").dt.tz_convert("UTC")
+    panel["currency"] = "EUR"
+    panel["source"] = "synthetic"
+    panel["license"] = "internal"
+    panel["tz"] = "Europe/Rome"
+    panel["quality_flag"] = "clean"
+    panel["revision_tag"] = "qa_regime"
+    panel["checksum"] = panel.apply(
+        lambda row: hashlib.sha256(
+            f"{row['symbol']}|{row['field']}|{row['date'].isoformat()}|{float(row['value']):.12f}".encode(
+                "utf-8"
+            )
+        ).hexdigest(),
+        axis=1,
+    )
+    panel["pit_flag"] = 1
+    panel.to_parquet(root / "asset_panel.parquet")
 
 
 def _write_thresholds(path: Path) -> Path:

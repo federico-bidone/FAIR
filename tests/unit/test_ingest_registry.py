@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sqlite3
 from datetime import UTC, date, datetime
 from io import StringIO
 from pathlib import Path
@@ -60,7 +61,11 @@ def test_fetch_filtra_date_e_costruisce_metadati(
     """Verifica che `fetch` applichi il filtro `start` e popoli i metadati audit."""
 
     payloads = {"AAA": _sample_payload(1.0, date="2023-12-31"), "BBB": _sample_payload(2.5)}
-    fetcher = DummyFetcher(payloads=payloads, raw_root=tmp_path)
+    fetcher = DummyFetcher(
+        payloads=payloads,
+        raw_root=tmp_path,
+        clean_database=tmp_path / "fair.sqlite",
+    )
     monkeypatch.setattr(
         fetcher,
         "_download",
@@ -87,7 +92,11 @@ def test_fetch_con_progress_attiva_tqdm(tmp_path: Path, monkeypatch: pytest.Monk
     """Quando progress=True il fetcher deve invocare tqdm con descrizione coerente."""
 
     payloads = {"AAA": _sample_payload(1.0)}
-    fetcher = DummyFetcher(payloads=payloads, raw_root=tmp_path)
+    fetcher = DummyFetcher(
+        payloads=payloads,
+        raw_root=tmp_path,
+        clean_database=tmp_path / "fair.sqlite",
+    )
     monkeypatch.setattr(
         fetcher,
         "_download",
@@ -108,10 +117,43 @@ def test_fetch_con_progress_attiva_tqdm(tmp_path: Path, monkeypatch: pytest.Monk
     assert captured["unit"] == "symbol"
 
 
+def test_fetch_persist_metadata_sqlite(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Verifica che l'ingest salvi i log e gli strumenti nella base SQLite."""
+
+    database_path = tmp_path / "fair.sqlite"
+    payloads = {"AAA": _sample_payload(1.0)}
+    fetcher = DummyFetcher(
+        payloads=payloads,
+        raw_root=tmp_path,
+        clean_database=database_path,
+    )
+    monkeypatch.setattr(
+        fetcher,
+        "_download",
+        lambda url, session=None: fetcher._payloads[url.split("/")[-1]],
+    )
+    artifact = fetcher.fetch(symbols=["AAA"], start=date(2024, 1, 1))
+    assert artifact.metadata["checksum_sha256"] is not None
+
+    conn = sqlite3.connect(database_path)
+    try:
+        ingest = pd.read_sql_query("SELECT * FROM ingest_log", conn)
+        assert len(ingest) == 1
+        assert ingest.loc[0, "source"] == "dummy"
+        instrument = pd.read_sql_query("SELECT * FROM instrument", conn)
+        assert instrument.loc[0, "id"] == "AAA"
+    finally:
+        conn.close()
+
+
 def test_fetch_richiede_almeno_un_simbolo(tmp_path: Path) -> None:
     """Lancia un errore chiaro quando la lista dei simboli è vuota."""
 
-    fetcher = DummyFetcher(payloads={}, raw_root=tmp_path)
+    fetcher = DummyFetcher(
+        payloads={},
+        raw_root=tmp_path,
+        clean_database=tmp_path / "fair.sqlite",
+    )
     with pytest.raises(ValueError, match="At least one symbol must be provided"):
         fetcher.fetch(symbols=[])
 
@@ -134,12 +176,21 @@ def test_available_sources_includes_manual_and_alpha_sources() -> None:
     assert "coingecko" in sources
     assert "binance" in sources
     assert "portviz" in sources
+    assert "portfoliocharts" in sources
+    assert "testfolio" in sources
+    assert "usmarket" in sources
+    assert "eodhd" in sources
+    assert "curvo" in sources
 
 
 def test_simple_frame_rileva_colonne_mancanti(tmp_path: Path) -> None:
     """`_simple_frame` deve fallire se il CSV non espone le colonne attese."""
 
-    fetcher = DummyFetcher(payloads={}, raw_root=tmp_path)
+    fetcher = DummyFetcher(
+        payloads={},
+        raw_root=tmp_path,
+        clean_database=tmp_path / "fair.sqlite",
+    )
     payload = "date,valore\n2024-01-01,1.0\n"
     with pytest.raises(ValueError, match="Expected columns"):
         fetcher._simple_frame(payload, "AAA", date_column="date", value_column="value")

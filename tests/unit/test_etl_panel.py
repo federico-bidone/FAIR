@@ -50,14 +50,14 @@ def test_tr_panel_builder_pipeline_minima(
 
     salvati: dict[str, pd.DataFrame] = {}
 
-    def finto_write(self: make_tr_panel.TRPanelBuilder, frame: pd.DataFrame, name: str) -> Path:
-        io_utils.ensure_dir(self.clean_root)
-        path = Path(self.clean_root) / name
-        salvati[name] = frame.copy()
-        path.write_text(f"{name}\n", encoding="utf-8")
-        return path
+    def finto_persist(frame: pd.DataFrame, path: Path | str, schema: object) -> tuple[Path, str]:
+        io_utils.ensure_dir(Path(path).parent)
+        salvati["asset_panel.parquet"] = frame.copy()
+        target = Path(path)
+        target.write_text("panel\n", encoding="utf-8")
+        return target, "checksum"
 
-    monkeypatch.setattr(make_tr_panel.TRPanelBuilder, "_write_parquet", finto_write, raising=False)
+    monkeypatch.setattr(make_tr_panel, "persist_parquet", finto_persist, raising=False)
 
     builder = make_tr_panel.TRPanelBuilder(
         raw_root=raw_root,
@@ -69,16 +69,14 @@ def test_tr_panel_builder_pipeline_minima(
     stdout = capsys.readouterr().out
     assert "file_raw=2" in stdout
 
-    assert artefatti.prices_path.exists()
-    assert artefatti.returns_path.exists()
-    assert artefatti.features_path.exists()
+    assert artefatti.panel_path.exists()
     assert artefatti.qa_path.exists()
     assert artefatti.symbols == ["AAA"]
     assert artefatti.rows > 0
 
-    prezzi = salvati["prices.parquet"]
-    assert {"price", "currency", "fx_rate", "currency_original", "source"}.issubset(prezzi.columns)
-    assert (prezzi["currency"] == "EUR").all()
+    pannello = salvati["asset_panel.parquet"]
+    assert {"date", "symbol", "field", "value", "currency", "license", "checksum"}.issubset(pannello.columns)
+    assert (pannello["currency"] == "EUR").all()
 
     qa_log = pd.read_csv(artefatti.qa_path)
     assert qa_log.iloc[0]["source"] == "asset"

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import sqlite3
 import time
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
@@ -24,12 +25,14 @@ except ModuleNotFoundError:  # pragma: no cover - fallback
 
 
 from fair3.engine.logging import setup_logger
-from fair3.engine.utils.io import ensure_dir
+from fair3.engine.utils.io import ensure_dir, sha256_file
+from fair3.engine.utils.storage import ensure_metadata_schema, upsert_sqlite
 
 __all__ = [
     "IngestArtifact",
     "BaseCSVFetcher",
     "available_sources",
+    "source_licenses",
     "create_fetcher",
     "run_ingest",
 ]
@@ -60,6 +63,7 @@ class BaseCSVFetcher:
         self,
         *,
         raw_root: Path | str | None = None,
+        clean_database: Path | str | None = None,
         logger: logging.Logger | None = None,
         session: requests.Session | None = None,
     ) -> None:
@@ -70,6 +74,11 @@ class BaseCSVFetcher:
             raise ValueError("LICENSE must be defined on subclasses")
         self.raw_root = Path(raw_root) if raw_root is not None else Path("data") / "raw"
         self.logger = logger or setup_logger(f"fair3.ingest.{self.SOURCE}")
+        self.database_path = (
+            Path(clean_database)
+            if clean_database is not None
+            else Path("data") / "fair_metadata.sqlite"
+        )
         self.session = session
 
     # --- public API -----------------------------------------------------
@@ -107,6 +116,9 @@ class BaseCSVFetcher:
         timestamp = as_of or datetime.now(UTC)
         frames: list[pd.DataFrame] = []
         requests_meta: list[dict[str, Any]] = []
+        log_rows: list[dict[str, Any]] = []
+        instrument_rows: dict[str, dict[str, Any]] = {}
+        source_map_rows: list[dict[str, Any]] = []
         start_ts = pd.to_datetime(start) if start is not None else None
 
         # Per ogni simbolo ripetiamo download → parsing → filtro → log, mantenendo
@@ -119,13 +131,70 @@ class BaseCSVFetcher:
         )
         for symbol in iterator:
             url = self.build_url(symbol, start_ts)
+            start_time = time.perf_counter()
             payload = self._download(url, session=session)
+            duration = time.perf_counter() - start_time
             frame = self.parse(payload, symbol)
             if start_ts is not None:
                 frame = frame[frame["date"] >= start_ts]
             frame = frame.sort_values("date").reset_index(drop=True)
             frames.append(frame)
             requests_meta.append({"symbol": symbol, "url": url})
+            if isinstance(payload, bytes):
+                payload_bytes = len(payload)
+            else:
+                payload_bytes = len(payload.encode("utf-8"))
+            currency = frame.get("currency")
+            currency_value = (
+                currency.iloc[0] if isinstance(currency, pd.Series) and not currency.empty else None
+            )
+            instrument_rows[symbol] = {
+                "id": symbol,
+                "isin": None,
+                "figi": None,
+                "mic": None,
+                "symbol": symbol,
+                "asset_class": None,
+                "currency": currency_value,
+                "lot": None,
+                "adv_hint": None,
+                "fee_hint": None,
+                "bidask_hint": None,
+                "provider_pref": self.SOURCE,
+                "ucits_flag": None,
+                "govies_share_hint": None,
+                "ter_hint": None,
+                "kid_url": None,
+            }
+            source_map_rows.append(
+                {
+                    "instrument_id": symbol,
+                    "preferred_source": self.SOURCE,
+                    "fallback_source": None,
+                    "url": url,
+                    "license": self.LICENSE,
+                    "rate_limit_note": None,
+                    "last_success": timestamp,
+                    "etag": None,
+                    "last_modified": None,
+                }
+            )
+            log_rows.append(
+                {
+                    "ts": timestamp,
+                    "source": self.SOURCE,
+                    "endpoint": url,
+                    "symbol": symbol,
+                    "status": "success",
+                    "http_code": 200,
+                    "bytes": payload_bytes,
+                    "rows": int(len(frame)),
+                    "duration_s": duration,
+                    "retries": 0,
+                    "warning": "",
+                    "checksum_sha256": None,
+                }
+            )
             self.logger.info(
                 "ingest_complete source=%s symbol=%s rows=%d license=%s url=%s",
                 self.SOURCE,
@@ -141,12 +210,17 @@ class BaseCSVFetcher:
             data = pd.DataFrame(columns=["date", "value", "symbol"])
 
         path = self._write_csv(data, timestamp)
+        checksum = sha256_file(path) if path.exists() else None
+        if checksum is not None:
+            for row in log_rows:
+                row["checksum_sha256"] = checksum
         # I metadati conservano licenza, timestamp e richieste effettuate per audit trail.
         metadata = {
             "license": self.LICENSE,
             "as_of": timestamp.isoformat(),
             "requests": requests_meta,
             "start": start_ts.isoformat() if start_ts is not None else None,
+            "checksum_sha256": checksum,
         }
         artifact = IngestArtifact(
             source=self.SOURCE,
@@ -154,6 +228,8 @@ class BaseCSVFetcher:
             data=data,
             metadata=metadata,
         )
+        if log_rows:
+            self._persist_metadata(log_rows, instrument_rows, source_map_rows)
         return artifact
 
     # --- subclass hooks -------------------------------------------------
@@ -229,6 +305,44 @@ class BaseCSVFetcher:
         data_to_write.to_csv(target_path, index=False)
         return target_path
 
+    def _persist_metadata(
+        self,
+        log_rows: list[dict[str, Any]],
+        instrument_rows: Mapping[str, dict[str, Any]],
+        source_map_rows: list[dict[str, Any]],
+    ) -> None:
+        """Aggiorna le tabelle SQLite con i dati di ingest appena raccolti."""
+
+        ensure_dir(self.database_path.parent)
+        conn = sqlite3.connect(self.database_path)
+        try:
+            ensure_metadata_schema(conn)
+            log_frame = pd.DataFrame(log_rows)
+            log_frame["ts"] = (
+                pd.to_datetime(log_frame["ts"], utc=True)
+                .dt.tz_convert("UTC")
+                .dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+            )
+            upsert_sqlite(conn, "ingest_log", log_frame, ["ts", "source", "symbol", "endpoint"])
+
+            instrument_frame = pd.DataFrame(instrument_rows.values())
+            upsert_sqlite(conn, "instrument", instrument_frame, ["id"])
+
+            source_map_frame = pd.DataFrame(source_map_rows)
+            source_map_frame["last_success"] = (
+                pd.to_datetime(source_map_frame["last_success"], utc=True)
+                .dt.tz_convert("UTC")
+                .dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+            )
+            upsert_sqlite(
+                conn,
+                "source_map",
+                source_map_frame,
+                ["instrument_id", "preferred_source"],
+            )
+        finally:
+            conn.close()
+
 
 def _fetcher_map() -> Mapping[str, type[BaseCSVFetcher]]:
     from .alpha import AlphaFetcher
@@ -239,15 +353,20 @@ def _fetcher_map() -> Mapping[str, type[BaseCSVFetcher]]:
     from .boe import BOEFetcher
     from .cboe import CBOEFetcher
     from .coingecko import CoinGeckoFetcher
+    from .curvo import CurvoFetcher
     from .ecb import ECBFetcher
+    from .eodhd import EODHDFetcher
     from .fred import FREDFetcher
     from .french import FrenchFetcher
     from .lbma import LBMAFetcher
     from .nareit import NareitFetcher
     from .oecd import OECDFetcher
     from .portfolio_visualizer import PortfolioVisualizerFetcher
+    from .portfoliocharts import PortfolioChartsFetcher
+    from .testfolio import TestfolioPresetFetcher
     from .stooq import StooqFetcher
     from .tiingo import TiingoFetcher
+    from .us_market_data import USMarketDataFetcher
     from .worldbank import WorldBankFetcher
     from .yahoo import YahooFetcher
 
@@ -260,13 +379,18 @@ def _fetcher_map() -> Mapping[str, type[BaseCSVFetcher]]:
         BOEFetcher.SOURCE: BOEFetcher,
         CBOEFetcher.SOURCE: CBOEFetcher,
         CoinGeckoFetcher.SOURCE: CoinGeckoFetcher,
+        CurvoFetcher.SOURCE: CurvoFetcher,
         ECBFetcher.SOURCE: ECBFetcher,
+        EODHDFetcher.SOURCE: EODHDFetcher,
         FREDFetcher.SOURCE: FREDFetcher,
         FrenchFetcher.SOURCE: FrenchFetcher,
         LBMAFetcher.SOURCE: LBMAFetcher,
         NareitFetcher.SOURCE: NareitFetcher,
         OECDFetcher.SOURCE: OECDFetcher,
         PortfolioVisualizerFetcher.SOURCE: PortfolioVisualizerFetcher,
+        PortfolioChartsFetcher.SOURCE: PortfolioChartsFetcher,
+        TestfolioPresetFetcher.SOURCE: TestfolioPresetFetcher,
+        USMarketDataFetcher.SOURCE: USMarketDataFetcher,
         StooqFetcher.SOURCE: StooqFetcher,
         TiingoFetcher.SOURCE: TiingoFetcher,
         WorldBankFetcher.SOURCE: WorldBankFetcher,
@@ -278,6 +402,15 @@ def available_sources() -> Sequence[str]:
     """Restituisce l'elenco alfabetico delle sorgenti disponibili per l'ingest."""
 
     return tuple(sorted(_fetcher_map().keys()))
+
+
+def source_licenses() -> Mapping[str, str]:
+    """Restituisce mappatura ``source -> license`` dichiarata dai fetcher."""
+
+    mapping: dict[str, str] = {}
+    for fetcher_cls in _fetcher_map().values():
+        mapping[fetcher_cls.SOURCE] = fetcher_cls.LICENSE
+    return mapping
 
 
 def create_fetcher(source: str, **kwargs: object) -> BaseCSVFetcher:
