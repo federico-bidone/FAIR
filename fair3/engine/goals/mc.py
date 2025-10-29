@@ -1,10 +1,9 @@
-"""Monte Carlo goal simulation utilities.
+"""Utility per la simulazione Monte Carlo degli obiettivi.
 
-This module implements a deterministic Monte Carlo engine used to evaluate
-household goals under different regime assumptions. The simulator models
-cash-flow plans with contributions and withdrawals, applies glidepath
-adjustments based on the probability of success, and produces artefacts for
-the CLI interface.
+Il modulo implementa un motore Monte Carlo deterministico usato per valutare
+gli obiettivi familiari sotto diverse ipotesi di regime. Il simulatore modella
+flussi di cassa con contributi e prelievi, applica glidepath in funzione della
+probabilità di successo e produce artefatti destinati all'interfaccia CLI.
 """
 
 from __future__ import annotations
@@ -232,13 +231,13 @@ class RegimeCurves:
     crisis_probability: np.ndarray
 
     def slice(self, periods: int) -> RegimeCurves:
-        """Return the first ``periods`` observations for each curve.
+        """Restituisce le prime ``periods`` osservazioni per ciascuna curva.
 
         Args:
-          periods: Number of monthly observations to retain.
+          periods: Numero di osservazioni mensili da mantenere.
 
         Returns:
-          A :class:`RegimeCurves` truncated to the requested horizon.
+          Un :class:`RegimeCurves` troncato all'orizzonte richiesto.
         """
 
         return RegimeCurves(
@@ -376,16 +375,16 @@ def build_contribution_schedule(
     growth_rate: float = 0.02,
     rules: Sequence[ContributionRule] | None = None,
 ) -> np.ndarray:
-    """Return the deterministic contribution schedule over ``periods`` months.
+    """Restituisce il piano deterministico dei contributi per ``periods`` mesi.
 
     Args:
-      periods: Number of months to generate.
-      monthly_contribution: Baseline monthly contribution in euros.
-      growth_rate: Annual growth rate applied to the baseline.
-      rules: Optional recurring contribution rules that override the baseline.
+      periods: Numero di mesi da generare.
+      monthly_contribution: Contributo mensile di base in euro.
+      growth_rate: Tasso di crescita annuale applicato al baseline.
+      rules: Regole opzionali ricorrenti che sostituiscono il baseline.
 
     Returns:
-      Array containing net contributions for each month.
+      Array con i contributi netti di ciascun mese.
     """
 
     if periods <= 0:
@@ -426,14 +425,14 @@ def build_contribution_schedule(
 def build_withdrawal_schedule(
     periods: int, withdrawals: Sequence[WithdrawalRule] | None
 ) -> np.ndarray:
-    """Return the withdrawal schedule as negative cash flows.
+    """Restituisce il piano dei prelievi come flussi di cassa negativi.
 
     Args:
-      periods: Number of months to generate.
-      withdrawals: Optional withdrawal rules.
+      periods: Numero di mesi da generare.
+      withdrawals: Regole di prelievo opzionali.
 
     Returns:
-      Array of withdrawals (negative amounts) for each month.
+      Array di prelievi (importi negativi) per ogni mese.
     """
 
     if periods <= 0:

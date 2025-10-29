@@ -118,9 +118,7 @@ class LBMAFetcher(BaseCSVFetcher):
         columns = {col: col.strip() for col in frame.columns}
         frame = frame.rename(columns=columns)
         if "Date" not in frame.columns or spec.value_column not in frame.columns:
-            msg = (
-                "Expected columns 'Date' and " f"'{spec.value_column}' in LBMA payload for {symbol}"
-            )
+            msg = f"Expected columns 'Date' and '{spec.value_column}' in LBMA payload for {symbol}"
             raise ValueError(msg)
 
         dates = pd.to_datetime(frame["Date"], errors="coerce", dayfirst=True)

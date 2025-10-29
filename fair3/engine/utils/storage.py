@@ -8,9 +8,9 @@ and library callers can share the same deterministic storage layer.
 """
 
 from __future__ import annotations
+
 import sqlite3
 from collections.abc import Iterable, Mapping
-from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np

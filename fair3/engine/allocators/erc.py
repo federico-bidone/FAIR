@@ -1,4 +1,4 @@
-"""Equal risk contribution helpers."""
+"""Utility per l'analisi dei contributi di rischio egualizzati."""
 
 from __future__ import annotations
 
@@ -6,10 +6,10 @@ import numpy as np
 
 
 def risk_contributions(w: np.ndarray, Sigma: np.ndarray) -> np.ndarray:  # noqa: N803
-    r"""Return marginal contribution of each asset to portfolio risk.
+    r"""Restituisce il contributo marginale di ogni asset al rischio di portafoglio.
 
-    The calculation follows the standard ERC definition ``RC_i = w_i (\Sigma w)_i``
-    with a small epsilon in the denominator to guard against division by zero.
+    Il calcolo segue la definizione ERC standard ``RC_i = w_i (\Sigma w)_i`` con un
+    piccolo epsilon nel denominatore per proteggere dalle divisioni per zero.
     """
 
     w = np.asarray(w, dtype=float)
@@ -37,11 +37,11 @@ def balance_clusters(
     tol: float,
     max_iter: int = 50,
 ) -> np.ndarray:
-    """Scale cluster weights so their risk contributions align within ``tol``.
+    """Ribilancia i pesi dei cluster così che i contributi di rischio siano entro ``tol``.
 
-    The routine rescales weights iteratively until the absolute deviation of
-    cluster-level risk contributions from their mean falls below ``tol`` or the
-    iteration budget is exhausted.
+    La routine ridimensiona i pesi in modo iterativo finché la deviazione assoluta
+    dei contributi di rischio a livello di cluster rispetto alla media scende sotto
+    ``tol`` o finché non si esaurisce il budget di iterazioni.
     """
 
     if not clusters:

@@ -35,7 +35,7 @@ def cross_purged_splits(
     n_splits: int,
     embargo: int,
 ) -> list[tuple[np.ndarray, np.ndarray]]:
-    """Return deterministic cross-purged splits with embargo in calendar space."""
+    """Restituisce split deterministici cross-purged con embargo sul calendario."""
 
     if n_splits < 2:
         raise ValueError("n_splits must be >= 2")

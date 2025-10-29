@@ -75,7 +75,15 @@ def test_tr_panel_builder_pipeline_minima(
     assert artefatti.rows > 0
 
     pannello = salvati["asset_panel.parquet"]
-    assert {"date", "symbol", "field", "value", "currency", "license", "checksum"}.issubset(pannello.columns)
+    assert {
+        "date",
+        "symbol",
+        "field",
+        "value",
+        "currency",
+        "license",
+        "checksum",
+    }.issubset(pannello.columns)
     assert (pannello["currency"] == "EUR").all()
 
     qa_log = pd.read_csv(artefatti.qa_path)

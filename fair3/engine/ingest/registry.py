@@ -81,7 +81,7 @@ class BaseCSVFetcher:
         )
         self.session = session
 
-    # --- public API -----------------------------------------------------
+    # --- API pubblica ---------------------------------------------------
     def fetch(
         self,
         *,
@@ -232,7 +232,7 @@ class BaseCSVFetcher:
             self._persist_metadata(log_rows, instrument_rows, source_map_rows)
         return artifact
 
-    # --- subclass hooks -------------------------------------------------
+    # --- hook per sottoclassi ------------------------------------------
     def build_url(self, symbol: str, start: pd.Timestamp | None) -> str:
         """Hook di estensione: restituisce l'URL completo per un simbolo specifico."""
         raise NotImplementedError
@@ -241,7 +241,7 @@ class BaseCSVFetcher:
         """Hook di estensione: interpreta il payload in un DataFrame conforme."""
         raise NotImplementedError
 
-    # --- helpers --------------------------------------------------------
+    # --- helper --------------------------------------------------------
     def _download(
         self,
         url: str,
@@ -363,8 +363,8 @@ def _fetcher_map() -> Mapping[str, type[BaseCSVFetcher]]:
     from .oecd import OECDFetcher
     from .portfolio_visualizer import PortfolioVisualizerFetcher
     from .portfoliocharts import PortfolioChartsFetcher
-    from .testfolio import TestfolioPresetFetcher
     from .stooq import StooqFetcher
+    from .testfolio import TestfolioPresetFetcher
     from .tiingo import TiingoFetcher
     from .us_market_data import USMarketDataFetcher
     from .worldbank import WorldBankFetcher

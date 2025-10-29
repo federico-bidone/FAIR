@@ -1,3 +1,12 @@
+"""Coordinamento delle analisi di robustezza per FAIR-III.
+
+Il laboratorio di robustezza esegue in sequenza bootstrap, scenari storici e
+analisi di ablation opzionali. Il modulo mira a rendere espliciti i passaggi
+per permettere al team di controllo di comprendere e riprodurre facilmente i
+workflow; le docstring in italiano descrivono parametri, artefatti prodotti e
+logica di gestione dei seed.
+"""
+
 from __future__ import annotations
 
 import inspect
@@ -17,6 +26,8 @@ from fair3.engine.robustness.scenarios import ShockScenario, replay_shocks
 from fair3.engine.utils.io import artifact_path, ensure_dir, write_json
 from fair3.engine.utils.rand import generator_from_seed, spawn_child_rng
 
+# Impostiamo il backend ``Agg`` così da poter generare PDF anche in ambienti
+# headless (es. CI o container senza display server).
 plt.switch_backend("Agg")
 
 __all__ = [
@@ -60,7 +71,17 @@ def _render_pdf(
     *,
     path: Path,
 ) -> Path:
-    """Costruisce un PDF con istogramma bootstrap e riepilogo degli scenari."""
+    """Costruisce un PDF con istogramma bootstrap e riepilogo degli scenari.
+
+    Args:
+        bootstrap: DataFrame con le metriche ottenute dal bootstrap.
+        scenarios: DataFrame con gli esiti del replay degli shock.
+        gates: Risultati dei controlli di robustezza da riportare nel riepilogo.
+        path: Percorso finale del PDF da generare.
+
+    Returns:
+        Percorso del PDF scritto su disco, utile per logging a valle.
+    """
 
     fig, axes = plt.subplots(2, 1, figsize=(8.0, 10.0))
 
@@ -100,13 +121,33 @@ def run_robustness_lab(
     ablation_runner: Callable[..., Mapping[str, float]] | None = None,
     base_flags: Mapping[str, bool] | None = None,
 ) -> tuple[RobustnessArtifacts, RobustnessGates]:
-    """Esegue bootstrap, scenari e (opzionalmente) ablation sui rendimenti."""
+    """Esegue bootstrap, scenari e (opzionalmente) ablation sui rendimenti.
+
+    Il laboratorio crea una struttura di cartelle (quando non fornita) e salva
+    tutti gli artefatti su disco per facilitare audit e reportistica.
+
+    Args:
+        returns: Sequenza di rendimenti storici su cui applicare le analisi.
+        config: Configurazione del laboratorio; se ``None`` usa i default.
+        seed: Seed deterministico condiviso tra bootstrap e ablation.
+        scenarios: Shock storici personalizzati da utilizzare; ``None`` usa
+            :func:`default_shock_scenarios`.
+        ablation_runner: Callback per eseguire lo studio di ablation; se
+            assente il passo viene saltato.
+        base_flags: Set di flag iniziali passato all'ablation per definire la
+            baseline.
+
+    Returns:
+        Coppia con gli artefatti generati e i gate di robustezza calcolati.
+    """
 
     cfg = config or RobustnessConfig()
     base_path = cfg.output_dir or artifact_path("robustness", create=True)
     base_path = ensure_dir(base_path)
 
     parent_rng = generator_from_seed(seed, stream=cfg.stream)
+    # Ogni sotto-processo ottiene un generatore figlio per evitare correlazioni
+    # tra bootstrap e ablation pur mantenendo riproducibilità globale.
     bootstrap_rng = spawn_child_rng(parent_rng)
 
     bootstrap_df, gates = block_bootstrap_metrics(
@@ -153,7 +194,13 @@ def run_robustness_lab(
         signature = inspect.signature(ablation_runner)
 
         def runner(flags: Mapping[str, bool]) -> Mapping[str, float]:
-            """Adatta la callback utenti accettando opzionalmente seed o rng."""
+            """Adatta la callback utenti accettando opzionalmente seed o rng.
+
+            Consente di supportare più API utente senza duplicare logica:
+            se la callback espone ``rng`` riceve il generatore figlio, mentre
+            con ``seed`` viene fornito un intero determinato in modo
+            deterministico.
+            """
 
             bound_kwargs: dict[str, object] = {}
             if "rng" in signature.parameters:

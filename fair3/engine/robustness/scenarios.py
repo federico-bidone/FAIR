@@ -1,3 +1,11 @@
+"""Scenari di shock storici per il laboratorio di robustezza.
+
+Qui vengono definite le traiettorie stilizzate utilizzate negli stress test
+su FAIR-III insieme agli helper per rigiocarle contro serie storiche. I
+commenti spiegano in italiano come vengono calcolate le metriche e come
+vengono scalati gli scenari rispetto alla volatilità di base.
+"""
+
 from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
@@ -46,6 +54,8 @@ def _scenario_cagr(path: np.ndarray, *, periods_per_year: int) -> float:
     return float(total_return ** (1.0 / years) - 1.0)
 
 
+# Collezione predefinita di shock storici che copre crisi energetiche,
+# finanziarie e pandemiche utilizzate nel QA del sistema.
 DEFAULT_SHOCKS: tuple[ShockScenario, ...] = (
     ShockScenario(
         name="1973_oil_crisis",
@@ -131,7 +141,12 @@ DEFAULT_SHOCKS: tuple[ShockScenario, ...] = (
 
 
 def default_shock_scenarios() -> tuple[ShockScenario, ...]:
-    """Restituisce gli shock storici forniti di default."""
+    """Restituisce gli shock storici forniti di default.
+
+    Returns:
+        Tupla immutabile con gli scenari di shock da utilizzare per gli stress
+        test quando l'utente non fornisce una lista personalizzata.
+    """
 
     return DEFAULT_SHOCKS
 
@@ -153,7 +168,21 @@ def replay_shocks(
     scale_to_base_vol: bool = True,
     periods_per_year: int = 252,
 ) -> pd.DataFrame:
-    """Rigioca gli shock storici sui rendimenti osservati e riporta le metriche."""
+    """Rigioca gli shock storici sui rendimenti osservati e riporta le metriche.
+
+    Args:
+        base_returns: Rendimento della strategia su cui effettuare lo stress
+            test.
+        scenarios: Elenco di scenari da applicare; ``None`` usa
+            :data:`DEFAULT_SHOCKS`.
+        scale_to_base_vol: Se ``True`` scala gli scenari per eguagliare la
+            volatilità della serie base.
+        periods_per_year: Numero di periodi utilizzati per annualizzare il CAGR.
+
+    Returns:
+        DataFrame ordinato per drawdown contenente le metriche principali per
+        ciascuno scenario.
+    """
 
     base_series = pd.Series(base_returns, dtype="float64")
     if base_series.empty:

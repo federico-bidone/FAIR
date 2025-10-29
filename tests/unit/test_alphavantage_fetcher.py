@@ -41,7 +41,7 @@ def test_parse_csv_returns_dataframe() -> None:
 
 def test_parse_json_rate_limit() -> None:
     fetcher = AlphaVantageFXFetcher(api_key="demo", throttle_seconds=0.0)
-    payload = "{" '"Note": "Thank you for using Alpha Vantage"' "}"
+    payload = '{"Note": "Thank you for using Alpha Vantage"}'
     with pytest.raises(ValueError, match="rate limit"):
         fetcher.parse(payload, "USD")
 

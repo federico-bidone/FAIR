@@ -248,8 +248,7 @@ def launch_gui(cfg: dict[str, Any] | None = None) -> None:
                 self._append_log(f"ETL failed: {exc}")
             else:
                 self._append_log(
-                    f"ETL complete: panel={artifacts.panel_path} "
-                    f"checksum={artifacts.checksum}"
+                    f"ETL complete: panel={artifacts.panel_path} checksum={artifacts.checksum}"
                 )
 
         def _run_factors(self) -> None:

@@ -3,9 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-
-"""Pipeline utilities to compute and validate factor libraries."""
-
 from dataclasses import asdict, dataclass
 from pathlib import Path
 

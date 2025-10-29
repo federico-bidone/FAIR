@@ -62,7 +62,7 @@ def _cluster_variance(cov: np.ndarray, indices: np.ndarray) -> float:
 
 
 def hrp_weights(Sigma: np.ndarray, labels: list[str]) -> np.ndarray:  # noqa: N802,N803
-    """Return intra-cluster HRP weights with equal factor budgets."""
+    """Restituisce pesi HRP intra-cluster con budget fattoriali uniformi."""
 
     sigma = np.asarray(Sigma, dtype=float)
     n = sigma.shape[0]

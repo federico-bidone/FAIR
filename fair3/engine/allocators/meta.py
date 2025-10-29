@@ -1,4 +1,4 @@
-"""Meta-learner combining generator outputs."""
+"""Meta-learner che combina gli output dei generatori."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ def fit_meta_weights(
     penalty_te: float,
     baseline_idx: int = 0,
 ) -> np.ndarray:
-    """Return convex combination of generator returns."""
+    """Restituisce una combinazione convessa dei rendimenti dei generatori."""
 
     sigma = np.asarray(sigma_matrix, dtype=float)
     returns_matrix = np.asarray(returns_by_gen, dtype=float)

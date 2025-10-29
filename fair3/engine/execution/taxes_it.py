@@ -1,4 +1,4 @@
-"""Italian tax primitives for execution."""
+"""Primitive fiscali italiane a supporto dell'esecuzione."""
 
 from __future__ import annotations
 
@@ -12,11 +12,11 @@ import pandas as pd
 
 @dataclass(frozen=True)
 class MinusLot:
-    """Represent a loss carry-forward amount with an expiry date.
+    """Rappresenta una minusvalenza riportabile con data di scadenza.
 
-    Attributes:
-      amount: Loss amount available for offsetting future gains.
-      expiry: Date when the loss expires (inclusive).
+    Attributi:
+      amount: Ammontare in perdita disponibile per compensare futuri guadagni.
+      expiry: Data in cui la perdita decade (inclusa).
     """
 
     amount: float
@@ -24,7 +24,7 @@ class MinusLot:
 
 
 class MinusBag:
-    """Track loss carry-forward amounts over the four-year Italian horizon."""
+    """Gestisce le minusvalenze riportabili sul periodo quadriennale italiano."""
 
     def __init__(self, lots: Iterable[MinusLot] | None = None) -> None:
         self._lots: list[MinusLot] = []
@@ -35,7 +35,7 @@ class MinusBag:
         self._lots = [lot for lot in self._lots if lot.expiry >= as_of]
 
     def consume(self, amount: float, as_of: dt.date) -> float:
-        """Consume available losses up to ``amount`` and return the utilised value."""
+        """Consuma minus fino a ``amount`` e restituisce quanto utilizzato."""
 
         if amount <= 0.0:
             return 0.0
@@ -57,7 +57,7 @@ class MinusBag:
         return float(sum(lot.amount for lot in consumed))
 
     def add_loss(self, amount: float, trade_date: dt.date) -> None:
-        """Store a new loss amount with four-year expiry from ``trade_date``."""
+        """Registra una nuova minus con scadenza quadriennale da ``trade_date``."""
 
         if amount <= 0.0:
             return
@@ -66,27 +66,27 @@ class MinusBag:
         self._lots.sort(key=lambda lot: lot.expiry)
 
     def snapshot(self) -> list[MinusLot]:
-        """Return a copy of the remaining loss lots."""
+        """Restituisce una copia delle minusvalenze residue."""
 
         return list(self._lots)
 
     @property
     def total(self) -> float:
-        """Total loss amount still available for offsetting."""
+        """Totale delle perdite ancora compensabili."""
 
         return float(sum(lot.amount for lot in self._lots))
 
 
 @dataclass(frozen=True)
 class TaxRules:
-    """Configuration bundle for Italian tax computations.
+    """Pacchetto di configurazione per i calcoli fiscali italiani.
 
-    Attributes:
-      method: Tax lot matching method (``fifo``, ``lifo``, ``min_tax``).
-      stamp_duty_rate: Pro-rata "bollo" duty rate applied to the portfolio value.
-      govies_threshold: Minimum government share triggering the 12.5% rate.
-      minus_bag: Optional loss carry container shared across periods.
-      portfolio_value: Current positive portfolio value used for stamp duty.
+    Attributi:
+      method: Metodo di abbinamento dei lotti fiscali (``fifo``, ``lifo``, ``min_tax``).
+      stamp_duty_rate: Aliquota pro-rata del bollo applicata al valore di portafoglio.
+      govies_threshold: Quota minima di governativi che attiva l'aliquota al 12,5%.
+      minus_bag: Contenitore opzionale di minus condiviso tra i periodi.
+      portfolio_value: Valore positivo di portafoglio usato per il calcolo del bollo.
     """
 
     method: str
@@ -98,15 +98,15 @@ class TaxRules:
 
 @dataclass(frozen=True)
 class TaxComputation:
-    """Structured summary of a tax computation.
+    """Riepilogo strutturato di un calcolo fiscale.
 
-    Attributes:
-      capital_gains_tax: Total capital gains tax due after offsets.
-      stamp_duty: Bollo computed from the configured portfolio value.
-      taxable_other: Remaining taxable gains taxed at 26%.
-      taxable_govies: Remaining taxable gains taxed at 12.5%.
-      minus_consumed: Losses consumed from the minus bag during the computation.
-      minus_added: New losses added to the minus bag with four-year expiry.
+    Attributi:
+      capital_gains_tax: Imposta complessiva sui capital gain dopo le compensazioni.
+      stamp_duty: Bollo calcolato sul valore di portafoglio configurato.
+      taxable_other: Guadagni tassabili residui al 26%.
+      taxable_govies: Guadagni tassabili residui al 12,5%.
+      minus_consumed: Minus utilizzate dal sacchetto durante il calcolo.
+      minus_added: Minus aggiunte al sacchetto con scadenza quadriennale.
     """
 
     capital_gains_tax: float
@@ -118,7 +118,7 @@ class TaxComputation:
 
     @property
     def total_tax(self) -> float:
-        """Return the total tax burden combining capital gains and stamp duty."""
+        """Restituisce il carico fiscale totale tra capital gain e bollo."""
 
         return self.capital_gains_tax + self.stamp_duty
 
@@ -128,19 +128,18 @@ def tax_penalty_it(
     govies_ratio: np.ndarray,
     stamp_duty_rate: float = 0.002,
 ) -> float:
-    """Estimate Italian-style tax penalties using aggregate PnL arrays.
+    """Stima le penalità fiscali italiane usando array aggregati di PnL.
 
     Args:
-      realized_pnl: Realised PnL per instrument expressed in currency units.
-      govies_ratio: Share of qualifying government securities (≥51% => 12.5% tax
-        rate) per instrument.
-      stamp_duty_rate: Pro-rata "bollo" duty rate applied to positive balances.
+      realized_pnl: PnL realizzato per strumento espresso in valuta.
+      govies_ratio: Quota di titoli governativi agevolati (≥51% ⇒ tassazione 12,5%) per strumento.
+      stamp_duty_rate: Aliquota pro-rata del bollo applicata ai saldi positivi.
 
     Returns:
-      Estimated tax penalty (capital gains plus stamp duty).
+      Penalità fiscale stimata (capital gain più bollo).
 
     Raises:
-      ValueError: If the arrays have mismatched shapes.
+      ValueError: Se gli array hanno dimensioni non coerenti.
     """
 
     pnl = np.asarray(realized_pnl, dtype=float)
@@ -172,25 +171,23 @@ def compute_tax_penalty(
     inventory: pd.DataFrame,
     tax_rules: TaxRules,
 ) -> TaxComputation:
-    """Compute Italian tax penalties using per-lot matching.
+    """Calcola le imposte italiane usando il matching lotto per lotto.
 
     Args:
-      orders: DataFrame with executed trades. Columns required: ``instrument_id``,
-        ``quantity`` (positive for buys, negative for sells), ``price``,
+      orders: DataFrame con le operazioni eseguite. Richiede le colonne ``instrument_id``,
+        ``quantity`` (positiva per acquisti, negativa per vendite), ``price``,
         ``trade_date``, ``govies_share``.
-      inventory: DataFrame describing current holdings. Columns required:
+      inventory: DataFrame che descrive le posizioni correnti. Richiede le colonne
         ``instrument_id``, ``lot_id``, ``quantity``, ``cost_basis``, ``acquired``,
         ``govies_share``.
-      tax_rules: Configuration bundle specifying matching method, stamp duty,
-        government threshold, optional minus bag, and portfolio value.
+      tax_rules: Pacchetto di configurazione con metodo di matching, bollo,
+        soglia governativi, eventuale sacchetto di minus e valore di portafoglio.
 
     Returns:
-      ``TaxComputation`` detailing taxable amounts, consumed/added losses, and
-      total taxes.
+      ``TaxComputation`` con importi tassabili, minus consumate/aggiunte e tasse totali.
 
     Raises:
-      ValueError: If inputs are missing required columns or if sells exceed
-        inventory quantities.
+      ValueError: Se mancano colonne richieste o se le vendite eccedono le quantità in inventario.
     """
 
     required_orders = {
@@ -304,17 +301,17 @@ def compute_tax_penalty(
 
 
 def _add_years(start: dt.date, years: int) -> dt.date:
-    """Return ``start`` advanced by ``years`` while handling leap years."""
+    """Restituisce ``start`` spostata di ``years`` gestendo gli anni bisestili."""
 
     try:
         return start.replace(year=start.year + years)
     except ValueError:
-        # Handle February 29th by falling back to February 28th.
+        # Gestiamo il 29 febbraio ripiegando sul 28 febbraio.
         return start.replace(month=2, day=28, year=start.year + years)
 
 
 def _coerce_date(value: object) -> dt.date:
-    """Convert supported date representations into ``datetime.date``."""
+    """Converte i formati supportati in un ``datetime.date``."""
 
     if isinstance(value, dt.date) and not isinstance(value, dt.datetime):
         return value
@@ -329,7 +326,7 @@ def _coerce_date(value: object) -> dt.date:
 
 
 def _sort_lots(lots: list[dict[str, object]], method: str) -> list[dict[str, object]]:
-    """Return lots sorted according to the selected matching method."""
+    """Restituisce i lotti ordinati secondo il metodo di matching scelto."""
 
     if method not in {"fifo", "lifo", "min_tax"}:
         raise ValueError(f"Unsupported tax matching method: {method}")
@@ -358,7 +355,7 @@ def _sort_lots(lots: list[dict[str, object]], method: str) -> list[dict[str, obj
 
 
 def _to_ordinal(value: object) -> int:
-    """Return the ordinal representation of a date-like object."""
+    """Restituisce la rappresentazione ordinale di un oggetto assimilabile a data."""
 
     date_value = _coerce_date(value)
     return date_value.toordinal()

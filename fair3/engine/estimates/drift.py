@@ -1,4 +1,4 @@
-"""Covariance drift diagnostics."""
+"""Diagnostica del drift di covarianza."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from numpy.typing import NDArray
 
 
 def frobenius_relative_drift(sigma_t: NDArray[np.float64], sigma_tm1: NDArray[np.float64]) -> float:
-    """Return the relative Frobenius norm drift between two covariance matrices."""
+    """Restituisce il drift relativo (norma di Frobenius) tra due covarianze."""
 
     if sigma_t.shape != sigma_tm1.shape:
         raise ValueError("Covariance matrices must share the same shape")
@@ -17,7 +17,7 @@ def frobenius_relative_drift(sigma_t: NDArray[np.float64], sigma_tm1: NDArray[np
 
 
 def max_corr_drift(corr_t: NDArray[np.float64], corr_tm1: NDArray[np.float64]) -> float:
-    """Compute the maximum absolute difference between correlation matrices."""
+    """Calcola la differenza assoluta massima tra matrici di correlazione."""
 
     if corr_t.shape != corr_tm1.shape:
         raise ValueError("Correlation matrices must share the same shape")

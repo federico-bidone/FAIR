@@ -7,15 +7,15 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class DecisionBreakdown:
-    """Structured summary of an execution decision.
+    """Riepilogo strutturato di una decisione di esecuzione.
 
-    Attributes:
-      execute: ``True`` when all decision gates pass and trades should execute.
-      drift_ok: Result of the drift-band check.
-      turnover_ok: Result of the turnover constraint check.
-      expected_benefit_lb: Expected benefit lower bound from the bootstrap.
-      total_costs: Aggregated transaction costs for the candidate trades.
-      total_taxes: Estimated tax penalty associated with the rebalance.
+    Attributi:
+      execute: ``True`` quando tutti i gate decisionali sono superati e va eseguito.
+      drift_ok: Esito del controllo sulle bande di drift.
+      turnover_ok: Esito del vincolo di turnover.
+      expected_benefit_lb: Limite inferiore dell'expected benefit dal bootstrap.
+      total_costs: Costi di transazione aggregati per i trade candidati.
+      total_taxes: Penalità fiscale stimata associata al ribilanciamento.
     """
 
     execute: bool
@@ -27,7 +27,7 @@ class DecisionBreakdown:
 
     @property
     def net_benefit(self) -> float:
-        """Return the net benefit after subtracting costs and taxes."""
+        """Restituisce il beneficio netto al netto di costi e tasse."""
 
         return self.expected_benefit_lb - self.total_costs - self.total_taxes
 
@@ -39,17 +39,17 @@ def should_trade(
     tax: float,
     turnover_ok: bool,
 ) -> bool:
-    """Evaluate the EB_LB − cost − tax > 0 gate with drift and turnover checks.
+    """Valuta il gate EB_LB − costi − tasse > 0 con i controlli di drift e turnover.
 
     Args:
-      drift_ok: Result of drift-band evaluation.
-      eb_lb: Expected benefit lower bound from the bootstrap distribution.
-      cost: Aggregated transaction cost for the trade list.
-      tax: Estimated tax penalty.
-      turnover_ok: Result of the turnover constraint evaluation.
+      drift_ok: Esito della valutazione sulle bande di drift.
+      eb_lb: Limite inferiore dell'expected benefit dalla distribuzione bootstrap.
+      cost: Costo di transazione aggregato per l'elenco ordini.
+      tax: Penalità fiscale stimata.
+      turnover_ok: Esito della valutazione sul vincolo di turnover.
 
     Returns:
-      ``True`` when all constraints pass and the net benefit remains positive.
+      ``True`` quando tutti i vincoli sono rispettati e il beneficio netto resta positivo.
     """
 
     return drift_ok and turnover_ok and (eb_lb - cost - tax) > 0.0
@@ -62,17 +62,17 @@ def summarise_decision(
     tax: float,
     turnover_ok: bool,
 ) -> DecisionBreakdown:
-    """Return a :class:`DecisionBreakdown` using :func:`should_trade`.
+    """Restituisce un :class:`DecisionBreakdown` usando :func:`should_trade`.
 
     Args:
-      drift_ok: Result of the drift-band evaluation.
-      eb_lb: Expected benefit lower bound from the bootstrap distribution.
-      cost: Aggregated transaction cost for the trade list.
-      tax: Estimated tax penalty.
-      turnover_ok: Result of the turnover constraint evaluation.
+      drift_ok: Esito della valutazione sulle bande di drift.
+      eb_lb: Limite inferiore dell'expected benefit dalla distribuzione bootstrap.
+      cost: Costo di transazione aggregato per l'elenco ordini.
+      tax: Penalità fiscale stimata.
+      turnover_ok: Esito della valutazione sul vincolo di turnover.
 
     Returns:
-      Structured decision summary including the net benefit.
+      Riepilogo decisionale strutturato che include il beneficio netto.
     """
 
     decision = should_trade(

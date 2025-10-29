@@ -1,4 +1,4 @@
-"""Tests for the optional PySide6 GUI orchestration layer."""
+"""Test per il layer opzionale di orchestrazione GUI basato su PySide6."""
 
 from __future__ import annotations
 
@@ -112,19 +112,19 @@ _LAST_WINDOWS: list[object] = []
 
 
 class _DummySignal:
-    """Minimal signal stub exposing a Qt-compatible connect API."""
+    """Segnale minimale che espone un'API ``connect`` compatibile Qt."""
 
     def __init__(self) -> None:
         self._callback: Callable[..., object] | None = None
 
     def connect(self, callback: Callable[..., object]) -> None:
-        """Store the callback without invoking it."""
+        """Memorizza la callback senza invocarla."""
 
         self._callback = callback
 
 
 class _DummyWidget:
-    """Base widget that ignores positional and keyword arguments."""
+    """Widget base che ignora argomenti posizionali e keyword."""
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         self._layout = None
@@ -158,7 +158,7 @@ class _DummyWidget:
 
 
 class _DummyPlainTextEdit(_DummyWidget):
-    """Plain text edit widget that records appended messages."""
+    """Widget di testo semplice che registra i messaggi aggiunti."""
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
@@ -172,7 +172,7 @@ class _DummyPlainTextEdit(_DummyWidget):
 
 
 class _DummyComboBox(_DummyWidget):
-    """Combo box storing the provided options for inspection."""
+    """Combo box che salva le opzioni fornite per l'ispezione."""
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
@@ -189,7 +189,7 @@ class _DummyComboBox(_DummyWidget):
 
 
 class _DummyLineEdit(_DummyWidget):
-    """Line edit recording the entered text value."""
+    """Campo di testo che memorizza il valore inserito."""
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
@@ -201,14 +201,14 @@ class _DummyLineEdit(_DummyWidget):
     def setText(self, value: str) -> None:  # noqa: N802
         self._text = value
 
-    def text(self) -> str:  # noqa: D401 - short getter description
-        """Return the stored string value."""
+    def text(self) -> str:
+        """Restituisce la stringa memorizzata."""
 
         return self._text
 
 
 class _DummyPushButton(_DummyWidget):
-    """Push button exposing a dummy clicked signal."""
+    """Pulsante che espone un segnale ``clicked`` fittizio."""
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
@@ -216,11 +216,11 @@ class _DummyPushButton(_DummyWidget):
 
 
 class _DummyLayout(_DummyWidget):
-    """Layout placeholder that ignores all operations."""
+    """Segnaposto di layout che ignora tutte le operazioni."""
 
 
 class _DummyApplication:
-    """Application stub returning immediately on exec()."""
+    """Applicazione fittizia che termina subito all'esecuzione."""
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         return None
@@ -230,7 +230,7 @@ class _DummyApplication:
 
 
 class _DummyMainWindow(_DummyWidget):
-    """Main window stub inheriting behaviour from the generic widget."""
+    """Finestra principale fittizia che eredita il comportamento del widget generico."""
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
@@ -238,7 +238,7 @@ class _DummyMainWindow(_DummyWidget):
 
 
 def _install_qt_stubs(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Inject PySide6.QtWidgets stubs into sys.modules."""
+    """Inietta gli stub di PySide6.QtWidgets in ``sys.modules``."""
 
     qtwidgets = ModuleType("PySide6.QtWidgets")
     qtwidgets.QApplication = _DummyApplication
@@ -260,7 +260,7 @@ def _install_qt_stubs(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def _last_message(window: object) -> str:
-    """Return the latest log message without the timestamp prefix."""
+    """Restituisce l'ultimo log senza il prefisso del timestamp."""
 
     if not window._log_output.text:  # pragma: no cover - defensive guard
         return ""
@@ -272,7 +272,7 @@ def _last_message(window: object) -> str:
 
 @pytest.fixture()
 def gui_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, object]:
-    """Create a GUI window with stubbed dependencies for interaction tests."""
+    """Crea una finestra GUI con dipendenze stub per i test di interazione."""
 
     _install_qt_stubs(monkeypatch)
     _LAST_WINDOWS.clear()
@@ -309,9 +309,7 @@ def gui_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, object
         def __init__(self, **kwargs: object) -> None:
             builder_calls.append({"init": kwargs})
 
-        def build(
-            self, *, seed: int, trace: bool
-        ) -> SimpleNamespace:  # noqa: D401 - interface parity
+        def build(self, *, seed: int, trace: bool) -> SimpleNamespace:
             builder_calls[-1]["build"] = {"seed": seed, "trace": trace}
             return SimpleNamespace(
                 panel_path=Path("asset_panel.parquet"),
@@ -417,7 +415,7 @@ def gui_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, object
 
 
 def test_launch_gui_missing_dependency(caplog: pytest.LogCaptureFixture) -> None:
-    """The GUI returns immediately when PySide6 is not installed."""
+    """La GUI termina immediatamente quando PySide6 non è installato."""
 
     sys.modules.pop("PySide6", None)
     caplog.set_level("INFO")
@@ -426,7 +424,7 @@ def test_launch_gui_missing_dependency(caplog: pytest.LogCaptureFixture) -> None
 
 
 def test_launch_gui_smoke_with_stubs(gui_env: dict[str, object]) -> None:
-    """A stubbed PySide6 environment allows the GUI to initialise."""
+    """Un ambiente PySide6 fittizio consente l'inizializzazione della GUI."""
 
     window = gui_env["window"]
     assert window._source_combo.currentText() == "stub_source"
@@ -434,7 +432,7 @@ def test_launch_gui_smoke_with_stubs(gui_env: dict[str, object]) -> None:
 
 
 def test_run_ingest_success(gui_env: dict[str, object]) -> None:
-    """Running ingest logs the artifact path and records the call."""
+    """L'esecuzione dell'ingest logga il percorso artefatto e registra la chiamata."""
 
     window = gui_env["window"]
     window._symbols_edit.setText("AAA, BBB")
@@ -452,7 +450,7 @@ def test_run_ingest_success(gui_env: dict[str, object]) -> None:
 
 
 def test_run_ingest_invalid_start(gui_env: dict[str, object]) -> None:
-    """Invalid start dates prevent ingest execution and surface guidance."""
+    """Date iniziali non valide impediscono l'esecuzione e mostrano istruzioni."""
 
     window = gui_env["window"]
     window._start_edit.setText("invalid-date")
@@ -462,7 +460,7 @@ def test_run_ingest_invalid_start(gui_env: dict[str, object]) -> None:
 
 
 def test_run_ingest_failure(gui_env: dict[str, object], monkeypatch: pytest.MonkeyPatch) -> None:
-    """Errors raised by run_ingest are captured and logged."""
+    """Gli errori sollevati da ``run_ingest`` vengono catturati e loggati."""
 
     def _boom(*args: object, **kwargs: object) -> None:
         raise RuntimeError("network down")
@@ -475,7 +473,7 @@ def test_run_ingest_failure(gui_env: dict[str, object], monkeypatch: pytest.Monk
 
 
 def test_run_etl_success(gui_env: dict[str, object]) -> None:
-    """The ETL helper builds panels and records builder usage."""
+    """L'helper ETL costruisce i pannelli e registra l'uso dei builder."""
 
     window = gui_env["window"]
     window._run_etl()
@@ -491,13 +489,13 @@ def test_run_etl_success(gui_env: dict[str, object]) -> None:
 
 
 def test_run_etl_failure(gui_env: dict[str, object], monkeypatch: pytest.MonkeyPatch) -> None:
-    """Builder failures are surfaced to the GUI log."""
+    """I fallimenti dei builder vengono riportati nel log della GUI."""
 
     class _ExplodingBuilder:
         def __init__(self, **_: object) -> None:
             return None
 
-        def build(self, *, seed: int, trace: bool) -> None:  # noqa: D401 - interface parity
+        def build(self, *, seed: int, trace: bool) -> None:
             raise RuntimeError(f"boom {seed} {trace}")
 
     monkeypatch.setattr(gui, "TRPanelBuilder", _ExplodingBuilder)
@@ -507,7 +505,7 @@ def test_run_etl_failure(gui_env: dict[str, object], monkeypatch: pytest.MonkeyP
 
 
 def test_run_factors_success(gui_env: dict[str, object]) -> None:
-    """The factor pipeline is invoked with default paths."""
+    """La pipeline fattoriale viene invocata con i percorsi di default."""
 
     window = gui_env["window"]
     window._run_factors()
@@ -534,7 +532,7 @@ def test_run_factors_failure(gui_env: dict[str, object], monkeypatch: pytest.Mon
 
 
 def test_run_estimate_success(gui_env: dict[str, object]) -> None:
-    """The estimate pipeline wires thresholds and sigma engine options."""
+    """La pipeline di stima collega soglie e opzioni del motore sigma."""
 
     window = gui_env["window"]
     window._run_estimate()
@@ -548,7 +546,7 @@ def test_run_estimate_success(gui_env: dict[str, object]) -> None:
 
 
 def test_run_estimate_failure(gui_env: dict[str, object], monkeypatch: pytest.MonkeyPatch) -> None:
-    """Failures in the estimate pipeline are propagated to the log widget."""
+    """I fallimenti della pipeline di stima vengono propagati al widget di log."""
 
     def _boom(**_: object) -> None:
         raise RuntimeError("estimate failure")
@@ -560,7 +558,7 @@ def test_run_estimate_failure(gui_env: dict[str, object], monkeypatch: pytest.Mo
 
 
 def test_run_mapping_success(gui_env: dict[str, object]) -> None:
-    """Mapping completes with deterministic defaults."""
+    """La pipeline di mapping si completa con default deterministici."""
 
     window = gui_env["window"]
     window._run_mapping()
@@ -574,7 +572,7 @@ def test_run_mapping_success(gui_env: dict[str, object]) -> None:
 
 
 def test_run_mapping_failure(gui_env: dict[str, object], monkeypatch: pytest.MonkeyPatch) -> None:
-    """Mapping errors are captured."""
+    """Gli errori di mapping vengono catturati."""
 
     def _boom(**_: object) -> None:
         raise RuntimeError("mapping failed")
@@ -586,7 +584,7 @@ def test_run_mapping_failure(gui_env: dict[str, object], monkeypatch: pytest.Mon
 
 
 def test_run_regime_success(gui_env: dict[str, object]) -> None:
-    """Regime pipeline outputs are acknowledged."""
+    """Gli output della pipeline di regime vengono riconosciuti."""
 
     window = gui_env["window"]
     window._run_regime()
@@ -599,7 +597,7 @@ def test_run_regime_success(gui_env: dict[str, object]) -> None:
 
 
 def test_run_regime_failure(gui_env: dict[str, object], monkeypatch: pytest.MonkeyPatch) -> None:
-    """Regime errors are logged for operator follow-up."""
+    """Gli errori della pipeline di regime vengono loggati per follow-up."""
 
     def _boom(**_: object) -> None:
         raise RuntimeError("regime failure")
@@ -611,7 +609,7 @@ def test_run_regime_failure(gui_env: dict[str, object], monkeypatch: pytest.Monk
 
 
 def test_run_goals_success(gui_env: dict[str, object]) -> None:
-    """Goal simulations use defaults and log weighted probability."""
+    """Le simulazioni degli obiettivi usano i default e loggano la probabilità pesata."""
 
     window = gui_env["window"]
     window._run_goals()
@@ -624,7 +622,7 @@ def test_run_goals_success(gui_env: dict[str, object]) -> None:
 
 
 def test_run_goals_no_config(gui_env: dict[str, object], monkeypatch: pytest.MonkeyPatch) -> None:
-    """An empty goal configuration produces a helpful log entry."""
+    """Una configurazione obiettivi vuota produce un log informativo."""
 
     monkeypatch.setattr(gui, "load_goal_configs_from_yaml", lambda _path: [])
     window = gui_env["window"]
@@ -633,7 +631,7 @@ def test_run_goals_no_config(gui_env: dict[str, object], monkeypatch: pytest.Mon
 
 
 def test_run_goals_failure(gui_env: dict[str, object], monkeypatch: pytest.MonkeyPatch) -> None:
-    """Errors surfaced by goal helper functions are logged."""
+    """Gli errori restituiti dagli helper degli obiettivi vengono loggati."""
 
     def _boom(_path: Path) -> None:
         raise FileNotFoundError("missing params")
@@ -645,7 +643,7 @@ def test_run_goals_failure(gui_env: dict[str, object], monkeypatch: pytest.Monke
 
 
 def test_open_report_empty(gui_env: dict[str, object]) -> None:
-    """Empty paths request user input instead of opening the browser."""
+    """Percorsi vuoti richiedono input utente invece di aprire il browser."""
 
     window = gui_env["window"]
     window._report_path_edit.setText("")
@@ -655,7 +653,7 @@ def test_open_report_empty(gui_env: dict[str, object]) -> None:
 
 
 def test_open_report_missing(gui_env: dict[str, object], tmp_path: Path) -> None:
-    """Non-existing report paths do not invoke the browser."""
+    """Percorsi report inesistenti non invocano il browser."""
 
     window = gui_env["window"]
     window._report_path_edit.setText(str(tmp_path / "missing.pdf"))
@@ -667,7 +665,7 @@ def test_open_report_missing(gui_env: dict[str, object], tmp_path: Path) -> None
 def test_open_report_failure(
     gui_env: dict[str, object], monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    """Browser errors are captured in the log for the operator."""
+    """Gli errori del browser vengono catturati nel log per l'operatore."""
 
     def _boom(url: str) -> bool:
         raise OSError(f"cannot open {url}")
@@ -682,7 +680,7 @@ def test_open_report_failure(
 
 
 def test_open_report_success(gui_env: dict[str, object], tmp_path: Path) -> None:
-    """Valid report paths trigger the browser helper."""
+    """Percorsi report validi attivano l'helper del browser."""
 
     window = gui_env["window"]
     report = tmp_path / "report.pdf"

@@ -21,7 +21,7 @@ from fair3.engine.goals import (
 
 
 def _sample_parameters() -> GoalParameters:
-    """Return representative goal parameters for testing."""
+    """Restituisce parametri obiettivo rappresentativi per i test."""
 
     return GoalParameters.from_mapping(
         {

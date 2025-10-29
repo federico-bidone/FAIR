@@ -16,7 +16,7 @@ class _DummyExcelFile:
     def __init__(self, data_map: dict[str, pd.DataFrame]) -> None:
         self._data_map = data_map
 
-    def __enter__(self) -> "_DummyExcelFile":  # pragma: no cover - trivial
+    def __enter__(self) -> _DummyExcelFile:  # pragma: no cover - trivial
         return self
 
     def __exit__(self, *_: object) -> bool:  # pragma: no cover - trivial
@@ -28,7 +28,9 @@ class _DummyExcelFile:
         return self._data_map[sheet_name]
 
 
-def test_parse_portfoliocharts_simba_normalizes_month_end(monkeypatch, tmp_path):
+def test_parse_portfoliocharts_simba_normalizes_month_end(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     """Verifica il parsing del workbook Simba con mapping di default."""
 
     data_series = pd.DataFrame(
@@ -80,7 +82,9 @@ def test_parse_portfoliocharts_simba_normalizes_month_end(monkeypatch, tmp_path)
     assert intl_stocks.iloc[0]["date"] == pd.Timestamp("2020-01-31")
 
 
-def test_portfoliocharts_fetcher_filters_and_metadata(monkeypatch, tmp_path):
+def test_portfoliocharts_fetcher_filters_and_metadata(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     """Verifica che il fetcher filtri per simbolo e propaghi i metadati."""
 
     workbook_path = tmp_path / portfoliocharts.DEFAULT_WORKBOOK_NAME
@@ -88,9 +92,7 @@ def test_portfoliocharts_fetcher_filters_and_metadata(monkeypatch, tmp_path):
 
     sample_data = pd.DataFrame(
         {
-            "date": pd.to_datetime(
-                ["2020-01-31", "2020-02-29", "2020-01-31", "2020-02-29"]
-            ),
+            "date": pd.to_datetime(["2020-01-31", "2020-02-29", "2020-01-31", "2020-02-29"]),
             "symbol": [
                 "US_LARGE_CAP",
                 "US_LARGE_CAP",
@@ -105,7 +107,9 @@ def test_portfoliocharts_fetcher_filters_and_metadata(monkeypatch, tmp_path):
         "US_MID_CAP": {"sheet": "Data_Series", "column": "US Mid Cap"},
     }
 
-    def _parse_stub(path: Path, *, mapping: object | None = None):  # noqa: D401
+    def _parse_stub(
+        path: Path, *, mapping: object | None = None
+    ) -> tuple[pd.DataFrame, dict[str, dict[str, str]]]:  # noqa: D401
         del path, mapping
         return sample_data, metadata_map
 
@@ -126,10 +130,9 @@ def test_portfoliocharts_fetcher_filters_and_metadata(monkeypatch, tmp_path):
     assert artifact.path.parent == raw_root / "portfoliocharts"
 
 
-def test_portfoliocharts_fetcher_missing_file(tmp_path):
+def test_portfoliocharts_fetcher_missing_file(tmp_path: Path) -> None:
     """Il fetcher solleva ``FileNotFoundError`` se il workbook manca."""
 
     fetcher = portfoliocharts.PortfolioChartsFetcher(manual_root=tmp_path)
     with pytest.raises(FileNotFoundError):
         fetcher.fetch(symbols=["US_LARGE_CAP"])
-

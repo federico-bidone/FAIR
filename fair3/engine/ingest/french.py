@@ -155,7 +155,7 @@ class FrenchFetcher(BaseCSVFetcher):
             raise ValueError(f"Unsupported French dataset: {symbol}") from exc
 
     def _select_member_name(self, archive: ZipFile) -> str:
-        """Return a deterministic member name from the archive contents."""
+        """Restituisce un nome di membro deterministico dal contenuto dell'archivio."""
 
         candidates = [name for name in archive.namelist() if not name.endswith("/")]
         if not candidates:
