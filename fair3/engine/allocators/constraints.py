@@ -1,4 +1,4 @@
-"""Constraint diagnostics for allocation engines."""
+"""Diagnostica dei vincoli per i motori di allocazione."""
 
 from __future__ import annotations
 
@@ -13,11 +13,11 @@ def erc_cluster_violation(
     clusters: list[list[int]],
     tol: float,  # noqa: N803
 ) -> float:
-    """Return the ERC cluster deviation minus tolerance.
+    """Restituisce la deviazione ERC dei cluster al netto della tolleranza.
 
-    Negative values indicate the deviation is within the acceptable tolerance
-    band. The helper works with ragged cluster definitions and ignores empty
-    clusters gracefully.
+    Valori negativi indicano che la deviazione rientra nella fascia di tolleranza
+    accettabile. L'helper funziona con cluster irregolari e ignora in modo
+    trasparente quelli vuoti.
     """
 
     if not clusters:

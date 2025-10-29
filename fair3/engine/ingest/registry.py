@@ -81,7 +81,7 @@ class BaseCSVFetcher:
         )
         self.session = session
 
-    # --- public API -----------------------------------------------------
+    # --- API pubblica ---------------------------------------------------
     def fetch(
         self,
         *,
@@ -232,7 +232,7 @@ class BaseCSVFetcher:
             self._persist_metadata(log_rows, instrument_rows, source_map_rows)
         return artifact
 
-    # --- subclass hooks -------------------------------------------------
+    # --- hook per sottoclassi ------------------------------------------
     def build_url(self, symbol: str, start: pd.Timestamp | None) -> str:
         """Hook di estensione: restituisce l'URL completo per un simbolo specifico."""
         raise NotImplementedError
@@ -241,7 +241,7 @@ class BaseCSVFetcher:
         """Hook di estensione: interpreta il payload in un DataFrame conforme."""
         raise NotImplementedError
 
-    # --- helpers --------------------------------------------------------
+    # --- helper --------------------------------------------------------
     def _download(
         self,
         url: str,

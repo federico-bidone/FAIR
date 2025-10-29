@@ -1,4 +1,4 @@
-"""Objectives used by allocation generators."""
+"""Obiettivi utilizzati dai generatori di allocazione."""
 
 from __future__ import annotations
 
@@ -6,10 +6,10 @@ import numpy as np
 
 
 def sharpe_objective(w: np.ndarray, mu: np.ndarray, Sigma: np.ndarray) -> float:  # noqa: N803
-    """Return the portfolio Sharpe ratio for ``w``.
+    """Restituisce lo Sharpe ratio di portafoglio per ``w``.
 
-    The routine is deterministic and guards against numerical underflow when the
-    variance term is nearly zero.
+    La routine è deterministica e protegge dal sottoscorimento numerico quando il
+    termine di varianza è quasi nullo.
     """
 
     w = np.asarray(w, dtype=float)
@@ -23,7 +23,7 @@ def sharpe_objective(w: np.ndarray, mu: np.ndarray, Sigma: np.ndarray) -> float:
 
 
 def dro_penalty(w: np.ndarray, rho: float) -> float:
-    """Simple 2-norm penalty used as Wasserstein DRO regulariser."""
+    """Penalità 2-norma semplice usata come regolarizzatore Wasserstein DRO."""
 
     w = np.asarray(w, dtype=float)
     rho = float(max(0.0, rho))

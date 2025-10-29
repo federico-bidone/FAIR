@@ -1,4 +1,4 @@
-"""Structured logging and metrics helpers for FAIR-III."""
+"""Utility per logging strutturato e metriche dedicate a FAIR-III."""
 
 from __future__ import annotations
 
@@ -20,10 +20,10 @@ LEVEL_ENV_FLAG: Final[str] = "FAIR_LOG_LEVEL"
 
 
 class JsonAuditFormatter(logging.Formatter):
-    """Format logging records as single-line JSON payloads."""
+    """Formatta i record di log come payload JSON monoriga."""
 
     def format(self, record: logging.LogRecord) -> str:
-        """Convert a record into a JSON string with audit-friendly fields."""
+        """Converte un record in una stringa JSON con campi adatti all'audit."""
 
         timestamp = datetime.fromtimestamp(record.created, tz=UTC).isoformat()
         payload = {
@@ -40,7 +40,7 @@ class JsonAuditFormatter(logging.Formatter):
 
 
 def _coerce_number(value: object) -> float | None:
-    """Cast arbitrary values to floats when possible."""
+    """Converte valori arbitrari in float quando possibile."""
 
     if value is None:
         return None
@@ -51,13 +51,13 @@ def _coerce_number(value: object) -> float | None:
 
 
 def _ensure_audit_dir() -> None:
-    """Create the audit directory lazily to support CLI-first usage."""
+    """Crea la cartella di audit in modo pigro per supportare l'uso da CLI."""
 
     AUDIT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def _resolve_level(level: str | int | None) -> int:
-    """Resolve the logging level using CLI/environment preferences."""
+    """Determina il livello di log usando preferenze CLI o d'ambiente."""
 
     env_level = os.environ.get(LEVEL_ENV_FLAG)
     if env_level:
@@ -73,7 +73,7 @@ def _resolve_level(level: str | int | None) -> int:
 
 
 def _json_logging_enabled(explicit: bool) -> bool:
-    """Return True when JSON logging is requested by flag or environment."""
+    """Restituisce ``True`` quando il logging JSON è richiesto da flag o ambiente."""
 
     if explicit:
         return True
@@ -84,7 +84,7 @@ def _json_logging_enabled(explicit: bool) -> bool:
 
 
 def _ensure_console_handler(logger: logging.Logger, level: int) -> None:
-    """Attach a console handler if the logger does not already have one."""
+    """Aggancia un handler console se il logger non ne possiede già uno."""
 
     for handler in logger.handlers:
         if getattr(handler, "_fair3_console", False):
@@ -98,7 +98,7 @@ def _ensure_console_handler(logger: logging.Logger, level: int) -> None:
 
 
 def _ensure_json_handler(logger: logging.Logger, level: int) -> None:
-    """Attach a JSON file handler when requested."""
+    """Collega un handler JSON su file quando richiesto."""
 
     for handler in logger.handlers:
         if getattr(handler, "_fair3_json", False):
@@ -117,13 +117,13 @@ def setup_logger(
     json_format: bool = False,
     level: str | int | None = None,
 ) -> logging.Logger:
-    """Configure and return a structured logger for FAIR-III modules."""
+    """Configura e restituisce un logger strutturato per i moduli FAIR-III."""
 
     resolved_level = _resolve_level(level)
     logger = logging.getLogger(name)
     logger.setLevel(resolved_level)
-    # Propagate to parent loggers to support capture handlers (e.g. pytest caplog)
-    # while still emitting through FAIR-III specific handlers.
+    # Propaghiamo ai logger genitori così da supportare gli handler di cattura
+    # (ad esempio ``pytest caplog``) mantenendo comunque gli handler specifici FAIR-III.
     logger.propagate = True
     _ensure_console_handler(logger, resolved_level)
     if _json_logging_enabled(json_format):
@@ -132,7 +132,7 @@ def setup_logger(
 
 
 def record_metrics(metric_name: str, value: float, tags: Mapping[str, str] | None = None) -> None:
-    """Append a metric observation to the audit metrics log."""
+    """Aggiunge un'osservazione di metrica al log di audit delle metriche."""
 
     _ensure_audit_dir()
     payload = {
@@ -146,7 +146,7 @@ def record_metrics(metric_name: str, value: float, tags: Mapping[str, str] | Non
 
 
 def configure_cli_logging(json_logs: bool, level: str | int | None = None) -> None:
-    """Reconfigure existing FAIR-III loggers for CLI execution."""
+    """Riconfigura i logger FAIR-III esistenti per l'esecuzione via CLI."""
 
     if json_logs:
         os.environ[JSON_ENV_FLAG] = "1"

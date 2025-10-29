@@ -24,5 +24,5 @@ def test_clip_trades_to_adv_limits_notional() -> None:
     caps = max_trade_notional(adv, prices, cap)
     trade_value = np.abs(adjusted) * portfolio_value
     assert np.all(trade_value <= caps + 1e-8)
-    # Signs preserved
+    # Il segno dei trade viene preservato
     assert np.all(np.sign(adjusted) == np.sign(delta_w))

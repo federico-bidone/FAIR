@@ -15,7 +15,7 @@ def drift_bands_exceeded(
     rc_new: np.ndarray,
     band: float,
 ) -> bool:
-    """Return ``True`` when weight or risk contribution drift exceeds ``band``."""
+    """Restituisce ``True`` se il drift di peso o di contributo di rischio supera ``band``."""
 
     w_old = np.asarray(w_old, dtype=float)
     w_new = np.asarray(w_new, dtype=float)
@@ -40,7 +40,7 @@ def expected_benefit(
     w_old: np.ndarray,
     w_new: np.ndarray,
 ) -> float:
-    """Compute a lower-bound expected benefit from trading."""
+    """Calcola un expected benefit minimo per l'operatività proposta."""
 
     delta_w = np.asarray(delta_w, dtype=float)
     mu_instr = np.asarray(mu_instr, dtype=float)

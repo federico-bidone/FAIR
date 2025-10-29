@@ -4,7 +4,7 @@ import numpy as np
 
 
 def max_trade_notional(adv: np.ndarray, prices: np.ndarray, cap_ratio: float) -> np.ndarray:
-    """Return the notional trade cap implied by ADV limits."""
+    """Restituisce il tetto nozionale imposto dai limiti ADV."""
 
     if cap_ratio < 0:
         raise ValueError("cap_ratio must be non-negative")
@@ -22,7 +22,7 @@ def clip_trades_to_adv(
     prices: np.ndarray,
     cap_ratio: float,
 ) -> np.ndarray:
-    """Scale trade vector so ADV caps are not breached."""
+    """Ridimensiona il vettore dei trade così da non violare i limiti ADV."""
 
     if portfolio_value < 0:
         raise ValueError("portfolio_value must be non-negative")
@@ -33,6 +33,6 @@ def clip_trades_to_adv(
     trade_value = np.abs(delta) * portfolio_value
     limit = np.maximum(caps, 1e-12)
     scale = np.minimum(1.0, limit / np.maximum(trade_value, 1e-12))
-    # preserve sign
+    # preserviamo il segno
     adjusted = delta * scale
     return adjusted

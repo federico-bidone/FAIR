@@ -51,7 +51,7 @@ def _allocate(cov: np.ndarray, order: list[int]) -> np.ndarray:
 
 
 def generator_B_hrp(Sigma: np.ndarray) -> np.ndarray:  # noqa: N802,N803
-    """Return an HRP allocation for covariance ``Sigma``."""
+    """Restituisce un'allocazione HRP per la covarianza ``Sigma``."""
 
     sigma = np.asarray(Sigma, dtype=float)
     n = sigma.shape[0]

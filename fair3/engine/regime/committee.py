@@ -1,4 +1,4 @@
-"""Committee helpers for the enhanced regime probability engine."""
+"""Utility del comitato per il motore di probabilità di regime avanzato."""
 
 from __future__ import annotations
 
@@ -25,12 +25,12 @@ LOG = setup_logger(__name__)
 
 @dataclass(frozen=True)
 class CommitteeWeights:
-    """Weights applied to each regime committee component.
+    """Pesi applicati a ciascun componente del comitato di regime.
 
-    Attributes:
-      hmm: Weight assigned to the HMM over market returns.
-      volatility: Weight assigned to the volatility HSMM component.
-      macro: Weight assigned to the macro slowdown trigger.
+    Attributi:
+      hmm: Peso assegnato all'HMM sui rendimenti di mercato.
+      volatility: Peso assegnato al componente HSMM di volatilità.
+      macro: Peso assegnato al trigger macro di rallentamento.
     """
 
     hmm: float = 0.5
@@ -38,13 +38,13 @@ class CommitteeWeights:
     macro: float = 0.2
 
     def normalised(self) -> tuple[float, float, float]:
-        """Return the tuple of weights normalised to sum to one.
+        """Restituisce la terna di pesi normalizzata a sommare a uno.
 
         Returns:
-          Tuple ``(w_hmm, w_volatility, w_macro)`` that sums to one.
+          La tupla ``(w_hmm, w_volatility, w_macro)`` che somma a uno.
 
         Raises:
-          ValueError: If the aggregate weight is not strictly positive.
+          ValueError: Se il peso complessivo non è strettamente positivo.
         """
 
         total = float(self.hmm + self.volatility + self.macro)
@@ -55,13 +55,13 @@ class CommitteeWeights:
 
     @classmethod
     def from_mapping(cls, payload: Mapping[str, object] | None) -> CommitteeWeights:
-        """Create weights from an arbitrary mapping.
+        """Crea i pesi partendo da una mappatura arbitraria.
 
         Args:
-          payload: Mapping with optional ``hmm``, ``volatility`` and ``macro`` keys.
+          payload: Mapping con eventuali chiavi ``hmm``, ``volatility`` e ``macro``.
 
         Returns:
-          :class:`CommitteeWeights` populated with the provided values or defaults.
+          :class:`CommitteeWeights` popolato con i valori forniti o con i default.
         """
 
         if not payload:
@@ -74,7 +74,7 @@ class CommitteeWeights:
 
 
 def _coerce_mapping(payload: object) -> dict[str, Any]:
-    """Convert arbitrary payloads (e.g. pydantic models) into dictionaries."""
+    """Converte payload arbitrari (es. modelli pydantic) in dizionari."""
 
     if payload is None:
         return {}
@@ -88,7 +88,7 @@ def _coerce_mapping(payload: object) -> dict[str, Any]:
 
 
 def _extract_section(panel: pd.DataFrame, field: str) -> pd.DataFrame:
-    """Return the panel section for ``field`` handling multi-index columns."""
+    """Restituisce la sezione del pannello per ``field`` gestendo colonne multi-index."""
 
     if panel.empty:
         return pd.DataFrame()
@@ -108,7 +108,7 @@ def _extract_section(panel: pd.DataFrame, field: str) -> pd.DataFrame:
 
 
 def _ensure_datetime_index(index: pd.Index) -> pd.DatetimeIndex:
-    """Convert an arbitrary index to a :class:`~pandas.DatetimeIndex`."""
+    """Converte un indice arbitrario in un :class:`~pandas.DatetimeIndex`."""
 
     if isinstance(index, pd.DatetimeIndex):
         return index
@@ -116,7 +116,7 @@ def _ensure_datetime_index(index: pd.Index) -> pd.DatetimeIndex:
 
 
 def _fit_hmm(series: pd.Series, seed: int) -> tuple[pd.Series, pd.Series]:
-    """Fit a two-state Gaussian HMM returning crisis probabilities and states."""
+    """Stima un HMM gaussiano a due stati restituendo probabilità e stati di crisi."""
 
     if series.empty:
         empty_index = pd.Index(series.index, dtype="datetime64[ns]")
@@ -433,16 +433,16 @@ def crisis_probability(
     macro: pd.DataFrame,
     weights: CommitteeWeights | None = None,
 ) -> pd.Series:
-    """Compatibility wrapper returning the combined crisis probability series.
+    """Wrapper di compatibilità che restituisce la serie di probabilità di crisi.
 
     Args:
-      returns: Return panel indexed by timestamp.
-      vol: Volatility proxy aligned with ``returns``.
-      macro: Macro indicators aligned with ``returns``.
-      weights: Optional committee weights overriding the defaults.
+      returns: Pannello di rendimenti indicizzato per timestamp.
+      vol: Proxy di volatilità allineato con ``returns``.
+      macro: Indicatori macroeconomici allineati con ``returns``.
+      weights: Pesi opzionali del comitato in override ai valori di default.
 
     Returns:
-      Series with the crisis probability in ``[0, 1]``.
+      Serie con la probabilità di crisi in ``[0, 1]``.
     """
 
     weights = weights or CommitteeWeights()

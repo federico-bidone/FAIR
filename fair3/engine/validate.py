@@ -1,11 +1,10 @@
-"""Validation utilities for FAIR-III configuration files.
+"""Utility di validazione per i file di configurazione FAIR-III.
 
-This module intentionally avoids optional runtime dependencies such as
-``pydantic`` so that the configuration validator remains available in minimal
-environments.  The validation logic focuses on the configuration fields that
-are consumed by the CLI and downstream pipelines.  Whenever an entry is
-missing or invalid, the validator records human readable diagnostics while
-returning the subset of sections that passed validation.
+Il modulo evita volutamente dipendenze opzionali come ``pydantic`` così che il
+validatore resti disponibile anche in ambienti minimali. La logica di controllo
+si concentra sui campi di configurazione utilizzati dalla CLI e dalle pipeline
+successive. Quando un elemento manca o non è valido, il validatore registra
+diagnostiche leggibili e restituisce solo le sezioni che hanno superato i test.
 """
 
 from __future__ import annotations
@@ -22,13 +21,12 @@ __all__ = ["ValidationSummary", "validate_configs"]
 
 @dataclass(slots=True)
 class ValidationSummary:
-    """Aggregate structure returning validation diagnostics and parsed configs.
+    """Struttura aggregata con diagnostiche di validazione e config normalizzate.
 
-    Attributes:
-      errors: Collection of error messages detected during schema validation.
-      warnings: Soft diagnostics that highlight potential configuration issues.
-      configs: Mapping between config label and the normalised payload obtained
-        after validation.
+    Attributi:
+      errors: Collezione di messaggi di errore emersi durante la validazione.
+      warnings: Diagnostiche leggere che evidenziano potenziali problemi di config.
+      configs: Mappatura tra etichetta di config e payload normalizzato post validazione.
     """
 
     errors: list[str] = field(default_factory=list)
@@ -37,13 +35,13 @@ class ValidationSummary:
 
 
 def _is_number(value: Any) -> bool:
-    """Return ``True`` if ``value`` is a real number (excluding booleans)."""
+    """Restituisce ``True`` se ``value`` è un numero reale (escludendo i boolean)."""
 
     return isinstance(value, int | float) and not isinstance(value, bool)
 
 
 def _is_string(value: Any) -> bool:
-    """Return ``True`` if ``value`` is a non-empty string."""
+    """Restituisce ``True`` se ``value`` è una stringa non vuota."""
 
     return isinstance(value, str) and value.strip() != ""
 
@@ -122,7 +120,7 @@ def _normalise_str_list(
     path: str,
     errors: list[str],
 ) -> list[str]:
-    """Return a list of strings ensuring each entry is valid."""
+    """Restituisce un elenco di stringhe assicurando che ogni voce sia valida."""
 
     if value is None:
         return []
