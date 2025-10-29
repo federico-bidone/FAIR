@@ -2,6 +2,8 @@
 
 > Strumento informativo/didattico; non costituisce consulenza finanziaria o raccomandazione.
 
+CAZZI
+
 > **Solo didattico** — Questo repository fornisce un'implementazione di ricerca e apprendimento del quadro di costruzione del portfolio FAIR-III.**Non** è una raccomandazione di investimento, una promozione finanziaria o una consulenza personalizzata ai sensi della MiFID II.
 
 ## Panoramica
