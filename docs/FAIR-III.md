@@ -1,226 +1,226 @@
-# FAIR-III Methodology
+# Metodologia FAIR-III
 
-## Macro Factors Stack (PR-05)
-The FAIR-III factor engine synthesises ten macro premia, blending cross-sectional long/short spreads and macro overlays. Each factor is anchored to an expected economic sign and built off the point-in-time panel generated in PR-04.
+## Stack dei fattori macro (PR-05)
+Il motore dei fattori FAIR-III sintetizza dieci premi macro, combinando spread trasversali lunghi/corti e sovrapposizioni macro. Ciascun fattore è ancorato a un segno economico atteso e costruito in base al pannello point-in-time generato in PR-04.
 
-- **Global Market (`global_mkt`)** – equal-weight beta proxy.
-- **Global Momentum / Growth Cycle** – high-minus-low trailing log returns and improving short-term momentum captures.
-- **Short-Term Reversal / Value Rebound** – contrarian tilts exploiting lagged underperformance.
-- **Carry Roll-Down** – 5d–21d momentum spread as a roll premium proxy.
-- **Quality & Defensive Stability** – low-volatility and momentum-per-unit-risk exposures.
-- **Liquidity Risk** – high-minus-low volatility cohort spread.
-- **Inflation Hedge / Rates Beta** – macro overlays driven by inflation and policy-rate surprises (fallback to zeros when macro data absent).
+- **Mercato globale (`global_mkt`)** – proxy beta di uguale ponderazione.
+- **Momentum globale/Ciclo di crescita** – rendimenti log finali alti-mini-bassi e acquisizioni di momentum a breve termine migliorate.
+- **Inversione a breve termine/rimbalzo del valore** –inclinazioni contrarian che sfruttano la sottoperformance ritardata.
+- **Carry Roll-Down** – spread di momentum 5-21 giorni come proxy roll premium.
+- **Qualità e stabilità difensiva** – esposizioni a bassa volatilità e momentum per unità di rischio.
+- **Rischio di liquidità** – spread di coorte con volatilità alta-bassa.
+- **Copertura dall'inflazione/Beta dei tassi** – sovrapposizioni macro guidate da sorprese sull'inflazione e sui tassi ufficiali (ripiego a zero in assenza di dati macro).
 
-Each factor series è generata deterministicamente via `FactorLibrary` e salvata da
-`run_factor_pipeline` (`fair3 factors`) che registra anche metadata (`FactorDefinition.expected_sign`)
+Ogni serie di fattori è generata deterministicamente tramite `FactorLibrary` e salvata da
+`run_factor_pipeline`(`fair3 factors`) che registra anche metadata (`FactorDefinition.expected_sign`)
 e diagnostiche CP-CV/FDR per audit e compliance.
 
 ### Validation & Controls
-- **Cross-Purged CV (CP-CV)** with embargo ensures no look-ahead in factor testing.
-- **Deflated Sharpe Ratio (DSR)** quantifies statistical significance of Sharpe estimates.
-- **White Reality Check (permutation bootstrap)** guards against data mining, with FDR Benjamini–Hochberg filtering to control false discoveries across the library.
-- **Orthogonality Guardrails** merge highly correlated factors (|ρ| > τ) and apply PCA rotation when the correlation matrix condition number exceeds the tolerance in `configs/thresholds.yml`.
+- **Cross-Purged CV (CP-CV)** con embargo garantisce l'assenza di look-ahead nei factor testing.
+- **Deflated Sharpe Ratio (DSR)** quantifica la significatività statistica diStime di Sharpe.
+- **White Reality Check (bootstrap di permutazione)** protegge dal data mining, con il filtro FDR Benjamini–Hochberg per controllare le false scoperte nella libreria.
+- **Guardrail di ortogonalità** uniscono fattori altamente correlati (|ρ| > τ) e applicano la rotazione PCA quando il numero di condizione della matrice di correlazione supera la tolleranza nel `configs/thresholds.yml`.
 
-## Expected-Returns Engine (PR-07)
-The μ stack follows a deterministic ensemble design:
+## Motore dei rendimenti attesi(PR-07)
+Lo stack μ segue un design d'insieme deterministico:
 
-- **Shrink-to-zero baseline:** sample means shrinked towards 0 with intensity
-  tied to T/N, ensuring stability when history is short.
-- **Bagging OLS:** bootstrapped linear models on lagged macro + return features
-  provide low-variance conditional forecasts.
-- **Gradient boosting:** shallow trees with early stopping capture light
-  nonlinearities without sacrificing reproducibility.
-- **Ridge stacking:** non-negative ridge regression combines the base learners,
-  using time-series cross-validation folds to calibrate the mix.
-- **Black–Litterman blend:** `reverse_opt_mu_eq` infers equilibrium returns from
-  Σ and market weights; `blend_mu` enforces the ω:=1 fallback whenever the view
-  information ratio breaches `tau.IR_view` in `configs/thresholds.yml`.
+- **Baseline ridotta a zero:** campione significa ridotto verso 0 con intensità
+  legato a T/N, garantendo stabilità quando la cronologia è breve.
+- **Bagging OLS:** modelli lineari bootstrap su macro ritardate + funzionalità di restituzione
+  forniscono previsioni condizionali a bassa varianza.
+- **Potenziamento del gradiente:** alberi poco profondi con arresto anticipato della cattura della luce
+  non linearità senza sacrificare la riproducibilità.
+- **impilamento della cresta:** la regressione della cresta non negativa combina gli studenti di base,
+  utilizzando pieghe di convalida incrociata di serie temporali per calibrare il mix.
+- **Miscela Black–Litterman:** `reverse_opt_mu_eq` deduce rendimenti di equilibrioda
+  Σ e pesi di mercato; `blend_mu` applica il fallback ω:=1 ogni volta che il rapporto informazioni
+  viola `tau. IR_view` in `configs/thresholds.yml`.
 
 `run_estimate_pipeline` (`fair3 estimate`) persiste `mu_post.csv`, `mu_star.csv`,
 `mu_eq.csv`, `sigma.npy` e `blend_log.csv` con ω e IR_view per audit trail, oltre a
-`risk/sigma_drift_log.csv` quando confronta stime consecutive.
+`risk/sigma_drift_log.csv` quando confronta tempi consecutivi.
 
 ## Covariance Engine (PR-06)
-The covariance stack combines multiple estimators to maintain PSD structure and
-monitor structural drift:
+Il covariance stack combina più stimatori per mantenere la struttura PSD e
+monitorare la strutturaderiva:
 
-- **Ledoit–Wolf shrinkage** towards the identity baseline.
-- **Graphical lasso** with BIC model selection to promote sparse precision
-  matrices.
-- **Factor shrinkage** from leading eigenvectors plus positive idiosyncratic
-  noise.
-- **Element-wise median** aggregation followed by **Higham PSD projection**.
-- **Geometric SPD median** optional consensus (`--sigma-engine spd_median`) computed
-  via affine-invariant gradient descent with Higham fallback on non-convergence.
-- **EWMA regime blending** with configurable `lambda_r` to smooth transitions
-  while enforcing PSD at every step.
-- **Drift diagnostics** (`frobenius_relative_drift`, `max_corr_drift`) feed the
-  acceptance gates in `configs/thresholds.yml`.
+- **Ritiro Ledoit–Wolf** verso la linea di base dell'identità.
+- **Lazo grafico** con selezione del modello BIC per promuovere matrici di precisione sparsa
+  .
+- **Contrazione del fattore** da autovettori principali più rumore idiosincratico positivo
+  .
+- **Aggregazione mediana per elementi** seguita da **Proiezione PSD di Higham**.
+- **Mediana SPD geometrica** consenso opzionale (`--sigma-engine spd_median`) calcolato
+  tramite discesa del gradiente affine-invariante con fallback di Higham sunon convergenza.
+- **Combinazione del regime EWMA** con `lambda_r` configurabile per agevolare le transizioni
+  applicando al tempo stesso la PSD in ogni fase.
+- **Diagnostica della deriva** (`frobenius_relative_drift`, `max_corr_drift`) alimenta il
+  gate di accettazione in `configs/thresholds.yml`.
 
 Gli artefatti sono scritti direttamente in `artifacts/estimates/` e accompagnati
 da snapshot seed/config attraverso `reporting.audit`.
 
 ## Allocation Stack (PR-08)
-The allocation layer introduces four deterministic generators plus a meta-learner:
+Il livello di allocazione introduce quattro generatori deterministici più un meta-leaner:
 
-- **Generator A (Sharpe + constraints):** solves a convex programme that maximises expected return penalised by a Wasserstein DRO radius, while enforcing long-only weights, turnover/gross leverage caps, and scenario-based CVaR95/EDaR risk limits. ERC cluster balancing is applied post-solve to honour tolerance `tau.rc_tol`.
-- **Generator B (HRP):** classical hierarchical risk parity baseline using Ward linkage and quasi-diagonalisation, serving as the retail benchmark and acceptance-gate reference.
-- **Generator C (DRO closed form):** ridge-regularised inverse of Σ scaled by risk aversion `γ` and penalty `ρ`, yielding a fast fallback when solver resources are constrained.
-- **Generator D (CVaR-ERC):** minimises scenario CVaR subject to turnover/leverage caps and ERC cluster balancing for tail-risk sensitive allocations.
-- **Meta learner:** fits non-negative simplex weights over generator PnLs with quadratic risk penalty and turnover/TE penalties relative to a baseline generator (default HRP).
+- **Generatore A (Sharpe + vincoli):**risolve un programma convesso che massimizza il rendimento atteso penalizzato da un raggio DRO di Wasserstein, applicando al contempo pesi long-only, limiti di fatturato/leva lorda e limiti di rischio CVaR95/EDaR basati su scenari. Il bilanciamento del cluster ERC viene applicato dopo la risoluzione per onorare la tolleranza `tau.rc_tol`.
+- **Generatore B (HRP):** linea di base di parità di rischio gerarchica classica utilizzando collegamento Ward e quasi-diagonalizzazione, che funge da benchmark al dettaglio e riferimento del gate di accettazione.
+- **Generatore C (forma chiusa DRO):** inverso regolarizzato in cresta di Σ scalato in base all'avversione al rischio `γ` e penalità`ρ`, ottenendo un rapido fallback quando le risorse del risolutore sono limitate.
+- **Generatore D (CVaR-ERC):** riduce al minimo il CVaR dello scenario soggetto a limiti di turnover/leva e bilanciamento del cluster ERC per allocazioni sensibili al rischio di coda.
+- **Meta learner:** adatta pesi simplex non negativi ai PnL del generatore con penalità di rischio quadratico e penalità di turnover/TE relative a un generatore di base (HRP predefinito).
 
-Il pipeline `run_optimization_pipeline` (`fair3 optimize`) genera CSV per ciascun
+Il pipeline `run_optimization_pipeline`(`fair3 optimize`) genera CSV per ciascun
 motore, l'allocazione finale, diagnostiche ERC e, se richiesto, `meta_weights.csv`,
 registrando audit snapshot e checksum.
 
 ## Mapping & Liquidity (PR-09)
-The mapping layer translates factor weights into implementable instruments while
-respecting UCITS liquidity guardrails:
+Il livello di mappatura traduce i pesi fattoriali in strumenti implementabili mentre
+rispettando i guardrail di liquidità degli OICVM:
 
-- **Rolling ridge betas:** `rolling_beta_ridge` centres each window, applies
-  ridge parameter `lambda_beta`, and stores estimator metadata for downstream
-  bootstrap diagnostics. Optional sign constraints enforce economic priors.
-- **Bootstrap confidence intervals:** `beta_ci_bootstrap` resamples windows with
-  deterministic RNG streams to compute CI80 ranges used to cap noisy betas when
+- **Beta Rolling Ridge:** `rolling_beta_ridge` centra ciascuna finestra, applica
+  parametro Ridge `lambda_beta` e memorizza i metadati dello stimatore per la diagnostica bootstrap downstream
+  .I vincoli di segno opzionali applicano i valori a priori economici.
+- **Intervalli di confidenza bootstrap:** `beta_ci_bootstrap` ricampiona le finestre con
+  flussi RNG deterministici per calcolare gli intervalli CI80 utilizzati per limitare i beta rumorosi quando
   `width > tau.beta_CI_width`.
-- **CI-driven caps:** `cap_weights_by_beta_ci` scales instrument weights when
-  CI80 widths breach `tau.beta_CI_width`, preserving the budget after
-  renormalisation.
-- **Intra-factor HRP:** `hrp_weights` splits instrument clusters by factor label
-  and assigns equal cluster budgets before running HRP within each group.
-- **Tracking-error budgets:** `enforce_te_budget` clamps factor deviations to
-  `TE_max_factor`, while `enforce_portfolio_te_budget` shrinks mapped weights
-  toward a baseline (e.g., HRP) to satisfy the same tolerance.
-- **ADV caps:** `clip_trades_to_adv` converts proposed trade weights into
-  notional terms and rescales them to obey ADV percentage limits while
-  preserving trade direction.
+- **Caps basati su CI:** `cap_weights_by_beta_ci` scala i pesi degli strumentiquando
+  CI80 allarga la breccia `tau.beta_CI_width`, preservando il budget dopo
+  rinormalizzazione.
+- **HRP intra-fattore:** `hrp_weights` divide i quadri strumenti in base all'etichetta del fattore
+  e assegna budget cluster uguali prima di eseguire l'HRP all'interno di ciascun gruppo.
+- **Budget degli errori di tracciamento:** `enforce_te_budget` limita le deviazioni dei fattori a
+  `TE_max_factor`, mentre `enforce_portfolio_te_budget` riduce la mappaturapondera
+  verso una linea di base (ad esempio, HRP) per soddisfare la stessa tolleranza.
+- **Limiti ADV:** `clip_trades_to_adv` converte i pesi commerciali proposti in
+  termini nozionali e li ridimensiona per rispettare i limiti percentuali ADV mentre
+  preservando la direzione commerciale.
 
 `run_mapping_pipeline` (`fair3 map`) scrive i rolling betas, le CI80, il riassunto di
 tracking-error e `weights/instrument_allocation.csv`, aggiornando i log di audit per
 beta, TE e clip ADV prima dell'esecuzione.
 
 ## Regime Overlay (PR-10)
-The regime layer guards allocations with a deterministic crisis-probability
-committee and hysteresis controls:
+The regimeallocazioni di layer guards con una probabilità di crisi deterministica
+comitato e controlli di isteresi:
 
-- **Committee signals:** equal-weight market returns feed a fixed two-state
-  Gaussian HMM, volatility stress is derived from rolling-median normalised
-  volatility ratios, and macro slowdown scores come from standardised deltas of
-  macro indicators. Component weights default to (0.5, 0.3, 0.2) and are
-  normalised for auditability.
-- **Probability governance:** outputs are clipped to \[0, 1\] and logged for
-  downstream acceptance gates. Missing inputs revert to neutral priors to keep
-  the overlay deterministic.
-- **Hysteresis + dwell:** `apply_hysteresis` enforces on/off thresholds (default
-  on=0.65, off=0.45), minimum dwell (20 trading days), and cooldown (10 days)
-  before re-entry. This prevents rapid flip-flops during choppy markets.
-- **Tilt mapping:** `tilt_lambda` linearly maps crisis probabilities to tilt
-  weights in \[0, 1\], blending baseline and crisis allocations in execution.
+- **Segnali del comitato:** rendimenti di mercato di pari peso alimentano un sistema a due stati fissi
+  HMM gaussiano, lo stress di volatilità deriva dai rapporti di volatilità 
+  mediana mobile normalizzata, mentre i punteggi di rallentamento macro provengono da delta standardizzati degli indicatori macro
+  .I pesi dei componenti sono predefiniti su (0, 5, 0, 3, 0, 2) e sono
+  normalizzati per la verificabilità.
+- **Governance delle probabilità:** gli output vengono ritagliati su \[0, 1\] e registrati per
+  gate di accettazione downstream. Gli input mancanti vengono ripristinati a priori neutri per mantenere
+  la sovrapposizione deterministica.
+- **Isteresi + pausa:** `apply_hysteresis` applica soglie di attivazione/disattivazione (impostazione predefinita
+  on=0, 65, off=0, 45), permanenza minima (20 giorni di negoziazione) e cooldown (10 giorni)
+  prima del rientro. Ciò impedisce rapidi ribaltamenti durante mercati instabili.
+- **Mappatura del tilt:** `tilt_lambda` mappa linearmente le probabilità di crisi per il tilt
+  pesi in \[0, 1\], combinando le allocazioni di base e di crisi durante l'esecuzione.
 
-The overlay will surface logs and component diagnostics in
-`artifacts/audit/regime/` when the CLI wiring lands, ensuring reproducible audit
-trails for compliance checks.
+La sovrapposizione mostrerà i registri e la diagnostica dei componenti in
+`artifacts/audit/regime/` quando il cablaggio CLI si atterra, garantendo la riproducibilitàaudit
+percorsi per i controlli di conformità.
 
 ## Execution Layer (PR-11)
-The execution layer enforces the retail guardrails before any order is routed:
+Il livello di esecuzione applica i guardrail di vendita al dettaglio prima che qualsiasi ordine venga instradato:
 
-- **Lot sizing:** `size_orders` converts weight deltas into integer lots using
-  portfolio value, prices, and lot sizes; `target_to_lots` remains available as a
-  thin alias for backwards compatibility.
-- **Transaction costs:** `trading_costs` implements the Almgren–Chriss schema –
-  explicit fees, half-spread slippage, and nonlinear market impact scaled by the
-  ADV percentage – while `almgren_chriss_cost` exposes the aggregated impact for
-  CLI summaries.
-- **Taxes:** `compute_tax_penalty` applies the Italian regime (26% default,
-  12.5% for govies ≥51%, 0.2% bollo) with FIFO/LIFO/min_tax matching and a
-  four-year `MinusBag` loss carry; `tax_penalty_it` remains as a quick
-  aggregated heuristic.
-- **No-trade guard:** `drift_bands_exceeded` checks weight and risk contribution
-  drift against tolerance bands; `expected_benefit_distribution` and
-  `expected_benefit_lower_bound` estimate EB_LB via block bootstrap before
-  `should_trade` combines drift, turnover caps, and the EB_LB − COST − TAX > 0
-  acceptance gate.
-- **Decision summaries:** `DecisionBreakdown` structures the gate evaluation for
-  CLI dry-runs and audit logging ahead of the full controller landing in PR-12.
+- **Dimensionamento dei lotti:** `size_orders` converte i delta di peso in lotti interi utilizzando
+  valore del portafoglio, prezzi e dimensioni dei lotti; `target_to_lots` rimane disponibile come alias
+  thin per compatibilità con le versioni precedenti.
+- **Costi di transazione:** `trading_costs` implementa lo schema Almgren–Chriss –
+  commissioni esplicite, slippage di metà spread e impatto di mercato non lineare ridimensionato in base alla percentuale
+  ADV – mentre `almgren_chriss_cost` espone l'impatto aggregatoper i riepiloghi 
+  CLI.
+- **Imposte:** `compute_tax_penalty` applica il regime italiano (26% default,
+  12, 5% per govies ≥51%, 0, 2% bollo) con abbinamento FIFO/LIFO/min_tax e 
+  quadriennale `MinusBag` loss carry; `tax_penalty_it` rimane un'euristica aggregata
+  rapida.
+- **No-trade guard:** `drift_bands_exceeded` controlla il peso e il contributo al rischio
+  deriva rispetto alle bande di tolleranza; `expected_benefit_distribution` e
+  `expected_benefit_lower_bound` stimano EB_LB tramite bootstrap a blocchi prima
+  `should_trade` combinano drift, limiti di fatturato e EB_LB − COST − TAX > 0
+  gate di accettazione.
+- **Riepiloghi delle decisioni:** `DecisionBreakdown` struttura la valutazione del gate per le prove
+  CLI e la registrazione dell'audit prima dell'arrivo completo del controller in PR-12.
 
-Outputs will populate `artifacts/trades/` and `artifacts/costs_tax/` alongside
-audit snapshots to maintain reproducibility.
+Gli output verranno popolati `artifacts/trades/` e `artifacts/costs_tax/` insieme alle istantanee dell'audit
+per mantenere la riproducibilità.
 
-## Reporting & Monthly Disclosures (PR-12)
-The reporting layer transforms PIT artefacts into retail-friendly disclosures:
+## Reporting eInformativa mensile (PR-12)
+Il livello di reporting trasforma gli artefatti PIT in informative adatte al dettaglio:
 
-- **Metrics deck:** `compute_monthly_metrics` annualises returns, calculates
-  Sharpe, Max Drawdown, CVaR(95), and three-year EDaR using deterministic
-  rounding (4 d.p.). Results are emitted as both CSV and JSON for auditability.
-- **Attribution:** Factor and instrument contributions are aggregated monthly
-  and exported side-by-side with stacked bar plots for visual inspection.
-- **Fan charts:** `simulate_fan_chart` bootstraps wealth and return paths via
-  `numpy.random.default_rng(seed)`; `plot_fan_chart`/`plot_fanchart` render
-  deterministic PNG outputs for wealth and risk metrics under
+- **Pacchetto di metriche:** `compute_monthly_metrics` annualizza i rendimenti, calcola
+  Sharpe, Max Drawdown, CVaR(95) e EDaR a tre anni utilizzando l'arrotondamento deterministico
+   (4 d.p.).I risultati vengono emessi sia come CSV che come JSON per la verificabilità.
+- **Attribuzione:** I contributi di fattori e strumenti vengono aggregati mensilmente
+  ed esportati affiancati con grafici a barre in pila per l'ispezione visiva.
+- **Grafici a ventaglio:** `simulate_fan_chart` bootstrap di ricchezza e percorsi di rendimento tramite
+  `numpy.random.default_rng(seed)`; `plot_fan_chart`/`plot_fanchart` visualizza
+  output PNG deterministici per parametri di ricchezza e rischio in
   `artifacts/reports/<period>/`.
-- **Turnover & costs:** Monthly turnover, cost, and tax series feed line/bar
-  combos to surface compliance with turnover and TE budgets.
-- **ERC clusters:** Optional cluster maps roll up average monthly weights,
-  supporting acceptance gates on cluster risk parity tolerances.
-- **Compliance log:** Flags such as UCITS eligibility, audit completion, and
-  no-trade adherence are persisted in `compliance.json` for downstream checks.
-- **Acceptance gates:** `acceptance_gates` evaluates P(MaxDD > τ) and the CAGR
-  lower bound, emitting `acceptance.json` with pass/fail verdicts.
-- **Attribution IC:** `attribution_ic` computes instrument contributions,
-  factor contributions, and rolling IC metrics, optionally persisted as CSV for
-  governance reviews.
-- **PDF dashboard:** `generate_monthly_report` assembles metrics, compliance
-  flags, acceptance gates, and chart artefacts into a compact PDF using
+- **Fatturato e costi:** riga/barra di alimentazione delle serie mensili di fatturato, costi e imposte
+  combo per evidenziare la conformità con il fatturato e i budget TE.
+- **Cluster ERC:** Mappe dei cluster opzionali raggruppano i pesi mensili medi,
+  supporto dei cancelli di accettazione sulle tolleranze di parità di rischio dei cluster.
+- **Registro di conformità:** Indicatori come idoneità OICVM, completamento dell'audit, e
+  l'adesione alle norme no-trade viene mantenuta in `compliance.json` per i controlli a valle.
+- **Porte di accettazione:** `acceptance_gates` valuta P(MaxDD > τ) e il CAGR
+  limite inferiore, emettendo `acceptance.json` con verdetti pass/fail.
+- **IC di attribuzione:** `attribution_ic` calcola i contributi degli strumenti,
+  i contributi dei fattori e le metriche IC variabili, facoltativamente persistenti come CSV per
+  revisioni della governance.
+- **Dashboard PDF:** `generate_monthly_report` riunisce metriche, flag di conformità
+  , gate di accettazione e artefatti grafici in un PDF compattoutilizzando
   `reportlab`.
 
-The CLI wrapper (`fair3 report --period ... --monthly`) currently feeds the
-report generator with deterministic synthetic data so acceptance gates and CI
-remain green while upstream orchestration is wired in. Future PRs will swap the
-synthetic stub for real PIT artefacts once the end-to-end pipeline is complete.
+Il wrapper CLI (`fair3 report --period ... --monthly`) attualmente alimenta il generatore di report
+con dati sintetici deterministici in modo che i gate di accettazione e CI
+rimangono verdi mentre l'orchestrazione a monte è collegata. I futuri PR scambieranno lo stub sintetico
+ con artefatti PIT reali una volta completata la pipeline end-to-end.
 
 ## Robustness Lab & Ablation (PR-13)
-The robustness laboratory extends FAIR-III governance with deterministic stress tests:
+Il laboratorio di robustezza estende la governance FAIR-III con stress test deterministici:
 
-- **Block bootstrap:** `block_bootstrap_metrics` samples 60-day blocks (default 1000 draws) to
-  compute distributions of max drawdown, CAGR, Sharpe, CVaR, and EDaR. Acceptance gates enforce
-  P(MaxDD ≤ τ) ≥ 95% and the 5th-percentile CAGR ≥ target. All runs use the
-  `robustness` RNG stream so they are reproducible across CI and research
-  environments.
-- **Shock replay:** `replay_shocks` replays stylised crisis profiles (1973 oil,
-  2008 GFC, 2020 COVID, 1970s stagflation) scaled to the realised volatility of
-  the input returns, highlighting worst-case drawdowns for governance reviews.
-- **Ablation harness:** `run_ablation_study` toggles governance switches (BL
-  fallback, Σ PSD projection, drift trigger, meta TO/TE penalties, regime tilt,
-  no-trade rule) to quantify their lift on key metrics. The orchestrator supplies
-  a callback that re-runs the downstream pipeline with the provided flags.
-- **Artefacts:** `run_robustness_lab` consolidates bootstrap draws, scenarios,
-  ablation tables, and a compact PDF summary inside `artifacts/robustness/` and
-  persists a JSON summary with gate verdicts for CI assertions.
+- **Block bootstrap:** `block_bootstrap_metrics` campioniBlocchi di 60 giorni (1000 estrazioni predefinite) per 
+  calcolare le distribuzioni del prelievo massimo, CAGR, Sharpe, CVaR ed EDaR.I cancelli di accettazione applicano
+  P(MaxDD ≤ τ) ≥ 95% e il CAGR del 5° percentile ≥ target. Tutte le esecuzioni utilizzano il flusso
+  `robustness` RNG in modo che siano riproducibili nell'IC e nella ricerca
+  ambientali.
+- **Replay shock:** `replay_shocks` ripropone profili di crisi stilizzati (petrolio del 1973,
+  2008 GFC, 2020 COVID, stagflazione degli anni '70) adattati alla volatilità realizzata del
+  i rendimenti degli input, evidenziando i prelievi nel caso peggiore per le revisioni della governance.
+- **Imbracatura dell'ablazione:**`run_ablation_study` attiva/disattiva gli interruttori di governance (BL
+  fallback, proiezione Σ PSD, trigger di deriva, sanzioni meta TO/TE, inclinazione del regime,
+  no-trade rule) per quantificare il loro incremento sui parametri chiave. L'orchestratore fornisce
+  un callback che riesegue la pipeline downstream con i flag forniti.
+- **Artefatti:** `run_robustness_lab` consolida disegni bootstrap, scenari,
+  tabelle di ablazione e un riepilogo PDF compatto all'interno di `artifacts/robustness/` e
+  persiste un riepilogo JSON con i verdetti dei gate per le asserzioni CI.
 
-These diagnostics back the FAIR acceptance gates before monthly reports are
-released, ensuring retail guardrails remain active even under structural breaks.
+Questi strumenti diagnostici supportano i gate di accettazione FAIR prima che vengano rilasciati i report mensili
+, garantendo che i guardrail al dettaglio rimangano attivi anche in condizioni strutturalipause.
 
 ## Goal Planning & Glidepath (PR-14)
-Household goals extend FAIR-III beyond portfolio construction, providing a
-deterministic Monte Carlo engine for probability-of-success analysis:
+Gli obiettivi familiari estendono FAIR-III oltre la costruzione del portafoglio, fornendo un
+motore Monte Carlo deterministico per l'analisi delle probabilità di successo:
 
-- **Regime-aware sampling:** `simulate_goals` draws Bernoulli states between
-  base and crisis regimes per month, with curve parameters generated via
-  `SeedSequence` so runs remain identical given the same seed.
-- **Contribution policy:** `build_contribution_schedule` grows monthly
-  contributions at a configurable annual rate (default 2%), ensuring long-horizon
-  savings plans reflect inflation drift.
-- **Glidepath:** `build_glidepath` linearly transitions allocation from growth
-  heavy to defensive weights over the maximum horizon across configured goals,
-  surfacing the implied asset mix for governance review.
-- **Outputs:** `run_goal_monte_carlo` writes deterministic `goals_<investor>_summary.csv`,
+- **Campionamento basato sul regime:** `simulate_goals` traccia mensilmente gli stati di Bernoulli tra i regimi di base e quelli di crisi
+  , con parametri della curva generati tramite
+  `SeedSequence` in modo che le esecuzioni rimangano identiche con lo stesso seed.
+- **Politica di contribuzione:** `build_contribution_schedule` cresce mensilmente
+  contributi a un tasso annuale configurabile (predefinito 2%), garantendoi piani di risparmio a lungo orizzonte
+   riflettono la deriva dell'inflazione.
+- **Glidepath:** `build_glidepath` passa linearmente l'allocazione da crescita
+  pesante a pesi difensivi sull'orizzonte massimo attraverso obiettivi configurati,
+  far emergere il mix di asset implicito per la revisione della governance.
+- **Output:** `run_goal_monte_carlo` scrive deterministico `goals_<investor>_summary.csv`,
   `goals_<investor>_glidepaths.csv`, `goals_<investor>_fan_chart.csv`, e `goals_<investor>.pdf`
   sotto `reports/` (o root custom);
-  il comando CLI `fair3 goals --simulate` stampa le probabilità ponderate e i
-  percorsi dei file generati così l'utente può iterare rapidamente su contributi
+  il comando CLI`fair3 goals --simulate` stampa le probabilità ponderate e i
+  percorsi dei file generati così l'utente può iterare rapidamente sui contributi
   e orizzonti.
 
-Acceptance thresholds derive from `configs/goals.yml` (target wealth `W`,
-minimum probability `p_min`, weights) and `configs/params.yml` (household
-contribution assumptions). Weighted probabilities must meet the specified
-`p_min` values to satisfy the FAIR-III goal governance gate.
+Le soglie di accettazione derivano da `configs/goals.yml` (ricchezza target `W`,
+probabilità minima `p_min`, pesi) e `configs/params.yml` (ipotesi contributive delle famiglie
+).Le probabilità ponderate devono soddisfare i valori 
+`p_min` specificati per soddisfare il cancello di governance dell'obiettivo FAIR-III.

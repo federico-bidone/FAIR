@@ -1,1 +1,1 @@
-No secrets, no servers. Disclose vulnerabilities via issues; avoid public exploits.
+Nessun segreto, nessun server. Divulgare le vulnerabilità tramite problemi; evitare exploit pubblici.

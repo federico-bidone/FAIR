@@ -1,18 +1,18 @@
-## Summary
-- [ ] Scope and motivation
-- [ ] Linked issue(s)
+## Riepilogo
+- [ ] Ambito e motivazione
+- [ ] Problemi collegati
 
-## What changed
-- [ ] Code
-- [ ] Tests
-- [ ] Docs
+## Cosa è cambiato
+- [ ] Codice
+- [ ] Test
+- [ ] Documenti
 
-## Definition of Done
-- [ ] CI ✅  - [ ] Linters ✅  - [ ] Coverage ≥ threshold
-- [ ] Acceptance gates relevant to this PR pass
+## Definizione di Fatto
+- [ ] CI ✅ - [ ] Linter ✅ - [ ] Copertura ≥ soglia
+- [ ] Porte di accettazione rilevanti per questo pass PR
 
-## Screenshots/Logs
+## Screenshot/registri
 
-## Checklist
-- [ ] No new runtime deps unless justified
-- [ ] Seeds/checksums updated when needed
+## Elenco di controllo
+- [ ] Nessun nuovo dep di runtime se non giustificato
+- [ ] Seed/checksum aggiornati quando necessario

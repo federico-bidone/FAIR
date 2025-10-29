@@ -1,11 +1,11 @@
-# Reporting Module
+# Modulo di reporting
 
-The reporting package aggregates outputs produced by the portfolio engine. In
-addition to the audit helpers introduced earlier, it now exposes a monthly
-report builder with deterministic plotting utilities to satisfy FAIR-III’s
-retail disclosure requirements.
+Il pacchetto di reporting aggrega i risultati prodotti dal motore di portafoglio. In
+oltre agli assistenti di audit introdotti in precedenza, ora espone un generatore di report
+mensile con utilità di grafico deterministico per soddisfare i requisiti di divulgazione al dettaglio di FAIR-III
+.
 
-## Public API
+## API pubbliche
 
 ### `fair3.engine.reporting.audit`
 - `ensure_audit_dir(audit_dir=None)`
@@ -25,18 +25,18 @@ retail disclosure requirements.
 - `attribution_ic(weights, returns, factors, window=12)`
 
 ### `fair3.engine.reporting.plots`
-- `plot_fan_chart(wealth_paths, percentiles=(0.05,0.5,0.95), path=None)`
+- `plot_fan_chart(wealth_paths, percentiles=(0.05, 0.5, 0.95), path=None)`
 - `plot_fanchart(axis, dates, median, lower, upper, title=None, ylabel=None)`
 - `plot_attribution(contributions, path=None, stacked=True)`
 - `plot_turnover_costs(turnover, costs, path=None)`
 
-## CLI / Pipeline Usage
+## CLI/Utilizzo pipeline
 
-Within the `fair3 report --period YYYY-MM:YYYY-MM --monthly` command the CLI
-loads PIT artefacts, assembles the `MonthlyReportInputs` structure, and emits
-CSV/JSON summaries, PNG plots, acceptance-gate diagnostics, and a PDF snapshot
-inside `artifacts/reports/<period>/`. The helper accepts a custom `output_dir`
-to facilitate regression tests and notebooks.
+All'interno del comando `fair3 report --period YYYY-MM:YYYY-MM --monthly` la CLI
+carica gli artefatti PIT, assembla la struttura `MonthlyReportInputs` ed emette
+CSV/JSON riepiloghi, grafici PNG, diagnostica del gate di accettazione e un PDFistantanea
+all'interno `artifacts/reports/<period>/`.L'aiutante accetta un `output_dir`
+ personalizzato per facilitare test di regressione e quaderni.
 
 ```python
 from fair3.engine.reporting import MonthlyReportInputs, generate_monthly_report
@@ -64,16 +64,16 @@ print("Acceptance gates", artifacts.acceptance_json)
 print("Monthly PDF", artifacts.report_pdf)
 ```
 
-## Common Errors & Troubleshooting
+## Errori comuni e risoluzione dei problemi
 
-| Symptom | Likely Cause | Resolution |
+| Sintomo | Probabile causa | Risoluzione |
 | --- | --- | --- |
-| Missing PNG outputs | Matplotlib backend not set in headless CI | The module forces `Agg`, ensure dependency installed |
-| Empty aggregation frames | Upstream ETL did not populate PIT artefacts | Verify ETL step and date filters before running reports |
-| Non-monotonic dates | Upstream merges produced unsorted indices | Call `.sort_index()` prior to feeding the report inputs |
+| Output PNG mancanti | Backend Matplotlib non impostato in CI headless | Il modulo forza `Agg`, garantisce la dipendenza installata |
+| Cornici di aggregazione vuote | L'ETL upstream non ha popolato gli artefatti PIT | Verificare la fase ETL e i filtri della data prima di eseguire i report |
+| Date non monotone | Le fusioni a monte hanno prodotto indici non ordinati | Chiama `.sort_index()` prima di inserire gli input del report |
 
 ## Trace Hooks
 
-Audit helpers and the monthly generator respond to the global `--trace` flag by
-reusing the logger configured via `fair3.engine.logging.setup_logger`. Include
-artefact paths in trace logs for quick diagnosis.
+Gli aiutanti di audit e il generatore mensile rispondono al flag globale `--trace`
+riutilizzando il logger configurato tramite `fair3.engine.logging.setup_logger`.Includi
+percorsi degli artefatti nei log di traccia per una diagnosi rapida.

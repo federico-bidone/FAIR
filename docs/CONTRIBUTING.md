@@ -1,3 +1,3 @@
-# Contributing to FAIR-III
+# Contribuire a FAIR-III
 
-Follow the Conventional Commit specification and keep pull requests narrowly scoped. Each contribution must include relevant documentation and tests, and should maintain compatibility with the Windows-first toolchain. Refer to the top-level CONTRIBUTING.md for workflow guidelines.
+Seguire le specifiche del commit convenzionale e mantenere le richieste pull con un ambito ristretto. Ogni contributo deve includere documentazione e test pertinenti e deve mantenere la compatibilità con la toolchain di Windows-first. Fare riferimento al file CONTRIBUTING.md di livello superiore per le linee guida sul flusso di lavoro.

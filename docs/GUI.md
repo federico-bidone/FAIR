@@ -2,61 +2,61 @@
 
 """Strumento informativo/educational; non costituisce consulenza finanziaria o raccomandazione."""
 
-The optional PySide6 GUI provides a thin orchestration layer over the existing
-CLI commands. It is intended for exploratory desktop workflows where a visual
-control panel is preferable to shell invocations.
+La GUI opzionale PySide6 fornisce un sottile livello di orchestrazione sui comandi esistenti
+CLI.È destinato ai flussi di lavoro desktop esplorativi in ​​cui un pannello di controllo visivo
+ è preferibile alle invocazioni della shell.
 
-## Installation
+## Installazione
 
-Install PySide6 alongside the FAIR-III extras:
+Installa PySide6 insieme agli extra di FAIR-III:
 
 ```bash
 pip install PySide6
 ```
 
-No other dependencies are required; the GUI relies entirely on the engines
-already bundled in FAIR-III.
+Non sono necessarie altre dipendenze; la GUI si basa interamente sui motori
+già incluso in FAIR-III.
 
-## Launching the GUI
+## Avvio della GUI
 
-Use the CLI wrapper to launch the interface:
+Utilizzare il wrapper CLI per avviare l'interfaccia:
 
 ```bash
 fair3 gui --raw-root data/raw --clean-root data/clean --artifacts-root artifacts
 ```
 
-The command accepts the same path overrides as the CLI to seed the interface.
-Passing `--dry-run` prints the derived configuration without starting the GUI,
-useful when validating configuration inside headless environments.
+Il comando accetta lo stesso percorso sovrascrive la CLI per inizializzare l'interfaccia.
+Passaggio `--dry-run` stampa la configurazione derivata senza avviare la GUI,
+utile quando si convalida la configurazione all'interno di headlessambienti.
 
-## Features
+## Funzioni
 
-- **Ingest tab:** select any registered source, supply optional symbols and a
-  start date, and trigger ingestion. Status lines mirror the CLI output and
-  append to the log panel.
-- **Pipeline tab:** buttons dispatch the ETL, factor, estimate, mapping, regime,
-  and goal engines using the configured directories and thresholds.
-- **Reports tab:** supply a PDF path to open with the platform default viewer.
+- **Scheda Ingest:** seleziona qualsiasi sorgente registrata, fornisci simboli opzionali e un
+  data di inizio e attivare l'importazione. Le righe di stato rispecchiano l'output CLI e
+  si aggiungono al pannello di registro.
+- **Scheda Pipeline:** i pulsanti inviano ETL, fattore, stima, mappatura, regime,
+  e motori obiettivo utilizzando le directory e le soglie configurate.
+- **Scheda Rapporti:** fornisce un percorso PDF da aprire con il visualizzatore predefinito della piattaforma.
 
-All actions catch exceptions and record them in the on-screen log so the
-application remains responsive even if a pipeline stage fails. When PySide6 is
-not installed the GUI quietly skips execution after logging a hint.
+Tutte le azioni rilevano le eccezioni e le registrano nel registro su schermo in modol'applicazione 
+ rimane reattiva anche se una fase della pipeline fallisce. Quando PySide6
+non è installato, la GUI salta silenziosamente l'esecuzione dopo aver registrato un suggerimento.
 
-## Interface layout
+## Layout dell'interfaccia
 
-The GUI window is partitioned into three tabs—**Ingest**, **Pipeline**, and
-**Reports**—stacked across the top of the frame. A persistent log panel sits at
-the bottom and mirrors CLI status updates in chronological order. Each tab
-exposes dry-run toggles and path selectors so that the GUI mirrors CLI semantics
-without relying on an embedded screenshot.
+La finestra della GUI è suddivisa in tre schede:**Ingest**, **Pipeline** e
+**Rapporti**—impilate nella parte superiore del frame. Un pannello di registro persistente si trova in 
+in basso e rispecchia gli aggiornamenti di stato della CLI in ordine cronologico. Ogni scheda
+espone attivazioni/disattivazioni di prova e selettori di percorso in modo che la GUI rispecchi la semantica della CLI
+senza fare affidamento su uno screenshot incorporato.
 
-## Troubleshooting
+## Risoluzione dei problemi
 
-- **Missing PySide6:** install the package or rely on the CLI (`launch_gui`
-  returns immediately and logs an info message).
-- **Long-running tasks:** pipeline executions occur on the GUI thread and may
-  block the window. For production runs prefer the CLI or wrap actions with
-  background scheduling.
+- **PySide6 mancante:** installa il pacchetto o fai affidamento sulla CLI (`launch_gui`
+  restituisce immediatamente e registra un messaggio informativo).
+- **Attività di lunga durata:** le esecuzioni della pipeline si verificano nel thread della GUI e potrebbero
+  bloccare la finestra. Per le esecuzioni di produzione, preferisci la CLI o le azioni wrap con
+  pianificazione in background.
 
-Remember that the GUI inherits all UCITS/EU/IT compliance constraints documented
-in the README and does not change the deterministic behaviour of the pipelines.
+Ricorda che la GUI eredita tutti i vincoli di conformità UCITS/UE/IT documentati
+nel README e non modifica il comportamento deterministico delle pipeline.

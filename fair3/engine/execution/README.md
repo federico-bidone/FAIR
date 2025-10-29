@@ -1,41 +1,41 @@
-# Execution Module
+# Modulo di esecuzione
 
-The execution layer transforms mapped factor deltas into implementable orders
-while enforcing UCITS retail guardrails. It exposes deterministic primitives
-that upstream orchestration stitches together when the portfolio is ready to
-trade.
+Il livello di esecuzione trasforma i delta dei fattori mappati in ordini implementabili
+applicando al contempo i guardrail al dettaglio degli OICVM.Espone le primitive deterministiche
+che l'orchestrazione a monte si unisce quando il portafoglio è pronto per essere scambiato
+.
 
-## Public APIs
+## API pubbliche
 
-- `size_orders(delta_w, portfolio_value, prices, lot_sizes)` – convert weight
-  changes into integer lot counts; alias `target_to_lots` is kept for
-  compatibility.
-- `trading_costs(prices, spreads, q, fees, adv, eta)` – Almgren–Chriss cost
-  model combining explicit fees, half-spread slippage, and nonlinear market
-  impact scaled by ADV.
-- `almgren_chriss_cost(order_qty, price, spread, adv, eta, fees)` – scalar
-  wrapper returning the aggregate Almgren–Chriss cost useful for CLI summaries.
-- `compute_tax_penalty(orders, inventory, tax_rules)` – Italian tax engine with
-  FIFO/LIFO/min_tax matching, four-year loss carry, and bollo; `tax_penalty_it`
-  remains available for quick aggregated estimates.
-- `drift_bands_exceeded(w_old, w_new, rc_old, rc_new, band)` – signal whether
-  weight or risk contribution drift breaches no-trade tolerances.
-- `expected_benefit(delta_w, mu, Sigma, w_old, w_new)` – analytic lower bound for
-  the execution expected benefit used per bootstrap sample.
+- `size_orders(delta_w, portfolio_value, prices, lot_sizes)` – converte il peso
+  modifiche in conteggi di lotti interi; alias `target_to_lots` viene mantenuto per
+  compatibilità.
+- `trading_costs(prices, spreads, q, fees, adv, eta)` – Costo Almgren–Chriss
+  modello che combina commissioni esplicite, slippage a metà spread e mercato non lineare
+  impatto ridimensionato da ADV.
+- `almgren_chriss_cost(order_qty, price, spread, adv, eta, fees)` – scalare
+  wrapper che restituisce il costo Almgren–Chriss aggregato utile per la CLIsintesi.
+- `compute_tax_penalty(orders, inventory, tax_rules)` – Motore fiscale italiano con 
+  FIFO/LIFO/min_taxmatch, loss carry a quattro anni e bollo; `tax_penalty_it`
+  rimane disponibile per stime aggregate rapide.
+- `drift_bands_exceeded(w_old, w_new, rc_old, rc_new, band)` – segnala se
+  la deriva del peso o del contributo al rischio viola le tolleranze non commerciali.
+- `expected_benefit(delta_w, mu, Sigma, w_old, w_new)` – limite inferiore analitico per
+  il vantaggio previsto dall'esecuzione utilizzato per campione bootstrap.
 - `expected_benefit_distribution(returns, delta_w, w_old, w_new, block_size,
-  n_resamples, seed)` – block bootstrap distribution of expected benefit values.
+  n_resamples, seed)` – blocca la distribuzione bootstrap dei valori dei benefici attesi.
 - `expected_benefit_lower_bound(returns, delta_w, w_old, w_new, alpha, block_size,
-  n_resamples, seed)` – EB_LB computed as the ``alpha``-quantile of the bootstrap
-  distribution.
-- `should_trade(drift_ok, eb_lb, cost, tax, turnover_ok)` – deterministic gate
-  implementing `EB_LB − COST − TAX > 0` with drift/turnover checks.
-- `summarise_decision(...)` – returns a `DecisionBreakdown` dataclass handy for
-  CLI dry-runs and logging.
+  n_resamples, seed)` – EB_LB computed as the ``alpha``-quantile della distribuzione bootstrap
+  .
+- `should_trade(drift_ok, eb_lb, cost, tax, turnover_ok)` – gate deterministico
+  implementazione di `EB_LB − COST − TAX > 0` con controlli di deriva/fatturato.
+- `summarise_decision(...)` – restituisce una classe di dati `DecisionBreakdown` a portata di manoper
+  CLI prove di prova e logging.
 
-All functions are vectorised via NumPy and expect consistent shapes. Raise
-`ValueError` for mismatched dimensions to keep orchestration failures explicit.
+Tutte le funzioni sono vettorizzate tramite NumPy e si aspettano forme coerenti. Aumenta
+`ValueError` per le dimensioni non corrispondenti per mantenere espliciti gli errori di orchestrazione.
 
-## CLI / Python Usage
+## Utilizzo CLI/Python
 
 ```python
 from fair3.engine.execution import (
@@ -68,22 +68,22 @@ eb_lb = expected_benefit_lower_bound(returns, delta_w, w_old, w_new, alpha=0.05,
 decision = summarise_decision(drift_ok, eb_lb, total_cost, tax.total_tax, turnover_ok=True)
 ```
 
-The CLI `fair3 execute` command now accepts `--rebalance-date`, `--tax-method`
-(`fifo`, `lifo`, `min_tax`) and `--dry-run` to surface these diagnostics; full
-orchestration will land once the reporting layer (PR-12) is integrated.
+Il comando CLI `fair3 execute` ora accetta `--rebalance-date`, `--tax-method`
+(`fifo`, `lifo`, `min_tax`) e `--dry-run` per far emergere queste diagnostiche; completo
+l'orchestrazione verrà eseguita una volta integrato il livello di reporting (PR-12).
 
-## Tracing & Logs
+## Tracciamento e registri
 
-- Execution logs are written under `artifacts/audit/execution.log` when the
-  module is driven via the CLI with `--trace` (to be added alongside orchestration).
-- Lot sizing, costs, and tax estimates should be snapshot to
-  `artifacts/trades/` and `artifacts/costs_tax/` by the controller.
+- I registri di esecuzione vengono scritti in `artifacts/audit/execution.log` quando il modulo
+   viene gestito tramite la CLI con `--trace` (da aggiungere insieme all'orchestrazione).
+- Il dimensionamento dei lotti, i costi e le stime fiscali devono essere istantanee su
+  `artifacts/trades/` e `artifacts/costs_tax/` dal titolare del trattamento.
 
-## Common Errors
+## Errori comuni
 
-- **Shape mismatch:** ensure prices, spreads, quantities, and lot sizes share the
-  same length.
-- **Zero ADV:** the helper gracefully treats zero ADV as no additional market
-  impact but still logs the instrument for manual inspection.
-- **Drift bands too tight:** if `band` is smaller than numerical noise, expect
-  frequent rebalancing; adjust via `configs/params.yml`.
+- **Mancata corrispondenza della forma:** garantisce che prezzi, spread, quantità e dimensioni dei lotti condividano la stessa lunghezza
+  .
+- **Zero ADV:** l'assistente tratta con garbo zero ADV come nessun mercato aggiuntivo
+  ma registra comunque lo strumento per l'esecuzione manualeispezione.
+- **Bande di deriva troppo strette:** se `band` è inferiore al rumore numerico, prevedere
+  frequenti ribilanciamenti; regolare tramite `configs/params.yml`.

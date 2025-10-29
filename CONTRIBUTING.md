@@ -1,4 +1,4 @@
-- Use Conventional Commits.
-- One PR per component.
-- Add/extend tests and docs with each change.
-- Keep CI < 60 seconds where possible.
+- Utilizza commit convenzionali.
+- Un PR per componente.
+- Aggiungi/estendi test e documenti con ogni modifica.
+- Mantieni CI < 60 secondi ove possibile.

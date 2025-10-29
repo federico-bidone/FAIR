@@ -1,26 +1,26 @@
-# QA pipeline module
+# Modulo QA pipeline
 
-> Strumento informativo/educational; non costituisce consulenza finanziaria o raccomandazione.
+> Strumento informativo/didattico; non contiene consulenza finanziaria o raccomandazione.
 
-The QA engine fabricates a deterministic synthetic dataset, executes the entire
-FAIR-III pipeline, and emits audit artefacts that confirm acceptance and
-robustness gates.  It is the reference workflow for validating installations and
-for debugging end-to-end regressions without hitting external data providers.
+Il motore QA crea un set di dati sintetici deterministici, esegue l'intera pipeline
+FAIR-III ed emette artefatti di audit che confermano l'accettazione e
+gate di robustezza. È il flusso di lavoro di riferimento per la convalida delle installazioni e
+per il debug delle regressioni end-to-end senza colpire i fornitori di dati esterni.
 
-## Key components
-- `DemoQAConfig`: immutable configuration for the QA scenario (calendar, label,
-  bootstrap controls, acceptance thresholds, and seed stream).
-- `DemoQAResult`: collection of output paths and pass/fail flags surfaced by the
-  CLI handler.
-- `run_demo_qa`: orchestrates ingest scaffolding, ETL, factors, estimates,
-  optimisation, mapping, regime overlay, reporting, and robustness lab on the
-  synthetic dataset.
+## Componenti chiave
+- `DemoQAConfig`: configurazione immutabile per lo scenario QA (calendario, etichetta,
+  controlli bootstrap, soglie di accettazione e flusso di seed).
+- `DemoQAResult`: raccolta di percorsi di output e flag pass/fail visualizzati dal gestore
+  CLI.
+- `run_demo_qa`: orchestra l'acquisizione di scaffolding, ETL, fattori, stime,
+  ottimizzazione, mappatura, sovrapposizione del regime, reporting e laboratorio di robustezza suil
+  set di dati sintetici.
 
-## Usage
+## Utilizzo
 ```bash
 fair3 qa --label demo --draws 256 --block-size 45 --validate-factors
 ```
 
-The command writes artefacts to `artifacts/qa/<label>/` by default.  Override the
-location with `--output-dir` to keep QA runs isolated from production artefacts.
-All outputs include checksum metadata so they can be diffed between releases.
+Il comando scrive gli artefatti in `artifacts/qa/<label>/` per impostazione predefinita. Sostituisci il
+location con `--output-dir` per mantenere le esecuzioni del QA isolate dagli artefatti di produzione.
+Tutti gli output includono metadati di checksum in modo che possano essere differenziati tra le versioni.

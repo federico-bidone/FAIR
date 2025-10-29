@@ -1,10 +1,10 @@
-# Configuration validation (`fair3 validate`)
+# Convalida della configurazione (`fair3 validate`)
 
-The `fair3 validate` command performs a schema audit on the core configuration files used by the
-FAIR-III portfolio engine. It is the recommended pre-flight step before running ETL, factor, or
-optimisation pipelines because it catches malformed YAML entries early.
+Il comando `fair3 validate` esegue un controllo dello schema sui file di configurazione principali utilizzati dal motore di portafoglio
+FAIR-III.È il passaggio pre-flight consigliato prima di eseguire pipeline di ottimizzazione ETL, factor o
+ perché rileva tempestivamente le voci YAML con formato errato.
 
-## Usage
+## Utilizzo
 
 ```bash
 fair3 validate \
@@ -14,26 +14,26 @@ fair3 validate \
   --verbose
 ```
 
-* `--params`, `--thresholds`, `--goals` allow overriding the default configuration locations.
-* `--verbose` prints the parsed payloads so the operator can review defaults and derived fields.
+* `--params`, `--thresholds`, `--goals` consente di sovrascrivere le posizioni di configurazione predefinite.
+* `--verbose` stampa i payload analizzati in modo che l'operatore possa esaminarli.valori predefiniti e campi derivati.
 
-Exit status is `0` when validation succeeds. Schema or file errors are written to stdout with an
-`[fair3] validate error: ...` prefix and the command exits with status `1`.
+Lo stato di uscita è `0` quando la convalida ha esito positivo. Gli errori di schema o file vengono scritti sullo stdout con un file
+`[fair3] validate error: ...` prefisso e il comando esce con stato `1`.
 
-## Schema summary
+## Riepilogo schema
 
-| File | Required keys | Notes |
+| File | Chiavi richieste | Note |
 | ---- | ------------- | ----- |
-| `params.yml` | `currency_base`, `household`, `rebalancing` | `currency_base` must be an ISO code; `household` now includes the optional fields `investor`, `contribution_plan` (rules with `start_year`/`end_year`/`frequency`), and `withdrawals`; `rebalancing.no_trade_bands` is capped at 50 bps. |
-| `thresholds.yml` | `vol_target_annual`, `tau`, `execution`, `regime`, `drift` | `regime.on` must exceed `regime.off`; activation/deactivation streaks are ≥1; committee weights and macro weights must sum to positive values; turnover, tracking-error and ADV caps stay within [0, 1]; the annual volatility target is clamped between 1% and 50%. |
-| `goals.yml` | `goals` (non-empty list) | Each goal requires `name`, `W`, `T_years`, `p_min`, `weight`. Probabilities sit in [0, 1]; weights are checked for near-unity sums with a 5% tolerance. |
+| `params.yml` | `currency_base`, `household`, `rebalancing` | `currency_base` deve essere un codice ISO; `household` ora include i campi opzionali `investor`, `contribution_plan` (regole con `start_year`/`end_year`/`frequency`), e `withdrawals`; `rebalancing.no_trade_bands` ha un limite massimo di 50 bps. |
+| `thresholds.yml` | `vol_target_annual`, `tau`, `execution`, `regime`, `drift` | `regime.on` deve superare `regime.off`; le strisce di attivazione/disattivazione sono ≥1; i pesi dei comitati e i pesi macro devono sommarsi a valori positivi; i limiti di fatturato, tracking error e ADV rimangono entro [0, 1]; l'obiettivo annuale di volatilità è compreso tra l'1% e il 50%. |
+| `goals.yml` | `goals` (elenco non vuoto) | Ogni obiettivo richiede `name`, `W`, `T_years`, `p_min`, `weight`.Le probabilità si trovano in [0, 1]; i pesi vengono controllati per somme prossime all'unità con una tolleranza del 5%. |
 
-Warnings (for example imbalanced goal weights) are reported but do not fail validation. Treat them as
-prompts to revisit the configuration before executing the full pipeline.
+Gli avvisi (ad esempio pesi obiettivo sbilanciati) vengono segnalati ma non falliscono la convalida. Trattateli come
+richiede di rivisitare la configurazione prima di eseguire la pipeline completa.
 
-All validation rules are encoded via [pydantic](https://docs.pydantic.dev/) models located in
-`fair3/engine/validate.py`. The models are versioned alongside the engine and guarantee deterministic
-behaviour across platforms.
+Tutte le regole di convalida sono codificate tramite modelli [pydantic](https://docs.pydantic.dev/) situati in
+`fair3/engine/validate.py`.I modelli sono versioni insieme al motore e garantiscono un comportamento deterministico
+ su tutte le piattaforme.
 
-> **Disclaimer:** strumento informativo/educational; non costituisce consulenza finanziaria o raccomandazione.
+> **Disclaimer:** strumento informativo/educativo; non costituisce consiglio finanziario o raccomandazione.
 
