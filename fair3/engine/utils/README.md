@@ -4,19 +4,19 @@
 La directory contiene gli strumenti trasversali che supportano le pipeline FAIR-III.
 Gli obiettivi principali sono:
 
-- fornire utilità di logging condivise e verbose per tutta la piattaforma tramite
+- fornire utilità di logging condiviso e verbose per tutta la piattaforma tramite
   il modulo `fair3.engine.logging`;
-- gestire input/output di configurazioni, artefatti e checksum in modo riproducibile;
+- gestire input/output di distribuzione, artefatti e checksum in modoriproducibile;
 - mantenere generatori casuali deterministici e proiezioni matematiche sicure.
 
-Ogni modulo espone docstring e commenti in italiano che spiegano cosa fa ogni
+Ogni modulo espone docstring e in italiano che spiega cosa fa ogni
 funzione, come lo fa e perché è utile nel flusso complessivo.
 
 ### Moduli principali
 
 - **`logging`** – (spostato in `fair3.engine.logging`) fornisce logger strutturati
   con mirroring JSON, progress bar e helper per metriche; le docstring spiegano
-  le variabili d'ambiente supportate e come ri-configurare i loggers dal CLI.
+  le variabili d'ambiente supportate e come ri-configurare i logger dalla CLI.
 - **`io`** – gestisce cartelle di artefatti, serializzazioni YAML/JSON
   deterministiche e checksum; ogni funzione documenta il comportamento sui
   corner case (percorso inesistente, file corrotti, ecc.).
@@ -30,22 +30,22 @@ funzione, come lo fa e perché è utile nel flusso complessivo.
 
 ## Utils Module (English Reference)
 
-The utilities package centralises shared concerns such as deterministic randomness, structured
-logging, and artifact management. These helpers keep higher-level engine modules focused on
-quantitative logic while guaranteeing reproducibility and auditability demanded by FAIR-III.
+The utilities package centralizza preoccupazioni condivise come determinismo casuale, strutturato
+registrazione e gestione degli artefatti. Questi helper mantengono i moduli del motore di livello superiore incentrati sulla logica quantitativa
+garantendo al tempo stesso la riproducibilità e la verificabilità richieste da FAIR-III.
 
-### Public API
+### API pubblica
 
-#### Logging (`fair3.engine.logging`)
+#### Logging(`fair3.engine.logging`)
 - `setup_logger(name, json_format=False, level=None)`
 - `record_metrics(metric_name, value, tags=None)`
 - `configure_cli_logging(json_logs, level=None)`
 
-Structured logs live in `artifacts/audit/fair3.log` when `json_format=True` or
-`FAIR_JSON_LOGS=1`. Console output always follows `[LEVEL] module: message`. Metrics are appended
-to `artifacts/audit/metrics.jsonl` for downstream observability.
+Log strutturati presenti in `artifacts/audit/fair3.log` quando `json_format=True` o
+`FAIR_JSON_LOGS=1`.L'output della console segue sempre `[LEVEL] module: message`.Le metriche vengono aggiunte
+a `artifacts/audit/metrics.jsonl` per l'osservabilità a valle.
 
-#### Randomness (`fair3.engine.utils.rand`)
+#### Casualità(`fair3.engine.utils.rand`)
 - `load_seeds(seed_path="audit/seeds.yml")`
 - `save_seeds(seeds, seed_path="audit/seeds.yml")`
 - `seed_for_stream(stream="global", seeds=None, seed_path=...)`
@@ -53,8 +53,8 @@ to `artifacts/audit/metrics.jsonl` for downstream observability.
 - `broadcast_seed(seed)`
 - `spawn_child_rng(parent, jumps=1)`
 
-Streams fall back to the global seed and default to 42 when no file is present. The helpers seed
-both NumPy and the Python standard library, ensuring consistent behaviour across workers.
+Gli stream ritornano al seed globale e diventano 42 per impostazione predefinita quando non è presente alcun file. Gli helper seminano
+sia NumPy che la libreria standard Python, garantendo un comportamento coerente tra i lavoratori.
 
 #### IO (`fair3.engine.utils.io`)
 - `artifact_path(*parts, create=True, root=None)`
@@ -64,16 +64,16 @@ both NumPy and the Python standard library, ensuring consistent behaviour across
 - `sha256_file(path)` / `compute_checksums(paths)`
 - `copy_with_timestamp(src, dest_dir, prefix=None, timestamp=None)`
 
-Use `artifact_path` to resolve canonical output locations (e.g. `artifact_path("audit", "checksums.json")`).
-Checksums stream large files safely using 64 KiB chunks.
+Utilizza `artifact_path` per risolvere posizioni di output canoniche (ad esempio `artifact_path("audit", "checksums.json")`).
+I checksum trasmettono file di grandi dimensioni in modo sicuro utilizzando blocchi da 64 KiB.
 
-#### PSD (`fair3.engine.utils.psd`)
+#### PSD(`fair3.engine.utils.psd`)
 - `project_to_psd(matrix, eps=None)`
 
-Projects symmetric matrici sul cono PSD usando la procedura di Higham (2002) con
+Projects symmetric matrici sul cono PSD utilizzando la procedura di Higham (2002) con
 `eps` calcolato automaticamente quando omesso.
 
-## Examples
+## Esempi
 
 ```python
 from fair3.engine.logging import setup_logger
@@ -86,17 +86,17 @@ logger.info("Saving factors to %s", outfile)
 psd_cov = project_to_psd(covariance_matrix)
 ```
 
-## Common Errors
+## Errori comuni
 
-| Symptom | Likely Cause | Resolution |
+| Sintomo | Probabile causa | Risoluzione |
 | --- | --- | --- |
-| `TypeError: Seed file must contain a mapping` | malformed `audit/seeds.yml` | Ensure YAML contains `seeds:` with key/value pairs |
-| `FileNotFoundError` from `copy_with_timestamp` | source path missing | Run upstream pipeline step or adjust path |
-| Duplicate log lines | logger propagation enabled twice | Set `propagate=False` (default) or remove parent handlers |
+| `TypeError: Seed file must contain a mapping` | malformato `audit/seeds.yml` | Assicurati che YAML contenga `seeds:` con coppie chiave/valore |
+| `FileNotFoundError` da `copy_with_timestamp` | percorso di origine mancante | Eseguire il passaggio della pipeline upstream o modificare il percorso |
+| Righe di registro duplicate | propagazione del logger abilitata due volte | Imposta `propagate=False` (impostazione predefinita) o rimuovi gestori principali |
 
-## Tracing and Debug Flags
+## Flag di tracciamento e debug
 
-The CLI exposes `--json-logs/--no-json-logs` to toggle the JSON audit mirror and honours
-`FAIR_LOG_LEVEL=DEBUG` for verbose diagnostics. For module-level debugging, request
-stream-specific RNGs (`generator_from_seed(stream="module"))` and include the stream name in
-audit metadata.
+La CLI espone `--json-logs/--no-json-logs` per attivare/disattivare il mirroring di controllo JSON e rispetta
+`FAIR_LOG_LEVEL=DEBUG` per la diagnostica dettagliata. Per il debug a livello di modulo, richiedi
+RNG specifici del flusso (`generator_from_seed(stream="module"))` e includi il nome del flusso nei
+metadati di controllo.

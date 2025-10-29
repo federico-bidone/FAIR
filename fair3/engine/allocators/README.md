@@ -1,23 +1,23 @@
-# Allocators Module
+# Modulo Allocatori
 
-The allocators package hosts the FAIR-III portfolio construction engines. Each generator respects the retail implementability constraints (long-only, turnover/TE/ADV caps) while enabling risk-aware combinations of factor or instrument returns.
+Il pacchetto allocatori ospita i motori di costruzione del portafoglio FAIR-III.Ciascun generatore rispetta i vincoli di implementabilità al dettaglio (long-only, limiti di fatturato/TE/ADV) consentendo al tempo stesso combinazioni di rendimenti di fattori o strumenti sensibili al rischio.
 
-## Public APIs
+## API pubbliche
 
-| Function | Description |
+| Funzione | Descrizione |
 | --- | --- |
-| `risk_contributions(w, Sigma)` | Marginal risk contributions \(RC_i = w_i (\Sigma w)_i\). |
-| `balance_clusters(w, Sigma, clusters, tol)` | Iteratively rescales cluster weights until ERC deviation is within `tol`. |
-| `generator_A(mu, Sigma, constraints)` | Maximise Sharpe with Wasserstein DRO penalty, CVaR/EDaR caps, turnover and leverage constraints, then balance ERC clusters. |
-| `generator_B_hrp(Sigma)` | Hierarchical Risk Parity baseline (Ward linkage, quasi-diagonalisation). |
-| `generator_C_dro_closed(mu, Sigma, gamma, rho)` | Closed-form distributionally robust portfolio via ridge-regularised inverse. |
-| `generator_D_cvar_erc(mu, Sigma, constraints)` | CVaR-minimising allocation with ERC cluster balancing and leverage/turnover caps. |
-| `fit_meta_weights(returns_by_gen, sigma_matrix, j_max, penalty_to, penalty_te, baseline_idx)` | Meta-learner that blends generator PnLs with turnover/TE penalties on the simplex. |
+| `risk_contributions(w, Sigma)` | Contributi al rischio marginale \(RC_i = w_i (\Sigma w)_i\). |
+| `balance_clusters(w, Sigma, clusters, tol)` | Ridimensiona iterativamente i pesi dei cluster finché la deviazione ERC non rientra in `tol`. |
+| `generator_A(mu, Sigma, constraints)` | Massimizza Sharpe con la penalità DRO di Wasserstein, i limiti CVaR/EDaR, i vincoli di turnover e leva finanziaria, quindi bilancia i cluster ERC. |
+| `generator_B_hrp(Sigma)` | Linea di base della parità gerarchica del rischio (collegamento dei reparti, quasi-diagonalizzazione). |
+| `generator_C_dro_closed(mu, Sigma, gamma, rho)` | Portafoglio distributivamente robusto in forma chiusa tramite inverso regolarizzato a cresta. |
+| `generator_D_cvar_erc(mu, Sigma, constraints)` | Allocazione per minimizzare il CVaR con bilanciamento dei cluster ERC e limiti di leva finanziaria/fatturato. |
+| `fit_meta_weights(returns_by_gen, sigma_matrix, j_max, penalty_to, penalty_te, baseline_idx)` | Meta-learner che unisce i PnL del generatore con le penalità di turnover/TE sul simplex. |
 | `run_optimization_pipeline(...)` | Wrapper che esegue generatori, meta-learner opzionale e persiste artefatti/audit (`OptimizePipelineResult`). |
 
-## CLI / Integration
+## CLI / Integrazione
 
-`fair3 optimize --generators A,B,C --meta` invoca il pipeline orchestrator e produce:
+`fair3 optimize --generators A, B, C --meta` invoca il pipeline orchestrator e produce:
 
 - `artifacts/weights/generator_*.csv` (pesi per singolo generatore)
 - `artifacts/weights/factor_allocation.csv` (allocazione finale)
@@ -26,16 +26,16 @@ The allocators package hosts the FAIR-III portfolio construction engines. Each g
 
 Audit snapshot e checksum sono registrati automaticamente.
 
-## Determinism & Seeds
+## Determinismo e semi
 
-All solvers are deterministic when fed deterministic inputs. Scenario draws must originate from `utils.rand.generator_from_seed`. Solver randomness is disabled by the convex back-ends (SCS/ECOS).
+Tutti i solutori sono deterministici quando alimentati con input deterministici. Le estrazioni degli scenari devono provenire da `utils.rand.generator_from_seed`.La casualità del risolutore è disabilitata dai back-end convessi (SCS/ECOS).
 
-## Common Errors
+## Errori comuni
 
-- **Infeasible CVaR constraints:** ensure `constraints["scenario_returns"]` has adequate history; loosen `cvar_cap` slightly or supply more scenarios.
-- **Turnover violation after ERC balancing:** the generator shrinks the post-balancing move if turnover exceeds the cap. Provide realistic `turnover_cap` (>0.01) to avoid degeneracy.
-- **HRP single asset edge cases:** the HRP generator returns `[1.0]` when only one asset is present.
+- **Vincoli CVaR non realizzabili:** assicurano che `constraints["scenario_returns"]` abbia una cronologia adeguata; allentare leggermente `cvar_cap` o fornire più scenari.
+- **Violazione del fatturato dopo il bilanciamento ERC:** il generatore riduce la mossa post-bilanciamento se il fatturato supera il limite. Fornire `turnover_cap` realistici (>0, 01) per evitare degenerazioni.
+- **Casi limite HRP per asset singolo:** il generatore HRP restituisce `[1.0]` quando è presente un solo asset.
 
-## Tracing Flags
+## Flag di tracciamento
 
-Pass `constraints["trace"] = True` to receive solver status messages and cluster diagnostics in the allocator log file.
+Passa `constraints["trace"] = True` per ricevere messaggi di stato del risolutore e diagnostica del cluster nel file di registro dell'allocatore.

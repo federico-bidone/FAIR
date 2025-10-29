@@ -1,12 +1,12 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+nome: Segnalazione bug
+informazioni su: Crea una segnalazione per aiutarci a migliorare
 ---
-**Describe the bug**
-**To Reproduce**
-**Expected behavior**
-**Logs / Screenshots**
-**Environment**
-- OS: Windows 11
+**Descrivi il bug**
+**Da riprodurre**
+**Comportamento previsto**
+**Registri/Schermate**
+**Ambiente**
+- Sistema operativo: Windows 11
 - Python: 3.11
-**Data license note**: please avoid attaching bulk data from third-party sources.
+**Nota sulla licenza dei dati**: evitare di allegare dati in blocco provenienti da fonti di terze parti.

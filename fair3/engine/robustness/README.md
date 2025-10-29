@@ -14,7 +14,7 @@ operativo.
 
 ### `fair3.engine.robustness.scenarios`
 - `ShockScenario`: rappresenta uno shock stilizzato con rendimenti precalcolati.
-- `default_shock_scenarios()`: fornisce gli shock storici inclusi di default.
+- `default_shock_scenarios()`: fornisce gli shock storici inclusi didefault.
 - `replay_shocks(...)`: riapplica gli shock sui rendimenti osservati
   calcolando drawdown e CAGR.
 
@@ -25,18 +25,18 @@ operativo.
 - `DEFAULT_FEATURES`: elenco ordinato delle feature governative di riferimento.
 
 ### `fair3.engine.robustness.lab`
-- `RobustnessConfig`: configura la dimensione dei blocchi, il numero di
+- `RobustnessConfig`: configura la dimensione dei blocchi, il numerodi
   estrazioni e le soglie di accettazione.
 - `RobustnessArtifacts`: descrive i file generati dal laboratorio di robustezza.
-- `run_robustness_lab(...)`: orquestra bootstrap, scenari e (facoltativamente)
+- `run_robustness_lab(...)`: orchestra bootstrap, scenario e (facoltativamente)
   ablation, producendo CSV, JSON e un PDF riassuntivo.
 
 ## Utilizzo da Pipeline/CLI
 
 L'orchestratore invoca `run_robustness_lab` dopo il reporting mensile per
-produrre diagnostiche in `artifacts/robustness/`. È possibile passare una
-callback `ablation_runner` che riceve i flag di governance e ritorna metriche
-(Sharpe, tracking error, drawdown). Il laboratorio crea automaticamente una
+produrre diagnostiche in `artifacts/robustness/`.È possibile passare una
+callback `ablation_runner` che riceve i flag di governance e ritorna metrica
+(Sharpe, tracking error, drawdown).Il laboratorio crea automaticamente una 
 cartella dedicata e popola i file in modo deterministico se si fornisce un
 `seed`.
 
@@ -59,17 +59,17 @@ artifacts, gates = run_robustness_lab(
 print("Gates superati:", gates.passes())
 ```
 
-## Errori Comuni e Troubleshooting
+## Errori Comuni e Risoluzione dei Problemi
 
 | Sintomo | Possibile causa | Risoluzione |
 | --- | --- | --- |
 | `ValueError` sulla dimensione del blocco | Il blocco richiesto è più grande del campione | Ridurre `block_size` o aggregare i rendimenti |
-| Tabella di ablation vuota | La callback non restituisce metriche | Verificare che il runner ritorni un dict di float |
+| Tabella di ablazione vuota | La callback non restituisce metriche | Verificare che il runner ritorni un dict di float |
 | PDF mancante | Backend Matplotlib non disponibile | Installare `matplotlib` e lasciare attivo il backend `Agg` |
 
 ## Tracciamento e Audit
 
-Impostando `seed` o affidandosi a `audit/seeds.yml` si ottengono risultati
-riproducibili per bootstrap e scenari. Le pipeline dovrebbero loggare i path
+Impostando `seed` o affidandosi a `audit/seeds.yml` si otterranno risultati
+riproducibili per bootstrap e scenario. Le pipeline dovrebbero loggare i path
 prodotti tramite `fair3.engine.logging.setup_logger` (con `--json-logs` quando
 serve l'audit trail completo) anche in modalità `--trace`.

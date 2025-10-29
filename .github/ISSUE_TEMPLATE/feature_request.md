@@ -1,8 +1,8 @@
 ---
-name: Feature request
-about: Suggest an idea
+nome: Richiesta di funzionalità
+informazioni: Suggerisci un'idea
 ---
-**Motivation**
-**Proposed solution**
-**Alternatives**
-**Impact on tests/docs**
+**Motivazione**
+**Soluzione proposta**
+**Alternative**
+**Impatto su test/documenti**

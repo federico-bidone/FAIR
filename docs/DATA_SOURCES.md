@@ -4,15 +4,15 @@ La tabella seguente mappa le principali fonti dati integrate in FAIR-III
 v0.2. Ogni riga riporta frequenza, URL di riferimento, vincoli di licenza e
 note operative (lag PIT, conversioni FX, passaggi manuali).
 
-| source | series/symbol | freq | earliest_date | url | license | rate_limit | requires_key | timezone | pit_rule | eom_pinning | eur_fx | manual_steps |
+| fonte | serie/simbolo | frequenza | prima_data | URL | licenza | limite_velocità | richiede_chiave | fuso orario | pit_rule | eom_pinning | euro_fx | passi_manuali |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| ecb | `EXR.D.USD.EUR.SP00.A` | Daily | 1999-01-04 | https://data-api.ecb.europa.eu/service/data/EXR | CC BY 4.0 | ≈20 req/min | No | Europe/Rome | T+0 16:00 CET | No | Base | Nessuno |
-| fred | `DGS10`, `T10YIE`, `CPIAUCSL` | Daily/Monthly | 1962-01-02 | https://api.stlouisfed.org/fred/series/observations | Data.gov | 120 req/min | Sì (`FRED_API_KEY`) | America/New_York | T+1 | Sì (CPI) | Sì (FX BCE) | Nessuno |
-| stooq | `spy.us`, `agg.us` | Daily | 2000-01-03 | https://stooq.com | CC BY 4.0 | N/A (static CSV) | No | Exchange local | T+0 close | No | Sì (FX BCE) | Nessuno |
-| cboe | `vix_historical.csv` | Daily | 1990-01-02 | https://www.cboe.com/us/equity_indices/file_info/ | Proprietary (terms of use) | Manual download | No | America/Chicago | T+1 09:15 CT | No | Sì | Nessuno |
-| portfoliocharts | Simba `Data_Series` | Monthly | 1900-01-31 | https://portfoliocharts.com | Educational use | Manual (Excel) | No | UTC | T+1 month-end | Sì | Sì | Copiare `Simba` in `data/portfoliocharts_manual/` |
-| curvo | MSCI/FTSE/STOXX CSV | Daily/Monthly | 2003-01-02 | https://curvo.eu | Proprietary | Manual download | No | Europe/Brussels | T+2 | Sì | Sì | Copia manuale in `data/curvo/` |
-| coingecko | `bitcoin`, `ethereum` | Daily | 2013-04-29 | https://api.coingecko.com/api/v3/ | CC BY 4.0 | 50 req/min | No | UTC | T+0 16:00 CET | No | No | Nessuno |
+| Bce | `EXR.D.USD.EUR.SP00. A` | Giornaliero | 04-01-1999 | https://data-api.ecb.europa.eu/service/data/EXR | CC BY 4.0 | ≈20 richieste/min | No | Europa/Roma | T+0 16:00 | No | Fondo | Nessuno |
+| Fred | `DGS10`, `T10YIE`, `CPIAUCSL` | Giornaliero/mensile | 02-01-1962 | https://api.stlouisfed.org/fred/series/observations | Data.gov | 120 richieste/min | Sì (`FRED_API_KEY`) | America/New_York | T+1 | Sì (CPI) | Sì (FX BCE) | Nessuno |
+| stooq | `spy.us`, `agg.us` | Giornaliero | 2000-01-03 | https://stooq.com | CC BY 4.0 | N/D (CSV statico) | No | Scambio locale | T+0 chiudi | No | Sì (FX BCE) | Nessuno |
+| cboe | `vix_historical.csv` | Giornaliero | 02-01-1990 | https://www.cboe.com/us/equity_indices/file_info/ | Proprietario (termini di utilizzo) | Scarica il manuale | No | America/Chicago | T+1 09:15 CT | No | Sì | Nessuno |
+| grafici di portafoglio | Simba`Data_Series` | Mensile | 31-01-1900 | https://portfoliocharts.com | Uso didattico | Manuale (Excel) | No | UTC | T+1 fine mese | Sì | Sì | Copiare `Simba` in `data/portfoliocharts_manual/` |
+| curvo | MSCI/FTSE/STOXX CSV | Giornaliero/mensile | 2003-01-02 | https://curvo.eu | Proprietario | Scarica il manuale | No | Europa/Bruxelles | T+2 | Sì | Sì | Copia manuale in `data/curvo/` |
+| coingecco | `bitcoin`, `ethereum` | Giornaliero | 29-04-2013 | https://api.coingecko.com/api/v3/ | CC BY 4.0 | 50 richieste/min | No | UTC | T+0 16:00 | No | No | Nessuno |
 
 Legenda colonne:
 

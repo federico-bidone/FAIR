@@ -1,50 +1,50 @@
-# Observability & Telemetry
+# Osservabilità e telemetria
 
-FAIR-III v0.2 centralises logging and runtime telemetry to make Windows-first CLI
-runs debuggable without bespoke infrastructure.
+FAIR-III v0.2 centralizza la registrazione e la telemetria di runtime per rendere le prime CLI di Windows
+eseguibili con debug senza un'infrastruttura personalizzata.
 
-## Structured Logging
+## Registrazione strutturata
 
-- Use `fair3.engine.logging.setup_logger(name, json_format=False, level=None)` in
-  every module. The helper reads `FAIR_LOG_LEVEL` (default `INFO`) and attaches a
-  console handler automatically.
-- When `json_format=True` or `FAIR_JSON_LOGS=1`, the logger also mirrors records
-  to `artifacts/audit/fair3.log` as single-line JSON containing
+- Utilizza `fair3.engine.logging.setup_logger(name, json_format=False, level=None)` in
+  ogni modulo. L'helper legge `FAIR_LOG_LEVEL` (predefinito `INFO`) e allega automaticamente un 
+  gestore della console.
+- Quando `json_format=True` o `FAIR_JSON_LOGS=1`, il logger esegue anche il mirroring dei record
+  a `artifacts/audit/fair3.log` come JSON a riga singola contenente
   `timestamp`, `level`, `source`, `message`, `process_time_ms`,
-  `bytes_downloaded`, `rows_processed`, and `ratelimit_event`.
-- CLI runs expose `--json-logs/--no-json-logs` and call
-  `configure_cli_logging()` so all `fair3.*` loggers share the same
-  configuration.
+  `bytes_downloaded`, `rows_processed` e `ratelimit_event`.
+- CLI esegue l'esposizione`--json-logs/--no-json-logs` e chiama
+  `configure_cli_logging()` in modo che tutti i logger `fair3.*` condividano la stessa
+  configurazione.
 
-## Metrics Stream
+## Flusso di metriche
 
-Call `record_metrics(metric_name, value, tags=None)` to append numerical gauges
-(e.g. rows ingested, bootstrap iterations) to
-`artifacts/audit/metrics.jsonl`. Each line captures a UTC timestamp, the metric
-name, the float value, and optional string tags. Metrics are safe to call from
-multiple commands; the helper ensures the audit directory exists.
+Chiama `record_metrics(metric_name, value, tags=None)` per aggiungere indicatori numerici
+(ad esempio righe importate, iterazioni bootstrap) in
+`artifacts/audit/metrics.jsonl`.Ogni riga acquisisce un timestamp UTC, il nome della metrica
+, il valore float e tag stringa opzionali. È sicuro richiamare le metriche da
+comandi multipli; l'helper garantisce che la directory di controllo esista.
 
-## Progress Bars
+## Barre di avanzamento
 
-Ingest fetchers now wrap symbol downloads with `tqdm`, activated via
-`--progress` or `--no-progress` on the CLI. The progress bar shows
-`ingest:<SOURCE>` with per-symbol updates and automatically disappears when
-disabled (default).
+I fetcher di acquisizione ora racchiudono i download di simboli con `tqdm`, attivati ​​tramite
+`--progress` o `--no-progress` sulla CLI.La barra di avanzamento mostra
+`ingest:<SOURCE>` con gli aggiornamenti per simbolo e scompare automaticamente quando
+disabilitato (impostazione predefinita).
 
 ## Test Harness Integration
 
-Pytest fixtures rely on the same helpers: the autouse fixture in
-`tests/conftest.py` sets `FAIR_LOG_LEVEL=INFO` so unit tests inherit a consistent
-verbosity. Individual tests can opt-in to JSON logging by setting
-`FAIR_JSON_LOGS=1` or calling `configure_cli_logging(True)`.
+I dispositivi Pytest si basano sugli stessi helper: il dispositivo autouse in
+`tests/conftest.py` imposta `FAIR_LOG_LEVEL=INFO` in modo che i test unitari ereditino una coerenza
+verbosità. I singoli test possono attivare la registrazione JSON impostando
+`FAIR_JSON_LOGS=1` o chiamando `configure_cli_logging(True)`.
 
-## Troubleshooting
+## Risoluzione dei problemi
 
-| Symptom | Likely Cause | Fix |
+| Sintomo | Probabile causa | Correzione |
 | --- | --- | --- |
-| JSON log file missing | `--json-logs` not passed and `FAIR_JSON_LOGS` unset | Run with `fair3 ... --json-logs` or export `FAIR_JSON_LOGS=1`. |
-| Progress bar not visible | Running under CI or `--no-progress` | Pass `--progress` explicitly; the flag defaults to `False`. |
-| Duplicate log lines | Logger reconfigured without clearing handlers | Rely on `setup_logger` (idempotent) instead of manual handler wiring. |
+| File di registro JSON mancante | `--json-logs` non superato e `FAIR_JSON_LOGS` non impostato | Esegui con `fair3 ... --json-logs` o esporta `FAIR_JSON_LOGS=1`. |
+| Barra di avanzamento non visibile | In esecuzione in CI o `--no-progress` | Passa `--progress` esplicitamente; il flag predefinito è `False`. |
+| Righe di registro duplicate | Logger riconfigurato senza cancellare i gestori | Affidarsi al cablaggio `setup_logger` (idempotente) anziché al comando manuale. |
 
-All paths and filenames are relative to the project root to ease Windows
-compatibility and reproducibility.
+Tutti i percorsi e i nomi dei file sono relativi alla radice del progetto per facilitare la compatibilità e la riproducibilità di Windows
+.

@@ -2,31 +2,31 @@
 
 ## Scopo
 Il modulo `fair3.engine.goals` fornisce il motore Monte Carlo per la
-valutazione dei goal household, producendo probabilità di successo
+valutazione dei goal family, producendo probabilità di successo
 ponderate, fan-chart e glidepath adattive coerenti con i vincoli FAIR-III.
 Il simulatore supporta piani di contribuzione e riscatti programmati,
-integra curve di regime (base/crisi) e consente di applicare glidepath
+integra curva di regime(base/crisi) e consente di applicare glidepath
 più conservativi o aggressivi in base alla probabilità di raggiungimento
 dei target.
 
 ## API Pubbliche
 - `run_goal_monte_carlo(goals, draws, seed, parameters, ...)`:
-  esegue la simulazione completa scrivendo CSV/PDF in `reports/`
-  (o nella directory specificata) con nomi basati sull'investor.
+  esegue la simulazione completa inserendo CSV/PDF in `reports/`
+  (o nella directory specificata) con nomi basato sull'investor.
 - `goal_monte_carlo(parameters, goals, draws=..., seed=..., regime_panel=None)`:
-  restituisce un payload serializzabile con risultati, glidepath e fan-chart
+  restituisce un payload serializzabile con risultati, glidepath efan-chart
   senza produrre artefatti.
 - `simulate_goals(goals, draws, seed, parameters, assumptions=None, regime_panel=None)`:
   restituisce `GoalSimulationSummary` con per-goal stats, glidepath e fan-chart.
 - `load_goal_configs_from_yaml(path)` / `load_goal_parameters(path)`:
   helper per leggere i file YAML di configurazione (`configs/goals.yml`
-  e `configs/params.yml`).
+  e`configs/params.yml`).
 - `build_contribution_schedule(...)`, `build_withdrawal_schedule(...)` e
-  `build_cashflow_schedule(...)`: utility deterministiche riutilizzabili in test
+  `build_cashflow_schedule(...)`: utilità deterministiche riutilizzabili in test
   e analisi.
 
 Tutte le API accettano un parametro `seed` propagato tramite
-`numpy.random.SeedSequence` per garantire risultati identici a parità di
+`numpy.random. SeedSequence` per garantire risultati identici a parità di
 input.
 
 ## Esempi
@@ -69,7 +69,7 @@ print("PDF:", artifacts.report_pdf)
 - `--simulate`: richiesto per eseguire la simulazione; senza flag il CLI
   mostra solamente il numero di goal configurati.
 - `--monthly-contribution`, `--initial-wealth`,
-  `--contribution-growth`: override CLI del piano household.
+  `--contribution-growth`: override CLI del piano domestic.
 - Log sintetico in stdout come
   `[fair3] goals investor=... draws=... weighted=... pdf=... fan=...`.
 
@@ -83,5 +83,5 @@ print("PDF:", artifacts.report_pdf)
 ## Tracciamento & Log
 Gli artefatti `*_summary.csv`, `*_glidepaths.csv`, `*_fan_chart.csv` e
 `goals_<investor>.pdf` vengono scritti in `reports/` (o percorso custom).
-I file riportano seed utilizzato, probabilità per ciascun goal, glidepath
+I file riportano seed utilizzato, probabilità per ciascun obiettivo, glidepath
 adattivo e fan-chart 5/50/95 per favorire auditabilità e analisi what-if.

@@ -1,25 +1,25 @@
-# fair3 package overview
+# Panoramica pacchetto fair3
 
-> Strumento informativo/educational; non costituisce consulenza finanziaria o raccomandazione.
+> Strumento informativo/didattico; non costituisce consulenza finanziaria o raccomandazione.
 
-The `fair3` package implements the FAIR-III portfolio research stack.  Every
-module respects the Google Python Style Guide, exposes typed, reusable
-entrypoints, and is callable both via CLI wiring and from downstream Python
-code.
+Il pacchetto `fair3` implementa lo stack di ricerca di portafoglio FAIR-III.Ogni
+modulo rispetta la Google Python Style Guide, espone punti di ingresso
+tipizzati e riutilizzabili ed è richiamabile sia tramite cablaggio CLI che dal codice Python
+ downstream.
 
 ## Layout
-- `fair3/cli/`: argparse-based command registration with deterministic defaults
-  and audit-friendly logging.
-- `fair3/engine/`: domain engines covering ingest, ETL, factor construction,
-  estimates, optimisation, mapping, regime detection, execution, reporting, QA,
-  robustness, and utilities.
-- `fair3/configs/`: runtime configuration loaders (not yet part of the public
-  API in v0.2).
+- `fair3/cli/`: registrazione dei comandi basata su argparse con valori predefiniti deterministici
+  e registrazione di facile verifica.
+- `fair3/engine/`: motori di dominio che coprono acquisizione, ETL, costruzione di fattori,
+  stime, ottimizzazione, mappatura, rilevamento del regime, esecuzione, reporting, QA,
+  robustezza e utilità.
+- `fair3/configs/`: caricatori di configurazione runtime (non ancora parte dell'API pubblica
+   inv0.2).
 
-## Contributor notes
-- Follow the PyGuide docstring structure (`Args`, `Returns`, `Raises`,
-  `Attributes`) and keep imports grouped (stdlib, third-party, local).
-- Prefer deterministic helpers that accept explicit seeds sourced from
+## Note del contributo
+- Segui la struttura della stringa di documentazione PyGuide (`Args`, `Returns`, `Raises`,
+  `Attributes`) e mantieni le importazioni raggruppate (stdlib, di terze parti, locale).
+- Preferisci helper deterministici che accettano seed espliciti provenienti da
   `audit/seeds.yml`.
-- Log license metadata, checksums, and paths whenever new artefacts are
-  produced so that the QA pipeline can surface discrepancies immediately.
+- Registra metadati, checksum e percorsi della licenza ogni volta che vengono prodotti nuovi artefatti
+  in modo che la pipeline QA possa far emergere immediatamente le discrepanze.
