@@ -201,7 +201,7 @@ class _DummyLineEdit(_DummyWidget):
     def setText(self, value: str) -> None:  # noqa: N802
         self._text = value
 
-    def text(self) -> str:  # noqa: D401 - short getter description
+    def text(self) -> str:
         """Restituisce la stringa memorizzata."""
 
         return self._text
@@ -309,7 +309,7 @@ def gui_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> dict[str, object
         def __init__(self, **kwargs: object) -> None:
             builder_calls.append({"init": kwargs})
 
-        def build(self, *, seed: int, trace: bool) -> SimpleNamespace:  # noqa: D401 - interface parity
+        def build(self, *, seed: int, trace: bool) -> SimpleNamespace:
             builder_calls[-1]["build"] = {"seed": seed, "trace": trace}
             return SimpleNamespace(
                 panel_path=Path("asset_panel.parquet"),
@@ -495,7 +495,7 @@ def test_run_etl_failure(gui_env: dict[str, object], monkeypatch: pytest.MonkeyP
         def __init__(self, **_: object) -> None:
             return None
 
-        def build(self, *, seed: int, trace: bool) -> None:  # noqa: D401 - interface parity
+        def build(self, *, seed: int, trace: bool) -> None:
             raise RuntimeError(f"boom {seed} {trace}")
 
     monkeypatch.setattr(gui, "TRPanelBuilder", _ExplodingBuilder)
