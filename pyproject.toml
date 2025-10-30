@@ -94,4 +94,3 @@ module = [
   "fair3.cli.main",
 ]
 ignore_errors = false
-
