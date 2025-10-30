@@ -56,7 +56,23 @@ class TRPanelBuilder:
 
     # ------------------------------------------------------------------
     def build(self, *, seed: int | None = None, trace: bool = False) -> TRPanelArtifacts:
-        """Esegue l'intera pipeline e ritorna i percorsi degli output."""
+        """Esegue l'intera pipeline ETL e restituisce gli artefatti generati.
+
+        Args:
+            seed: Seed opzionale per rendere deterministici gli stadi stocastici
+                (es. bootstrap feature). Se ``None`` viene mantenuta la
+                configurazione globale del motore.
+            trace: Se ``True`` stampa log sintetici su STDOUT per facilitare
+                l'ispezione manuale.
+
+        Returns:
+            TRPanelArtifacts: Percorsi, checksum e metadati del pannello
+                normalizzato.
+
+        Raises:
+            FileNotFoundError: Se non sono presenti artefatti raw in
+                ``self.raw_root``.
+        """
 
         run_ts = datetime.now(UTC)
         raw_records = self._load_raw_records()
@@ -353,6 +369,21 @@ class TRPanelBuilder:
 
 
 def build_tr_panel(**kwargs: object) -> TRPanelArtifacts:
+    """Convenienza per costruire il pannello prezzi/rendimenti in una riga.
+
+    Args:
+        **kwargs: Parametri passati a :class:`TRPanelBuilder`, ad esempio
+            ``raw_root``, ``clean_root``, ``audit_root`` o ``base_currency``.
+
+    Returns:
+        TRPanelArtifacts: Riferimenti al file Parquet, checksum SHA-256 e log
+            QA prodotti dalla pipeline.
+
+    Examples:
+        >>> build_tr_panel(raw_root="data/raw", clean_root="data/clean")
+        TRPanelArtifacts(...)
+    """
+
     builder = TRPanelBuilder(**kwargs)
     return builder.build()
 
