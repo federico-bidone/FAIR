@@ -23,11 +23,11 @@ fair3 = "fair3.cli.main:main"
 
 [tool.black]
 line-length = 100
-target-version = ["py311"]
+target-version = ["py312"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "N", "D"]
@@ -55,7 +55,7 @@ ignore = [
 convention = "google"
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 ignore_missing_imports = true
 show_error_codes = true
 pretty = true
@@ -94,3 +94,6 @@ module = [
   "fair3.cli.main",
 ]
 ignore_errors = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
