@@ -36,4 +36,3 @@ Tutte le regole di convalida sono codificate tramite modelli [pydantic](https://
  su tutte le piattaforme.
 
 > **Disclaimer:** strumento informativo/educativo; non costituisce consiglio finanziario o raccomandazione.
-
