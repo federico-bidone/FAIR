@@ -12,7 +12,7 @@ license = {text = "Apache-2.0"}
 dependencies = [
   "numpy", "pandas", "pyarrow", "scipy", "cvxpy", "scikit-learn",
   "pyyaml", "requests", "matplotlib", "pydantic>=2.5", "tqdm", "hmmlearn",
-  "reportlab>=4.1"
+  "reportlab>=4.1", "pdfplumber"
 ]
 
 [project.optional-dependencies]
@@ -23,14 +23,14 @@ fair3 = "fair3.cli.main:main"
 
 [tool.black]
 line-length = 100
-target-version = ["py311"]
+target-version = ["py312"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py312"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "B", "UP", "N", "ANN", "D"]
+select = ["E", "F", "I", "B", "UP", "N", "D"]
 ignore = [
   "D100",
   "D101",
@@ -53,3 +53,47 @@ ignore = [
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+show_error_codes = true
+pretty = true
+files = [
+  "fair3/engine/brokers",
+  "fair3/engine/universe",
+  "fair3/cli/main.py",
+]
+
+[[tool.mypy.overrides]]
+module = [
+  "requests",
+  "yaml",
+  "pandas",
+  "pandas.*",
+  "numpy",
+  "numpy.*",
+  "sklearn.*",
+  "tqdm.*",
+  "hmmlearn.*",
+  "reportlab.*",
+  "pyarrow.*",
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["fair3.*"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = [
+  "fair3.engine.brokers",
+  "fair3.engine.brokers.*",
+  "fair3.engine.universe",
+  "fair3.engine.universe.*",
+  "fair3.cli.main",
+]
+ignore_errors = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

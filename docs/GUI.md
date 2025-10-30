@@ -38,14 +38,14 @@ utile quando si convalida la configurazione all'interno di headlessambienti.
   e motori obiettivo utilizzando le directory e le soglie configurate.
 - **Scheda Rapporti:** fornisce un percorso PDF da aprire con il visualizzatore predefinito della piattaforma.
 
-Tutte le azioni rilevano le eccezioni e le registrano nel registro su schermo in modol'applicazione 
+Tutte le azioni rilevano le eccezioni e le registrano nel registro su schermo in modol'applicazione
  rimane reattiva anche se una fase della pipeline fallisce. Quando PySide6
 non è installato, la GUI salta silenziosamente l'esecuzione dopo aver registrato un suggerimento.
 
 ## Layout dell'interfaccia
 
 La finestra della GUI è suddivisa in tre schede:**Ingest**, **Pipeline** e
-**Rapporti**—impilate nella parte superiore del frame. Un pannello di registro persistente si trova in 
+**Rapporti**—impilate nella parte superiore del frame. Un pannello di registro persistente si trova in
 in basso e rispecchia gli aggiornamenti di stato della CLI in ordine cronologico. Ogni scheda
 espone attivazioni/disattivazioni di prova e selettori di percorso in modo che la GUI rispecchi la semantica della CLI
 senza fare affidamento su uno screenshot incorporato.

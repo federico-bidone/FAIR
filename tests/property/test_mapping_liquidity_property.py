@@ -3,11 +3,12 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-pytest.importorskip("hypothesis")
-
-from hypothesis import given
-from hypothesis import strategies as st
-from hypothesis.strategies import SearchStrategy
+try:
+    from hypothesis import given
+    from hypothesis import strategies as st
+    from hypothesis.strategies import SearchStrategy
+except ModuleNotFoundError:  # pragma: no cover - dipendenza opzionale
+    pytest.skip("Richiede la libreria hypothesis", allow_module_level=True)
 
 from fair3.engine.mapping import clip_trades_to_adv, max_trade_notional
 

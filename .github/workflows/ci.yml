@@ -1,24 +1,280 @@
-name: ci
+name: CI
+
 on:
-  push: { branches: [ main ] }
-  pull_request: { branches: [ main ] }
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  id-token: write
+
+env:
+  TZ: UTC
+  PYTHONHASHSEED: "0"
+
 jobs:
-  win:
-    runs-on: windows-latest
+  lint_type:
+    name: Ruff + Mypy
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "3.11" }
-      - name: Install
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install tooling
         run: |
-          python -m pip install -U pip
+          python -m pip install --upgrade pip
           pip install -e .[dev]
-          pre-commit install
-      - name: Lint & Format
+          pip install ruff mypy
+      - name: Ruff lint
         run: |
           ruff check .
           ruff format --check .
-          black --check .
-      - name: Tests
+      - name: Mypy
         run: |
-          pytest -q
+          mypy fair3
+
+  import_sanity:
+    name: Import sanity (fair3.*)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev]
+      - name: Import all modules
+        run: |
+          python - <<'PY'
+import importlib
+import pkgutil
+import sys
+
+import fair3
+
+failures: list[tuple[str, str]] = []
+prefix = fair3.__name__ + "."
+for module_info in pkgutil.walk_packages(fair3.__path__, prefix):
+    try:
+        importlib.import_module(module_info.name)
+    except Exception as exc:  # noqa: BLE001 - diagnostica completa per la CI
+        failures.append((module_info.name, repr(exc)))
+
+if failures:
+    for name, err in failures:
+        print(f"[IMPORT ERROR] {name}: {err}", file=sys.stderr)
+    sys.exit(1)
+print("All fair3.* modules import successfully")
+PY
+
+  tests_fast:
+    name: Tests fast (no network) + Coverage
+    runs-on: ubuntu-latest
+    needs: [lint_type, import_sanity]
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev]
+          pip install pytest pytest-cov pytest-xdist
+      - name: Pytest (exclude rete con marker o pattern)
+        run: |
+          set -e
+          # Preferiamo un marker dedicato se presente (--help contiene 'network').
+          if pytest --help | grep -q "network"; then
+            pytest -q -n auto --maxfail=1 --disable-warnings -m "not network" \
+              --cov=fair3 --cov-report=xml --cov-report=term-missing
+          else
+            # Fallback: escludiamo i test noti che richiedono HTTP esterno.
+            pytest -q -n auto --maxfail=1 --disable-warnings \
+              --cov=fair3 --cov-report=xml --cov-report=term-missing \
+              --ignore=tests/unit/test_aqr_fetcher.py \
+              --ignore=tests/unit/test_bis_fetcher.py \
+              --ignore=tests/unit/test_cboe_fetcher.py \
+              --ignore=tests/unit/test_curvo_fetcher.py \
+              --ignore=tests/unit/test_ecb_fetcher.py \
+              --ignore=tests/unit/test_eodhd_fetcher.py \
+              --ignore=tests/unit/test_french_fetcher.py \
+              --ignore=tests/unit/test_lbma_fetcher.py \
+              --ignore=tests/unit/test_oecd_fetcher.py \
+              --ignore=tests/unit/test_yahoo_fetcher.py
+          fi
+      - name: Persist coverage data
+        run: |
+          if [ -f .coverage ]; then
+            mv .coverage .coverage.${{ matrix.python-version }}
+          fi
+      - name: Upload raw coverage artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-raw-${{ matrix.python-version }}
+          path: .coverage.${{ matrix.python-version }}
+          if-no-files-found: ignore
+      - name: Upload coverage XML
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-xml-${{ matrix.python-version }}
+          path: coverage.xml
+          if-no-files-found: warn
+
+  tests_integration_network:
+    name: Tests integration (network)
+    runs-on: ubuntu-latest
+    needs: tests_fast
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install network test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev]
+          pip install pytest pytest-xdist requests-cache
+      - name: Prime HTTP cache directory
+        run: |
+          mkdir -p .httpcache
+      - name: Run network tests (marker o elenco)
+        env:
+          REQUESTS_CACHE_BACKEND: sqlite
+          REQUESTS_CACHE_NAME: .httpcache/cache
+        run: |
+          set -e
+          if pytest --help | grep -q "network"; then
+            pytest -q -n auto --maxfail=1 --disable-warnings -m network || \
+              pytest -q --maxfail=1 --disable-warnings -m network
+          else
+            pytest -q -n auto --maxfail=1 --disable-warnings \
+              tests/unit/test_aqr_fetcher.py \
+              tests/unit/test_bis_fetcher.py \
+              tests/unit/test_cboe_fetcher.py \
+              tests/unit/test_curvo_fetcher.py \
+              tests/unit/test_ecb_fetcher.py \
+              tests/unit/test_eodhd_fetcher.py \
+              tests/unit/test_french_fetcher.py \
+              tests/unit/test_lbma_fetcher.py \
+              tests/unit/test_oecd_fetcher.py \
+              tests/unit/test_yahoo_fetcher.py
+          fi
+      - name: Note future hardening
+        run: |
+          echo "Per rendere questo job blocking su PR, spostare la condizione 'if' su true e aggiornarne la strategia." \
+            " Valutare l'uso di cassette HTTP (es. pytest-vcr) per stabilizzare i fetcher." 
+
+  coverage_combine:
+    name: Combine coverage
+    runs-on: ubuntu-latest
+    needs: tests_fast
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download raw coverage parts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-raw-*
+          merge-multiple: true
+      - name: Combine coverage files
+        run: |
+          python -m pip install coverage
+          find . -name '.coverage.*' -print -exec mv {} . \;
+          coverage combine
+          coverage xml -o coverage-merged.xml
+          coverage report -m
+      - name: Upload merged coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-merged
+          path: coverage-merged.xml
+          if-no-files-found: warn
+
+  security:
+    name: Security (pip-audit + OSV)
+    runs-on: ubuntu-latest
+    needs: lint_type
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install tooling
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-audit pip-tools
+          curl -sSfL https://raw.githubusercontent.com/google/osv-scanner/main/scripts/install.sh | sh -s --
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Export requirements snapshot
+        run: |
+          if [ -f requirements.txt ]; then
+            cp requirements.txt requirements.ci.txt
+          else
+            pip-compile --quiet --output-file requirements.ci.txt || pip freeze > requirements.ci.txt
+          fi
+      - name: pip-audit (fail High/Critical)
+        run: |
+          pip-audit -r requirements.ci.txt --severity high
+      - name: OSV-Scanner (warn only)
+        run: |
+          ./osv-scanner -r . || true
+
+  build:
+    name: Build dist + SBOM
+    runs-on: ubuntu-latest
+    needs: [tests_fast, security]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Build distributions
+        run: |
+          python -m pip install --upgrade pip build cyclonedx-bom
+          python -m build
+          cyclonedx-bom -o sbom.json -e .
+      - name: Publish build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-and-sbom
+          path: |
+            dist/*
+            sbom.json
+
+  codeql:
+    name: CodeQL (Python)
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: python
+      - uses: github/codeql-action/analyze@v3

@@ -1,10 +1,11 @@
 import numpy as np
 import pytest
 
-pytest.importorskip("hypothesis")
-
-from hypothesis import given, settings
-from hypothesis import strategies as st
+try:
+    from hypothesis import given, settings
+    from hypothesis import strategies as st
+except ModuleNotFoundError:  # pragma: no cover - dipendenza opzionale
+    pytest.skip("Richiede la libreria hypothesis", allow_module_level=True)
 
 from fair3.engine.utils import project_to_psd
 

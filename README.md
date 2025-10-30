@@ -76,6 +76,7 @@ log.
 | --- | --- | --- |
 | `fair3 validate` | Convalida gli schemi di configurazione YAML prima di eseguire la pipeline. | `--verbose`, `--json-logs`, `--no-progress` |
 | `fair3 ingest` | Scarica i dati grezzi in `data/raw/` con registrazione di controllo completa. | `--source`, `--symbols`, `--from`, `--throttle`, `--dry-run` |
+| `fair3 universe` | Unifica universi broker, arricchisce gli ISIN con OpenFIGI e suggerisce i provider dati. | `--brokers`, `--output-dir`, `--openfigi-key`, `--dry-run` |
 | `fair3 etl` | Costruisci pannelli PIT Parquet/SQLite da artefatti grezzi acquisiti. | `--rebuild`, `--dry-run`, `--json-logs` |
 | `fair3 factors` | Libreria di fattori di calcolo con suddivisioni di convalida e report QA. | `--validate`, `--oos-splits`, `--dry-run` |
 | `fair3 estimate` | Stima μ/Σ utilizzando motori ensemble e PSD/SPD. | `--cv-splits`, `--sigma-engine`, `--dry-run` |
@@ -245,6 +246,7 @@ La tabella seguente riassume i pacchetti più importanti affinché i nuovi contr
 | --- | --- | --- |
 | `fair3.cli` | Definizioni dell'interfaccia della riga di comando e analisi degli argomenti. | `fair3/cli/main.py` orchestra sottocomandi come `fair3 factors` o `fair3 optimize`. |
 | `fair3.engine.ingest` | Downloader per fonti BCE, FRED, BoE, BRI, OCSE, Banca Mondiale, CBOE, Nareit, LBMA, Stooq, French Data Library e Yahoo fallback (yfinance) con dispositivi offline. | `run_ingest` pipeline, classi fetcher come `FREDFetcher`, `YahooFetcher`. |
+| `fair3.engine.universe` | Aggregatore degli universi investibili dei broker, arricchiti con mapping OpenFIGI e scelta intelligente dei data provider. | `run_universe_pipeline`, fetcher `TradeRepublicFetcher`, comando `fair3 universe`. |
 | `fair3.engine.etl` | Costruzione di pannelli puntuali e utilità di pulizia TR. | `TRPanelBuilder`, CLI ETL richiamata tramite `fair3 etl`. |
 | `fair3.engine.factors` | Libreria di fattori, ortogonalizzazione, cablaggio di validazione. | `FactorLibrary`, `run_factor_pipeline`, CLI `fair3 factors`. |
 | `fair3.engine.estimates` | Stack di stima media/varianza, fusione Black-Litterman, diagnostica della deriva. | `run_estimate_pipeline`, `estimate_mu_ensemble`. |

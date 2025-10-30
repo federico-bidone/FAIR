@@ -36,7 +36,7 @@ operativo.
 L'orchestratore invoca `run_robustness_lab` dopo il reporting mensile per
 produrre diagnostiche in `artifacts/robustness/`.È possibile passare una
 callback `ablation_runner` che riceve i flag di governance e ritorna metrica
-(Sharpe, tracking error, drawdown).Il laboratorio crea automaticamente una 
+(Sharpe, tracking error, drawdown).Il laboratorio crea automaticamente una
 cartella dedicata e popola i file in modo deterministico se si fornisce un
 `seed`.
 

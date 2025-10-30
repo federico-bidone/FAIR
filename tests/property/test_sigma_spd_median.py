@@ -6,10 +6,11 @@ import numpy as np
 import pandas as pd
 import pytest
 
-pytest.importorskip("hypothesis")
-
-from hypothesis import given, settings
-from hypothesis import strategies as st
+try:
+    from hypothesis import given, settings
+    from hypothesis import strategies as st
+except ModuleNotFoundError:  # pragma: no cover - dipendenza opzionale
+    pytest.skip("Richiede la libreria hypothesis", allow_module_level=True)
 
 from fair3.engine.estimates.sigma import sigma_spd_median
 
