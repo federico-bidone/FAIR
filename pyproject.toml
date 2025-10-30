@@ -59,9 +59,26 @@ python_version = "3.11"
 ignore_missing_imports = true
 show_error_codes = true
 pretty = true
+files = [
+  "fair3/engine/brokers",
+  "fair3/engine/universe",
+  "fair3/cli/main.py",
+]
 
 [[tool.mypy.overrides]]
-module = ["requests", "yaml", "pandas", "pandas.*", "numpy", "numpy.*", "sklearn.*", "tqdm.*", "hmmlearn.*", "reportlab.*", "pyarrow.*"]
+module = [
+  "requests",
+  "yaml",
+  "pandas",
+  "pandas.*",
+  "numpy",
+  "numpy.*",
+  "sklearn.*",
+  "tqdm.*",
+  "hmmlearn.*",
+  "reportlab.*",
+  "pyarrow.*",
+]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
