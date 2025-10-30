@@ -10,9 +10,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Final
 
+from fair3.engine.infra.paths import DEFAULT_LOG_ROOT
+
 CONSOLE_FORMAT: Final[str] = "[%(levelname)s] %(name)s: %(message)s"
 DEFAULT_LEVEL: Final[str] = "INFO"
-AUDIT_DIR: Final[Path] = Path("artifacts") / "audit"
+AUDIT_DIR: Final[Path] = DEFAULT_LOG_ROOT
 LOG_PATH: Final[Path] = AUDIT_DIR / "fair3.log"
 METRICS_PATH: Final[Path] = AUDIT_DIR / "metrics.jsonl"
 JSON_ENV_FLAG: Final[str] = "FAIR_JSON_LOGS"

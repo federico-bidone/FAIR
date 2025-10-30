@@ -47,7 +47,7 @@ Argomenti importanti:
 
 La funzione `run_demo_qa` restituisce `DemoQAResult` con i flag
 `acceptance_passed` e `robustness_passed`.Test di integrazione e la CLI
-registrano anche le metriche in `artifacts/audit/metrics.jsonl` per facilitare gli
+registrano anche le metriche in `artifacts/logs/metrics.jsonl` per facilitare gli
 assert di CI.
 
 ## FAQ

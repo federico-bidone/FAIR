@@ -17,9 +17,11 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest", "hypothesis", "ruff", "black", "pre-commit", "mypy"]
+gui = ["PySide6>=6.6", "keyring>=24.0"]
 
 [project.scripts]
 fair3 = "fair3.cli.main:main"
+fair3-gui = "fair3.engine.gui.main:main"
 
 [tool.black]
 line-length = 100

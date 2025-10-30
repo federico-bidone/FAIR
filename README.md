@@ -18,6 +18,8 @@ FAIR-III (Unified) è uno stack di ricerca di portafoglio basato esclusivamente 
 - Livello di esecuzione con dimensionamento dei lotti, costi di transazione Almgren–Chriss, euristica fiscale italiana e garanzie di non scambio.
 - Report mensili con grafici a ventaglio, gate di accettazione, dashboard PDF, laboratorio di robustezza (bootstrap/replay), studi di ablazione e artefatti di audit completi.
 - Motore Monte Carlo basato su obiettivi che produce probabilità di successo consapevoli del regime e artefatti del glidepath.
+- GUI PySide6 opzionale con gestione delle API key, scoperta dell'universo
+  investibile e ingest automatico dei provider suggeriti.
 
 ## Installazione (Windows 11)
 1. Installa Python 3.11 (64 bit) da Microsoft Store o python.org e assicurati che `python` punti a 3.11.
@@ -26,7 +28,7 @@ FAIR-III (Unified) è uno stack di ricerca di portafoglio basato esclusivamente 
    ```powershell
    python -m venv .venv
    . .venv/Scripts/Activate.ps1
-   pip install -e .[dev]
+   pip install -e .[dev,gui]
    pre-commit install
    ```
 4. Conferma ilconfigurazione:
@@ -46,12 +48,12 @@ FAIR-III (Unified) è uno stack di ricerca di portafoglio basato esclusivamente 
 - README aggiornato con Quickstart v0.2, tabella di riferimento CLI, promemoria di conformità UCITS/UE/IT e suggerimenti per la configurazione deterministica.
 
 ## Quickstart v0.2
-Esegui la CLI end-to-end su un computer con accesso a Internet per i datidownload. Ciascun comando registra l'attività in `artifacts/` e controlla i metadati in `artifacts/audit/`.
+Esegui la CLI end-to-end su un computer con accesso a Internet per i datidownload. Ciascun comando registra l'attività in `artifacts/` e controlla i metadati in `artifacts/logs/`.
 
 ```powershell
 python -m venv .venv
 . .venv/Scripts/activate  # su Windows; usa 'source .venv/bin/activate' su Linux/Mac
-pip install -e .[dev]
+pip install -e .[dev,gui]
 pre-commit install
 
 fair3 validate
@@ -67,7 +69,13 @@ fair3 execute --rebalance-date 2025-11-01 --dry-run --tax-method min_tax
 fair3 report --period 2025-01:2025-11 --monthly
 fair3 goals --simulate
 fair3 gui
+fair3-gui
 ```
+
+Configura eventuali credenziali richieste dai data provider dal pannello
+**API key** della GUI: le chiavi vengono cifrate nel keyring del sistema
+operativo e replicate automaticamente nella sessione. Per ambienti headless è
+possibile popolare le credenziali tramite `keyring set fair3:<servizio> default`.
 
 ## Riferimento comandi CLI (v0.2)
 Tutti i comandi accettano `--progress/--no-progress` per attivare/disattivare le barre tqdm e `--json-logs/--no-json-logs` per eseguire il mirroring dell'audit strutturato
@@ -86,30 +94,31 @@ log.
 | `fair3 execute` | Dimensionamento degli ordini, applicazione dei costi ed euristica fiscale italiana. | `--rebalance-date`, `--tax-method`, `--dry-run` |
 | `fair3 report` | Produci dashboard mensili PDF/CSV con gate di accettazione. | `--period`, `--monthly`, `--dry-run` |
 | `fair3 goals` | Esegui Monte Carlo consapevole del regime con la guida del glidepath. | `--simulate`, `--dry-run`, `--json-logs` |
-| `fair3 gui` | Avvia la GUI di orchestrazione PySide6 opzionale. | `--dry-run`, `--raw-root`, `--clean-root`, `--artifacts-root`, `--audit-root`, `--thresholds`, `--params`, `--goals`, `--report` |
+| `fair3 gui` / `fair3-gui` | Avvia la GUI di orchestrazione PySide6 opzionale. | `--dry-run`, `--raw-root`, `--clean-root`, `--artifacts-root`, `--audit-root`, `--thresholds`, `--params`, `--goals`, `--report`, `--universe-dir`, `--reports-dir`, `--secrets-path` |
 | `fair3 qa` | Esegui la pipeline demo deterministica del QA ed emetti artefatti di controllo. | `--label`, `--output-dir`, `--start`, `--end`, `--draws`, `--block-size`, `--cv-splits`, `--validate-factors`, `--seed` |
 
 ## GUI opzionale (PySide6)
-Installa `PySide6` per abilitare l'orchestratore grafico:
+Installa l'extra `gui` per abilitare l'orchestratore grafico e i relativi binding:
 
 ```bash
-pip install PySide6
+pip install .[gui]
 ```
 
-La GUI presenta tre schede:
+Avvia l'interfaccia con `fair3 gui` (o con lo shortcut `fair3-gui`). Le schede
+principali offrono:
 
-- **Ingest:** scegli un'origine registrata, simboli opzionali e la data di inizio per
-  attivare `run_ingest`.La GUI aggiunge gli aggiornamenti di stato, inclusi i conteggi delle righe e
-  percorsi CSV non elaborati, al pannello di registro.
-- **Pipeline:** esegue ETL, fattore, stima, mappatura, regime e obiettivo
-  pipeline utilizzando le radici/soglie configurate. Gli errori vengono rilevati e stampati
-  nell'area di registro senza arrestare l'applicazione.
-- **Rapporti:** fornisce un percorso PDF e aprilo con il visualizzatore di sistema predefinito.
+- **Ingest:** selezione della sorgente, simboli opzionali e modalità automatica che
+  riutilizza la mappatura dell'universo investibile.
+- **Automation:** esegue `run_universe_pipeline`, mostra i provider suggeriti e
+  lancia l'ingest multi-provider utilizzando i ticker arricchiti da OpenFIGI.
+- **Pipeline:** shortcut per ETL, fattori, stima, mappatura, regime e obiettivi.
+- **Reports:** genera report mensili in `data/reports/monthly`, aggiorna la lista
+  dei PDF e apre il file selezionato nel visualizzatore di sistema.
+- **API key:** salva le credenziali nel keyring locale, mascherandole nei log e
+  sincronizzando le variabili d'ambiente per la sessione corrente.
 
-Utilizza le sostituzioni CLI come `--raw-root`, `--clean-root` o `--report` per eseguire il seeding dell'interfaccia
-con directory non predefinite. Quando `PySide6` manca la CLI e l'helper
-`launch_gui` emette un registro informativo ed esce senza problemi, in modo che le distribuzioni headless
- rimangano inalterate.
+Quando PySide6 non è installato `launch_gui` emette un log informativo ed esce
+senza errori, preservando il funzionamento della CLI in ambienti headless.
 
 ## Guardie di conformità UCITS/UE/IT
 - **Universo:** limita i portafogli a ETF/futures conformi agli OICTS per gli investitori al dettaglio dell'UE; traccia i metadati KID in `instrument`.
@@ -122,7 +131,7 @@ con directory non predefinite. Quando `PySide6` manca la CLI e l'helper
 diagnostica di convalida e metadati (inclusa la governance dei segni economici).`fair3 estimate`
 produce consenso `mu_post.csv`, `sigma.npy` e mescola/deriva i log in
 `artifacts/estimates/` mentre copia la configurazione e le istantanee seed in
-`artifacts/audit/`.`fair3 optimize` memorizza i CSV specifici del generatore, l'allocazione mista,
+`artifacts/logs/`.`fair3 optimize` memorizza i CSV specifici del generatore, l'allocazione mista,
 e la diagnostica ERC all'interno di `artifacts/weights/`.`fair3 map` traduce le ponderazioni dei fattori in
 esposizioni strumentali con beta mobili, fasce CI80, riepiloghi di tracking error e liquidità
 aggiustamenti persistenti in `artifacts/mapping/` e `artifacts/weights/`.
@@ -178,7 +187,7 @@ di successo.
 | Portale dati Binance | Kline spot crittografiche (1d/1h) | Archivi ZIP giornalieri `data/binance.vision/data/spot/daily/klines/<symbol>/<interval>/<symbol>-<interval>-<date>.zip` analizzati con metadati delle valute quotate e guardrail di ridistribuzione. |
 | Banca Mondiale | Indicatori macro (PIL, popolazione, debito) | API JSON (`api.worldbank.org/v2/country/<ISO3>/indicator/<series>`) con impaginazione automatica e simboli normalizzati ISO3. |
 
-Ogni esecuzione di `fair3 ingest` produce file CSV timestampati (`<source>_YYYYMMDDTHHMMSSZ.csv`) con colonne standard (`date`, `value`, `symbol`) salvati in `data/raw/<source>/`.Le informazioni di licenza e gli URL vengono registrati nei log rotanti sotto `artifacts/audit/` per supportare la conformità UCITS/EU/IT.Il passo ETL ricostruisce un pannello PIT salvando `asset_panel.parquet` in `data/clean/` (campo `field` con valori `adj_close`, `ret`, `lag_*`, ecc.) e il QA log in `audit/qa_data_log.csv`.Non ridistribuire set di dati di terze parti senza autorizzazione.
+Ogni esecuzione di `fair3 ingest` produce file CSV timestampati (`<source>_YYYYMMDDTHHMMSSZ.csv`) con colonne standard (`date`, `value`, `symbol`) salvati in `data/raw/<source>/`.Le informazioni di licenza e gli URL vengono registrati nei log rotanti sotto `artifacts/logs/` per supportare la conformità UCITS/EU/IT.Il passo ETL ricostruisce un pannello PIT salvando `asset_panel.parquet` in `data/clean/` (campo `field` con valori `adj_close`, `ret`, `lag_*`, ecc.) e il QA log in `audit/qa_data_log.csv`.Non ridistribuire set di dati di terze parti senza autorizzazione.
 
 ## Concetti fondamentali
 - **Stima μ/Σ:** I rendimenti attesi provengono da un insieme di riduzione a zero + bagging OLS + gradient boosting impilati tramite ridge e miscelati con le viste Black–Litterman (ω:=1 fallback quando IR<τ).Le covarianze combinano Ledoit–Wolf, lazo grafico e fattore di contrazione; l'utente può scegliere tra il consenso PSD (mediana elemento per elemento + Higham) o la mediana geometrica SPD (`--sigma-engine spd_median`).
@@ -262,7 +271,7 @@ La tabella seguente riassume i pacchetti più importanti affinché i nuovi contr
 - **Test basati sulle proprietà:** le suite basate su ipotesi si trovano in `tests/property/`.Installa la dipendenza opzionale tramite `pip install hypothesis` (già elencata negli extra `pyproject.toml`) per abilitarle localmente.
 - **Controlli di verbosità:** Log delle pipeline tramite `fair3.engine.logging.setup_logger`.Migliora la verbosità con `FAIR_LOG_LEVEL=DEBUG` e i log JSON con struttura mirror utilizzando `--json-logs` o `FAIR_JSON_LOGS=1`; la CLI e pytest condividono gli stessi aiutanti di configurazione.
 - **Test del fumo mirati:** `tests/unit/test_pipeline_verbosity.py` esercita il fattore, la stima e l'ottimizzazione delle tubazioni con dispositivi leggeri. La suite blocca I/O costosi e continua ad affermare che vengono prodotti artefatti e che le istruzioni di log includono il contesto previsto, rendendo le regressioni più facili da diagnosticare.
-- **Istantanee di controllo:** le routine di controllo vengono eseguite automaticamente; nei test vengono patchati per le prestazioni. Durante l'esecuzione end-to-end, verifica che `artifacts/audit/` contenga `seeds.yml`, `checksums.json` e i registri delle modifiche per la verifica della conformità.
+- **Istantanee di controllo:** le routine di controllo vengono eseguite automaticamente; nei test vengono patchati per le prestazioni. Durante l'esecuzione end-to-end, verifica che `artifacts/logs/` contenga `seeds.yml`, `checksums.json` e i registri delle modifiche per la verifica della conformità.
 
 Per la riproduzione deterministica, assicurati di esportare `FAIR_LOG_LEVEL` (e facoltativamente `FAIR_JSON_LOGS=1`) prima di richiamare la CLI o i test. Esempio:
 
