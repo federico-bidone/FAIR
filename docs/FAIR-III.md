@@ -104,7 +104,7 @@ The regimeallocazioni di layer guards con una probabilità di crisi deterministi
 comitato e controlli di isteresi:
 
 - **Segnali del comitato:** rendimenti di mercato di pari peso alimentano un sistema a due stati fissi
-  HMM gaussiano, lo stress di volatilità deriva dai rapporti di volatilità 
+  HMM gaussiano, lo stress di volatilità deriva dai rapporti di volatilità
   mediana mobile normalizzata, mentre i punteggi di rallentamento macro provengono da delta standardizzati degli indicatori macro
   .I pesi dei componenti sono predefiniti su (0, 5, 0, 3, 0, 2) e sono
   normalizzati per la verificabilità.
@@ -129,10 +129,10 @@ Il livello di esecuzione applica i guardrail di vendita al dettaglio prima che q
   thin per compatibilità con le versioni precedenti.
 - **Costi di transazione:** `trading_costs` implementa lo schema Almgren–Chriss –
   commissioni esplicite, slippage di metà spread e impatto di mercato non lineare ridimensionato in base alla percentuale
-  ADV – mentre `almgren_chriss_cost` espone l'impatto aggregatoper i riepiloghi 
+  ADV – mentre `almgren_chriss_cost` espone l'impatto aggregatoper i riepiloghi
   CLI.
 - **Imposte:** `compute_tax_penalty` applica il regime italiano (26% default,
-  12, 5% per govies ≥51%, 0, 2% bollo) con abbinamento FIFO/LIFO/min_tax e 
+  12, 5% per govies ≥51%, 0, 2% bollo) con abbinamento FIFO/LIFO/min_tax e
   quadriennale `MinusBag` loss carry; `tax_penalty_it` rimane un'euristica aggregata
   rapida.
 - **No-trade guard:** `drift_bands_exceeded` controlla il peso e il contributo al rischio
@@ -181,7 +181,7 @@ rimangono verdi mentre l'orchestrazione a monte è collegata. I futuri PR scambi
 ## Robustness Lab & Ablation (PR-13)
 Il laboratorio di robustezza estende la governance FAIR-III con stress test deterministici:
 
-- **Block bootstrap:** `block_bootstrap_metrics` campioniBlocchi di 60 giorni (1000 estrazioni predefinite) per 
+- **Block bootstrap:** `block_bootstrap_metrics` campioniBlocchi di 60 giorni (1000 estrazioni predefinite) per
   calcolare le distribuzioni del prelievo massimo, CAGR, Sharpe, CVaR ed EDaR.I cancelli di accettazione applicano
   P(MaxDD ≤ τ) ≥ 95% e il CAGR del 5° percentile ≥ target. Tutte le esecuzioni utilizzano il flusso
   `robustness` RNG in modo che siano riproducibili nell'IC e nella ricerca
@@ -222,5 +222,5 @@ motore Monte Carlo deterministico per l'analisi delle probabilità di successo:
 
 Le soglie di accettazione derivano da `configs/goals.yml` (ricchezza target `W`,
 probabilità minima `p_min`, pesi) e `configs/params.yml` (ipotesi contributive delle famiglie
-).Le probabilità ponderate devono soddisfare i valori 
+).Le probabilità ponderate devono soddisfare i valori
 `p_min` specificati per soddisfare il cancello di governance dell'obiettivo FAIR-III.

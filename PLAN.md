@@ -59,7 +59,7 @@
   classi di dati (`TaxRules`, `TaxComputation`) espongono informazioni di audit ricche.
 
 ## Test e strumenti
-- Estendi `tests/unit/test_execution_primitives.py` per coprire `size_orders` e l'helper 
+- Estendi `tests/unit/test_execution_primitives.py` per coprire `size_orders` e l'helper
   scalare Almgren–Chriss e proteggi il comportamento degli alias.
 - Aggiungi test dedicati per `compute_tax_penalty` che coprono FIFO/LIFO/min_tax, meno
   consumo borse, acquisizione di nuove perdite ed errori di inventario insufficiente.
@@ -109,7 +109,7 @@
   traiettorie Sharpe, MaxDD, CVaR, EDaR e CAGR; persistere le bande quantiliche come grafici
   PNG.
 - Introdurre gli assistenti `acceptance_gates` e `attribution_ic` per la reportistica e il laboratorio di robustezza
-  condividere la logica di governance; emettere il riepilogo dell'accettazione come JSON ed 
+  condividere la logica di governance; emettere il riepilogo dell'accettazione come JSON ed
   esporre la diagnostica IC per il QA downstream.
 - Generare un PDF compatto (`reportlab`) combinando metriche, flag di conformità,
   gate di accettazione e artefatti grafici; arricchire `MonthlyReportArtifacts` con

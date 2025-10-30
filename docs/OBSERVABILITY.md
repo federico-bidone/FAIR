@@ -6,7 +6,7 @@ eseguibili con debug senza un'infrastruttura personalizzata.
 ## Registrazione strutturata
 
 - Utilizza `fair3.engine.logging.setup_logger(name, json_format=False, level=None)` in
-  ogni modulo. L'helper legge `FAIR_LOG_LEVEL` (predefinito `INFO`) e allega automaticamente un 
+  ogni modulo. L'helper legge `FAIR_LOG_LEVEL` (predefinito `INFO`) e allega automaticamente un
   gestore della console.
 - Quando `json_format=True` o `FAIR_JSON_LOGS=1`, il logger esegue anche il mirroring dei record
   a `artifacts/audit/fair3.log` come JSON a riga singola contenente

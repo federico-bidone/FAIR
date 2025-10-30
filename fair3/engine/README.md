@@ -31,7 +31,7 @@ mantenendo la disciplina point-in-time e il seeding deterministico.
 ## Linee guida per i contributi
 - Aggiungi stringhe di documentazione a moduli, classi e funzioni con sezioni `Args`,
   `Returns` e `Raises` esplicite anche quando il comportamento predefinito è semplice.
-- Evita lo stato nascosto; passa percorsi, configurazioni e seed espliciti agli helper in modo che i comandi 
+- Evita lo stato nascosto; passa percorsi, configurazioni e seed espliciti agli helper in modo che i comandi
   CLI rimangano idempotenti.
 - Cattura metadati di licenza, checksum e contesto di fuso orario/valuta in tutti gli output
   ingest ed ETL.

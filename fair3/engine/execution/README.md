@@ -15,7 +15,7 @@ che l'orchestrazione a monte si unisce quando il portafoglio è pronto per esser
   impatto ridimensionato da ADV.
 - `almgren_chriss_cost(order_qty, price, spread, adv, eta, fees)` – scalare
   wrapper che restituisce il costo Almgren–Chriss aggregato utile per la CLIsintesi.
-- `compute_tax_penalty(orders, inventory, tax_rules)` – Motore fiscale italiano con 
+- `compute_tax_penalty(orders, inventory, tax_rules)` – Motore fiscale italiano con
   FIFO/LIFO/min_taxmatch, loss carry a quattro anni e bollo; `tax_penalty_it`
   rimane disponibile per stime aggregate rapide.
 - `drift_bands_exceeded(w_old, w_new, rc_old, rc_new, band)` – segnala se

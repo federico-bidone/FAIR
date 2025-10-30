@@ -61,7 +61,7 @@ Questo documento descriverà la progettazione a più livelli del motore FAIR-III
   applica un intervallo di perdite mobili e aggiunge un'imposta di bollo dello 0, 2% sui saldi positivi.
 - I cancelli di deriva/fatturato combinano EB_LB − COST − TAX > 0 con bande di tolleranza su
   ponderazioni e contributi al rischio per evitare un abbandono non necessario.
-- I riepiloghi decisionali alimentano le prove CLI e gli artefatti di audit in 
+- I riepiloghi decisionali alimentano le prove CLI e gli artefatti di audit in
   `artifacts/costs_tax/` e `artifacts/trades/`.
 
 ## Reporting Layer (PR-12)
