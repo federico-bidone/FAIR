@@ -70,9 +70,9 @@ class TradeRepublicFetcher(BaseBrokerFetcher):
         metadata = {
             "url": self._url,
             "license": self.LICENSE,
-            "allowed_sections": None
-            if self._allowed_sections is None
-            else sorted(self._allowed_sections),
+            "allowed_sections": (
+                None if self._allowed_sections is None else sorted(self._allowed_sections)
+            ),
         }
         return BrokerUniverseArtifact(
             broker=self.BROKER,
