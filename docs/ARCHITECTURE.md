@@ -2,6 +2,17 @@
 
 Questo documento descriverà la progettazione a più livelli del motore FAIR-III attraverso i componenti di acquisizione, ETL, modellazione dei fattori, stima, allocazione, mappatura, sovrapposizione del regime, esecuzione, reporting, robustezza e pianificazione degli obiettivi. Contenuti dettagliati verranno aggiunti man mano che l'implementazione procede attraverso le tappe pianificate.
 
+## Automation & Orchestration Layer (PR-04)
+- La GUI PySide6 opzionale (`fair3.engine.gui`) espone tab modulari per broker,
+  provider, pipeline, keyring e report e utilizza `QThreadPool` per eseguire i job
+  senza bloccare l'interfaccia.
+- Le credenziali vengono salvate nel keyring tramite `fair3.engine.infra.secrets`;
+  il pannello **API key** maschera i valori nei log e sincronizza le variabili
+  d'ambiente della sessione.
+- La scheda **Pipeline** implementa sia ingest manuali sia la catena automatica
+  Universe → ingest provider suggeriti → ETL → fattori → stime → report in
+  `artifacts/reports/<timestamp>/`.
+
 ## Factor Layer (PR-05)
 - `FactorLibrary` genera gli 8–10 macro-premia deterministici partendo dal pannello
   clean, applicando spread quantili coerenti con i segni economici e seed centrali.

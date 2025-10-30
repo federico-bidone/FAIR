@@ -9,7 +9,7 @@ eseguibili con debug senza un'infrastruttura personalizzata.
   ogni modulo. L'helper legge `FAIR_LOG_LEVEL` (predefinito `INFO`) e allega automaticamente un
   gestore della console.
 - Quando `json_format=True` o `FAIR_JSON_LOGS=1`, il logger esegue anche il mirroring dei record
-  a `artifacts/audit/fair3.log` come JSON a riga singola contenente
+  a `artifacts/logs/fair3.log` come JSON a riga singola contenente
   `timestamp`, `level`, `source`, `message`, `process_time_ms`,
   `bytes_downloaded`, `rows_processed` e `ratelimit_event`.
 - CLI esegue l'esposizione`--json-logs/--no-json-logs` e chiama
@@ -20,7 +20,7 @@ eseguibili con debug senza un'infrastruttura personalizzata.
 
 Chiama `record_metrics(metric_name, value, tags=None)` per aggiungere indicatori numerici
 (ad esempio righe importate, iterazioni bootstrap) in
-`artifacts/audit/metrics.jsonl`.Ogni riga acquisisce un timestamp UTC, il nome della metrica
+`artifacts/logs/metrics.jsonl`.Ogni riga acquisisce un timestamp UTC, il nome della metrica
 , il valore float e tag stringa opzionali. È sicuro richiamare le metriche da
 comandi multipli; l'helper garantisce che la directory di controllo esista.
 

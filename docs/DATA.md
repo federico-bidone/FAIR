@@ -68,7 +68,7 @@ Il parametro `--from` filtra le osservazioni successive alla data indicata dopo 
 
 ## Note di licenza e ridistribuzione
 - I dati vengono scaricati solo localmente; non devono essere ridistribuiti nel repository.
-- Alcune fonti (es. ECB, BoE) richiedono attribuzione e limitano l'uso commerciale: conservare i log prodotti in `artifacts/audit/`.
+- Alcune fonti (es. ECB, BoE) richiedono attribuzione e limitano l'uso commerciale: conservare i log prodotti in `artifacts/logs/`.
 - In caso di errore HTTP o payload inatteso, il fetcher solleva eccezioni che devono essere intercettate dal livello CLI/ETL per applicare retry o fallback interni.
 
 ## Prossimipassi

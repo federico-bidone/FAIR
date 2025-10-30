@@ -118,7 +118,7 @@ comitato e controlli di isteresi:
   pesi in \[0, 1\], combinando le allocazioni di base e di crisi durante l'esecuzione.
 
 La sovrapposizione mostrerà i registri e la diagnostica dei componenti in
-`artifacts/audit/regime/` quando il cablaggio CLI si atterra, garantendo la riproducibilitàaudit
+`artifacts/logs/regime/` quando il cablaggio CLI si atterra, garantendo la riproducibilitàaudit
 percorsi per i controlli di conformità.
 
 ## Execution Layer (PR-11)

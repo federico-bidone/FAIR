@@ -12,7 +12,7 @@ from typing import Final
 
 CONSOLE_FORMAT: Final[str] = "[%(levelname)s] %(name)s: %(message)s"
 DEFAULT_LEVEL: Final[str] = "INFO"
-AUDIT_DIR: Final[Path] = Path("artifacts") / "audit"
+AUDIT_DIR: Final[Path] = Path("artifacts") / "logs"
 LOG_PATH: Final[Path] = AUDIT_DIR / "fair3.log"
 METRICS_PATH: Final[Path] = AUDIT_DIR / "metrics.jsonl"
 JSON_ENV_FLAG: Final[str] = "FAIR_JSON_LOGS"
