@@ -58,12 +58,16 @@ def _iter_functions(path: Path) -> Iterator[FunctionRecord]:
     class Visitor(ast.NodeVisitor):
         """Visitor AST che tiene traccia del contesto (moduli/classi)."""
 
-        def visit_ClassDef(self, node: ast.ClassDef) -> None:  # noqa: N802 - richiesto da ast.NodeVisitor
+        def visit_ClassDef(
+            self, node: ast.ClassDef
+        ) -> None:  # noqa: N802 - richiesto da ast.NodeVisitor
             stack.append(node.name)
             self.generic_visit(node)
             stack.pop()
 
-        def visit_FunctionDef(self, node: ast.FunctionDef) -> None:  # noqa: N802 - richiesto da ast.NodeVisitor
+        def visit_FunctionDef(
+            self, node: ast.FunctionDef
+        ) -> None:  # noqa: N802 - richiesto da ast.NodeVisitor
             record = FunctionRecord(
                 percorso=path.relative_to(PROJECT_ROOT).as_posix(),
                 qualifica=".".join(stack + [node.name]),
@@ -75,7 +79,9 @@ def _iter_functions(path: Path) -> Iterator[FunctionRecord]:
             records.append(record)
             self.generic_visit(node)
 
-        def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:  # noqa: N802 - richiesto da ast.NodeVisitor
+        def visit_AsyncFunctionDef(
+            self, node: ast.AsyncFunctionDef
+        ) -> None:  # noqa: N802 - richiesto da ast.NodeVisitor
             self.visit_FunctionDef(node)
 
     Visitor().visit(tree)
