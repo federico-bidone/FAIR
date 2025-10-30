@@ -31,11 +31,62 @@ from fair3.engine.utils.storage import ensure_metadata_schema, upsert_sqlite
 __all__ = [
     "IngestArtifact",
     "BaseCSVFetcher",
+    "CredentialField",
     "available_sources",
+    "credential_fields",
     "source_licenses",
     "create_fetcher",
     "run_ingest",
 ]
+
+
+@dataclass(frozen=True, slots=True)
+class CredentialField:
+    """Metadata describing credentials required by specific providers."""
+
+    source: str
+    env: str
+    label: str
+    description: str
+    url: str | None = None
+
+
+PROVIDER_CREDENTIALS: tuple[CredentialField, ...] = (
+    CredentialField(
+        source="alphavantage_fx",
+        env="ALPHAVANTAGE_API_KEY",
+        label="Alpha Vantage FX",
+        description="FX_DAILY endpoint for currency crosses",
+        url="https://www.alphavantage.co/support/#api-key",
+    ),
+    CredentialField(
+        source="tiingo",
+        env="TIINGO_API_KEY",
+        label="Tiingo",
+        description="Equity and ETF OHLCV feed",
+        url="https://www.tiingo.com/account/api/token",
+    ),
+    CredentialField(
+        source="eodhd",
+        env="EODHD_API_TOKEN",
+        label="EOD Historical Data",
+        description="EOD equity prices and fundamentals",
+        url="https://eodhistoricaldata.com/financial-apis/",
+    ),
+    CredentialField(
+        source="fred",
+        env="FRED_API_KEY",
+        label="FRED",
+        description="Federal Reserve macroeconomic time series",
+        url="https://fred.stlouisfed.org/faq#api_key",
+    ),
+)
+
+
+def credential_fields() -> tuple[CredentialField, ...]:
+    """Expose credential metadata for GUI consumers."""
+
+    return PROVIDER_CREDENTIALS
 
 
 @dataclass(slots=True)

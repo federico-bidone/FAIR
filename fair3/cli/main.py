@@ -474,6 +474,24 @@ def _add_gui_subparser(
         type=Path,
         help="Optional report path pre-filled in the GUI",
     )
+    gui.add_argument(
+        "--universe-dir",
+        type=Path,
+        default=Path("data") / "clean" / "universe",
+        help="Directory used to persist broker universe artefacts",
+    )
+    gui.add_argument(
+        "--reports-dir",
+        type=Path,
+        default=Path("data") / "reports" / "monthly",
+        help="Directory where generated reports are stored",
+    )
+    gui.add_argument(
+        "--secrets-path",
+        type=Path,
+        default=Path("configs") / "api_keys.yml",
+        help="Path to the YAML file storing API keys",
+    )
 
 
 def _add_qa_subparser(
@@ -896,6 +914,9 @@ def _handle_gui(args: argparse.Namespace) -> None:
         "thresholds": args.thresholds,
         "params": args.params,
         "goals": args.goals,
+        "universe_root": args.universe_dir,
+        "report_root": args.reports_dir,
+        "secrets_path": args.secrets_path,
     }
     if args.report is not None:
         config["report_path"] = args.report
@@ -903,7 +924,8 @@ def _handle_gui(args: argparse.Namespace) -> None:
         print(
             "[fair3] gui dry-run "
             f"raw_root={args.raw_root} clean_root={args.clean_root} "
-            f"artifacts_root={args.artifacts_root}"
+            f"artifacts_root={args.artifacts_root} universe_dir={args.universe_dir} "
+            f"report_root={args.reports_dir} secrets_path={args.secrets_path}"
         )
         return
     launch_gui(config)

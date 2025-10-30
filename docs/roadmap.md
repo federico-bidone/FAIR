@@ -14,7 +14,7 @@ le funzionalità da implementare, i file principali da toccare e i rischi da mon
 
 ## PR-17 — Logging & osservabilità
 - `fair3/engine/logging.py` con logger strutturato, `record_metrics`, opzione `--json-logs`/`--progress`.
-- Aggiornare CLI per usare il logger e scrivere metriche in `artifacts/audit/metrics.jsonl`.
+- Aggiornare CLI per usare il logger e scrivere metriche in `artifacts/logs/metrics.jsonl`.
 
 ## PR-18 —Regime Engine v2 ✅
 - HMM/HSMM (`hmmlearn`), vol-state e macro trigger (riscatto YoY, PMI, tassi reali) con `regime_probability`.

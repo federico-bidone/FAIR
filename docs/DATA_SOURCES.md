@@ -2,7 +2,9 @@
 
 La tabella seguente mappa le principali fonti dati integrate in FAIR-III
 v0.2. Ogni riga riporta frequenza, URL di riferimento, vincoli di licenza e
-note operative (lag PIT, conversioni FX, passaggi manuali).
+note operative (lag PIT, conversioni FX, passaggi manuali). Le chiavi API
+necessarie vengono gestite tramite `configs/api_keys.yml`: la GUI PySide6
+esporta le credenziali impostandole nelle variabili d'ambiente della sessione.
 
 | fonte | serie/simbolo | frequenza | prima_data | URL | licenza | limite_velocità | richiede_chiave | fuso orario | pit_rule | eom_pinning | euro_fx | passi_manuali |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
