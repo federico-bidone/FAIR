@@ -98,27 +98,34 @@ log.
 | `fair3 qa` | Esegui la pipeline demo deterministica del QA ed emetti artefatti di controllo. | `--label`, `--output-dir`, `--start`, `--end`, `--draws`, `--block-size`, `--cv-splits`, `--validate-factors`, `--seed` |
 
 ## GUI opzionale (PySide6)
-Installa l'extra `gui` per abilitare l'orchestratore grafico e i relativi binding:
+Installa l'extra `gui` per abilitare l'orchestratore grafico e i relativi binding
+(`.[data]` aggiunge l'integrazione Yahoo basata su `yfinance`):
 
 ```bash
 pip install .[gui]
+# per l'ingest Yahoo opzionale
+pip install .[data]
 ```
 
 Avvia l'interfaccia con `fair3 gui` (o con lo shortcut `fair3-gui`). Le schede
 principali offrono:
 
-- **Ingest:** selezione della sorgente, simboli opzionali e modalità automatica che
-  riutilizza la mappatura dell'universo investibile.
-- **Automation:** esegue `run_universe_pipeline`, mostra i provider suggeriti e
-  lancia l'ingest multi-provider utilizzando i ticker arricchiti da OpenFIGI.
-- **Pipeline:** shortcut per ETL, fattori, stima, mappatura, regime e obiettivi.
-- **Reports:** genera report mensili in `data/reports/monthly`, aggiorna la lista
-  dei PDF e apre il file selezionato nel visualizzatore di sistema.
-- **API key:** salva le credenziali nel keyring locale, mascherandole nei log e
-  sincronizzando le variabili d'ambiente per la sessione corrente.
+- **Broker:** elenco interattivo dei broker registrati con selezione/deselezione
+  rapida e avvio della pipeline Universe.
+- **Data provider:** ingest puntuale scegliendo la sorgente registrata, simboli
+  opzionali e data di partenza con conversione compatibile PySide6.
+- **Pipeline:** orchestrazione automatica completa oppure pipeline manuale
+  personalizzata (Universe → Ingest → ETL → Fattori → Stime → Report) con
+  step selezionabili e override di provider/broker.
+- **Report:** elenco delle esecuzioni in `artifacts/reports/`, anteprima delle
+  metriche (`summary.json`) e apertura mirata degli artefatti principali.
+- **API key:** salva, testa e cancella le credenziali nel keyring locale,
+  mascherandole nei log e sincronizzandole nell'ambiente della sessione.
 
 Quando PySide6 non è installato `launch_gui` emette un log informativo ed esce
-senza errori, preservando il funzionamento della CLI in ambienti headless.
+senza errori, preservando il funzionamento della CLI in ambienti headless. In
+assenza di `yfinance` il tab Data provider segnala l'azione `pip install .[data]`
+prima di avviare l'ingest Yahoo.
 
 ## Guardie di conformità UCITS/UE/IT
 - **Universo:** limita i portafogli a ETF/futures conformi agli OICTS per gli investitori al dettaglio dell'UE; traccia i metadati KID in `instrument`.

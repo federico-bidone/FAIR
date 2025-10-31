@@ -11,10 +11,13 @@ nei comandi `fair3`, così i workflow restano riproducibili anche in ambienti he
 
 ```bash
 pip install .[gui]
+# dipendenze facoltative per Yahoo Finance
+pip install .[data]
 ```
 
-L'extra `gui` installa PySide6, il tema `qt-material` e `keyring`, necessario per
-persistire in modo sicuro le chiavi API. Se PySide6 non è presente, il launcher
+L'extra `gui` installa PySide6 e `keyring`, necessario per
+persistire in modo sicuro le chiavi API. L'extra `data` aggiunge `yfinance`,
+richiesto per l'ingest Yahoo. Se PySide6 non è presente, il launcher
 mostra un messaggio con il comando da eseguire e termina senza errori, lasciando
 la CLI completamente operativa.
 
@@ -34,19 +37,26 @@ Gli override disponibili coincidono con quelli della CLI (`--raw-root`,
 La GUI è composta da un `QTabWidget` con cinque pannelli coordinati da
 `fair3.engine.gui.mainwindow.FairMainWindow`:
 
-- **Broker** – elenca i broker registrati e avvia la pipeline Universe con un
-  click, utilizzando OpenFIGI quando la chiave è presente nel keyring.
+- **Broker** – elenca i broker registrati, permette la selezione/deselezione
+  rapida e avvia la pipeline Universe utilizzando OpenFIGI quando la chiave è
+  presente nel keyring.
 - **Data provider** – consente ingest puntuali scegliendo la sorgente registrata,
-  simboli opzionali e la data minima di download.
-- **Pipeline** – espone due modalità: manuale (ingest singolo provider) e
-  automatica (Universe → ingest provider suggeriti → ETL → fattori → stime →
-  report). Le esecuzioni avvengono in thread di lavoro (`QThreadPool`) per evitare
-  blocchi dell'interfaccia.
+  simboli opzionali e la data minima di download, con conversione QDate
+  compatibile PySide6 (`toPython` + fallback). Se si sceglie *yahoo* senza aver
+  installato `yfinance`, il pannello suggerisce `pip install .[data]`.
+- **Pipeline** – espone due modalità: una automatica completa (Universe → ingest
+  multi-provider → ETL → fattori → stime → report) e una manuale
+  personalizzabile. Quest'ultima permette di selezionare quali step eseguire, i
+  broker target e, per l'ingest, il provider e la lista di simboli. Le esecuzioni
+  avvengono in thread di lavoro (`QThreadPool`) per evitare blocchi dell'interfaccia.
 - **API key** – genera dinamicamente un campo per ogni sorgente che richiede
-  credenziali, salva i token nel keyring di sistema e permette un test rapido
-  della presenza delle chiavi.
-- **Report** – mostra le cartelle generate in `artifacts/reports/` e apre quella
-  selezionata con il file manager del sistema operativo.
+  credenziali, salva/testa/cancella i token nel keyring di sistema (mostrando
+  solo `***ABCD` per indicare i valori salvati) e permette un test rapido della
+  presenza delle chiavi.
+- **Report** – mostra le cartelle generate in `artifacts/reports/`, elenca i
+  principali artefatti (PDF, CSV, JSON, PNG) e visualizza un riepilogo delle
+  metriche (`summary.json`). Il pulsante *Apri artefatto* apre il file selezionato
+  nel visualizzatore di sistema.
 
 Sotto alle schede è presente una console (`QPlainTextEdit`) che riceve gli stessi
 log testuali della CLI e mantiene fino a 2.000 righe recenti; tutti i log JSON
@@ -64,20 +74,23 @@ seguenti step, registrando eventuali errori senza interrompere l'interfaccia:
    parametri di default di FAIR-III.
 4. Se richiesto, crea una cartella timestampata in `artifacts/reports/` e vi
    scrive un report sintetico tramite `generate_monthly_report` (utile come
-   placeholder fino alla disponibilità di dati reali).
+   placeholder fino alla disponibilità di dati reali) indicando il percorso del
+   PDF direttamente nel pannello Report.
 
 ## Gestione delle credenziali
 
 Il pannello **API key** interroga `fair3.engine.ingest.registry.credential_fields`
 per determinare quali provider richiedono autenticazione. Ogni valore viene
-memorizzato nel servizio `fair3:<env>.lower()` del keyring e riflesso nella
-sessione corrente: non è più necessario modificare `configs/api_keys.yml`.
-Per gli ambienti non interattivi è possibile popolare il keyring con
-`keyring set fair3:alphavantage_api_key default` e analoghi.
+memorizzato tramite `fair3.engine.infra.secrets.save_api_keys` e reso disponibile
+nei processi attivi con `apply_api_keys`, evitando file YAML locali. Per gli
+ambienti non interattivi è possibile popolare il keyring con comandi come
+`keyring set fair3:alphavantage_api_key default`.
 
 ## Risoluzione dei problemi
 
 - **PySide6 mancante** – assicurarsi di aver installato `pip install .[gui]`.
+- **yfinance mancante** – installare l'extra `pip install .[data]` prima di
+  avviare ingest Yahoo.
 - **Esecuzioni lente** – la maggior parte dei task gira su `QThreadPool`, ma
   ingest intensivi potrebbero richiedere tempo: consultare la console in basso
   per lo stato dettagliato.

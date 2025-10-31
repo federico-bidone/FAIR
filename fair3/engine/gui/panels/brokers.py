@@ -34,6 +34,16 @@ class BrokersPanel(QtWidgets.QWidget):  # type: ignore[misc]
         self._list.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         layout.addWidget(self._list)
 
+        selection_row = QtWidgets.QHBoxLayout()
+        select_all = QtWidgets.QPushButton("Seleziona tutti")
+        select_all.clicked.connect(lambda: self._set_all(True))
+        selection_row.addWidget(select_all)
+        select_none = QtWidgets.QPushButton("Deseleziona tutti")
+        select_none.clicked.connect(lambda: self._set_all(False))
+        selection_row.addWidget(select_none)
+        selection_row.addStretch(1)
+        layout.addLayout(selection_row)
+
         button_row = QtWidgets.QHBoxLayout()
         self._refresh = QtWidgets.QPushButton("Aggiorna elenco broker")
         self._refresh.clicked.connect(self.refresh)
@@ -79,6 +89,12 @@ class BrokersPanel(QtWidgets.QWidget):  # type: ignore[misc]
     def _emit_selection(self) -> None:
         brokers = self.selected_brokers()
         self.discoverRequested.emit(brokers)
+
+    def _set_all(self, checked: bool) -> None:
+        state = QtCore.Qt.Checked if checked else QtCore.Qt.Unchecked
+        for index in range(self._list.count()):
+            item = self._list.item(index)
+            item.setCheckState(state)
 
 
 __all__ = ["BrokersPanel"]

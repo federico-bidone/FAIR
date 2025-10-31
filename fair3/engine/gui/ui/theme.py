@@ -22,6 +22,26 @@ def _resolve(token_map: dict[str, Any], key: str, fallback: str) -> str:
     return str(value)
 
 
+def _adjust_hex(color: str, factor: float) -> str:
+    color = color.strip()
+    if not color.startswith("#") or len(color) != 7:
+        return color
+    try:
+        red = int(color[1:3], 16)
+        green = int(color[3:5], 16)
+        blue = int(color[5:7], 16)
+    except ValueError:  # pragma: no cover - difesa
+        return color
+
+    def _tune(channel: int) -> int:
+        if factor >= 1:
+            return int(channel + (255 - channel) * min(factor - 1, 1))
+        return int(channel * max(factor, 0))
+
+    tuned = (_tune(red), _tune(green), _tune(blue))
+    return "#" + "".join(f"{value:02X}" for value in tuned)
+
+
 def build_stylesheet(tokens: dict[str, Any] | None = None) -> str:
     """Return a QSS stylesheet composed from design tokens."""
 
@@ -32,6 +52,9 @@ def build_stylesheet(tokens: dict[str, Any] | None = None) -> str:
     font_family = _resolve(tokens, "font.family", "Inter")
     radius_small = _resolve(tokens, "radius.small", "6")
     radius_large = _resolve(tokens, "radius.large", "12")
+
+    hover = _adjust_hex(primary, 1.12)
+    pressed = _adjust_hex(primary, 0.85)
 
     return f"""
     QWidget {{
@@ -45,7 +68,10 @@ def build_stylesheet(tokens: dict[str, Any] | None = None) -> str:
         padding: 6px 12px;
     }}
     QPushButton:hover {{
-        background-color: lighten({primary}, 10%);
+        background-color: {hover};
+    }}
+    QPushButton:pressed {{
+        background-color: {pressed};
     }}
     QGroupBox {{
         border: 1px solid rgba(255, 255, 255, 0.12);

@@ -483,14 +483,8 @@ def _add_gui_subparser(
     gui.add_argument(
         "--reports-dir",
         type=Path,
-        default=Path("data") / "reports" / "monthly",
+        default=Path("artifacts") / "reports",
         help="Directory where generated reports are stored",
-    )
-    gui.add_argument(
-        "--secrets-path",
-        type=Path,
-        default=Path("configs") / "api_keys.yml",
-        help="Path to the YAML file storing API keys",
     )
 
 
@@ -916,7 +910,6 @@ def _handle_gui(args: argparse.Namespace) -> None:
         "goals": args.goals,
         "universe_root": args.universe_dir,
         "report_root": args.reports_dir,
-        "secrets_path": args.secrets_path,
     }
     if args.report is not None:
         config["report_path"] = args.report
@@ -925,7 +918,7 @@ def _handle_gui(args: argparse.Namespace) -> None:
             "[fair3] gui dry-run "
             f"raw_root={args.raw_root} clean_root={args.clean_root} "
             f"artifacts_root={args.artifacts_root} universe_dir={args.universe_dir} "
-            f"report_root={args.reports_dir} secrets_path={args.secrets_path}"
+            f"report_root={args.reports_dir}"
         )
         return
     launch_gui(config)

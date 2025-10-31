@@ -1,6 +1,7 @@
 import types
 
-import pytest
+import os
+
 import pytest
 
 from fair3.engine.infra import secrets
@@ -36,19 +37,32 @@ def dummy_keyring(monkeypatch: pytest.MonkeyPatch) -> dict[str, dict[str, str]]:
     return storage
 
 
-def test_set_and_get_secret(dummy_keyring: dict[str, dict[str, str]]) -> None:
-    secrets.set_secret("alphavantage_api_key", "default", "alpha123")
-    assert secrets.get_secret("alphavantage_api_key", "default") == "alpha123"
+def test_save_and_load_secret(dummy_keyring: dict[str, dict[str, str]]) -> None:
+    stored = secrets.save_api_keys({"ALPHAVANTAGE_API_KEY": "alpha123"})
+    assert stored["ALPHAVANTAGE_API_KEY"] == "alpha123"
+    loaded = secrets.load_api_keys()
+    assert loaded == stored
+    assert secrets.get_api_key("ALPHAVANTAGE_API_KEY") == "alpha123"
 
 
 def test_delete_secret(dummy_keyring: dict[str, dict[str, str]]) -> None:
-    secrets.set_secret("fred_api_key", "default", "fred")
-    secrets.set_secret("fred_api_key", "default", None)
-    assert secrets.get_secret("fred_api_key", "default") is None
+    secrets.save_api_keys({"FRED_API_KEY": "fred"})
+    secrets.save_api_keys({"FRED_API_KEY": None})
+    assert "FRED_API_KEY" not in secrets.load_api_keys()
+    assert secrets.get_api_key("FRED_API_KEY") is None
+
+
+def test_apply_api_keys_sets_environment(
+    dummy_keyring: dict[str, dict[str, str]], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delenv("TIINGO_API_KEY", raising=False)
+    secrets.save_api_keys({"TIINGO_API_KEY": "token123"})
+    secrets.apply_api_keys(secrets.load_api_keys())
+    assert os.environ["TIINGO_API_KEY"] == "token123"
 
 
 def test_missing_backend_raises(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(secrets, "keyring", None)
     with pytest.raises(RuntimeError):
-        secrets.set_secret("tiingo_api_key", "default", "token")
-    assert secrets.get_secret("tiingo_api_key", "default") is None
+        secrets.save_api_keys({"TIINGO_API_KEY": "token"})
+    assert secrets.get_api_key("TIINGO_API_KEY") is None

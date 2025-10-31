@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from fair3.engine.logging import setup_logger
+from fair3.engine.logging import LOG_PATH, setup_logger
 
 
 @pytest.fixture(autouse=True)
@@ -51,6 +51,5 @@ def test_separate_loggers_share_json_file() -> None:
     for handler in alpha.handlers + beta.handlers:
         handler.flush()
 
-    lines = Path("artifacts") / "audit" / "fair3.log"
-    content = lines.read_text(encoding="utf-8")
+    content = LOG_PATH.read_text(encoding="utf-8")
     assert "alpha" in content and "beta" in content

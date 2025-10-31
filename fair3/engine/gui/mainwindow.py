@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Iterable, Mapping
 
 import pandas as pd
 
@@ -14,8 +14,8 @@ from fair3.engine.gui.panels.data_providers import DataProvidersPanel
 from fair3.engine.gui.panels.pipeline import PipelinePanel
 from fair3.engine.gui.panels.reports import ReportsPanel
 from fair3.engine.gui.workers.job import JobRunner
-from fair3.engine.infra.paths import DEFAULT_REPORT_ROOT, create_run_dir
-from fair3.engine.infra.secrets import get_secret
+from fair3.engine.infra.paths import DEFAULT_REPORT_ROOT, run_dir
+from fair3.engine.infra.secrets import apply_api_keys, get_api_key, load_api_keys
 from fair3.engine.reporting import MonthlyReportInputs, generate_monthly_report
 
 try:  # pragma: no cover - optional dependency
@@ -58,6 +58,7 @@ class FairMainWindow(QtWidgets.QMainWindow):  # type: ignore[misc]
         self._emitter = _LogEmitter()
         self._log_handler = _GuiLogHandler(self._emitter)
         self._report_root = Path(self._configuration.get("report_root", DEFAULT_REPORT_ROOT))
+        self._logging_attached = False
 
         self.setWindowTitle("FAIR-III Orchestrator")
         self.resize(1280, 820)
@@ -65,6 +66,7 @@ class FairMainWindow(QtWidgets.QMainWindow):  # type: ignore[misc]
         self._build_ui()
         self._attach_logging()
         self._connect_signals()
+        apply_api_keys(load_api_keys())
 
     # ------------------------------------------------------------------
     def _build_ui(self) -> None:
@@ -95,13 +97,16 @@ class FairMainWindow(QtWidgets.QMainWindow):  # type: ignore[misc]
 
     def _attach_logging(self) -> None:
         root = logging.getLogger()
-        root.addHandler(self._log_handler)
-        self._emitter.message.connect(self._append_log)
+        if self._log_handler not in root.handlers:
+            root.addHandler(self._log_handler)
+        if not self._logging_attached:
+            self._emitter.message.connect(self._append_log)
+            self._logging_attached = True
 
     def _connect_signals(self) -> None:
         self._brokers_panel.discoverRequested.connect(self._handle_universe_request)
         self._data_panel.ingestRequested.connect(self._handle_data_ingest)
-        self._pipeline_panel.manualRequested.connect(self._run_manual_ingest)
+        self._pipeline_panel.manualRequested.connect(self._handle_manual_pipeline)
         self._pipeline_panel.automaticRequested.connect(self._handle_automatic_pipeline)
         self._api_keys_panel.testRequested.connect(self._handle_test_provider)
 
@@ -109,8 +114,12 @@ class FairMainWindow(QtWidgets.QMainWindow):  # type: ignore[misc]
     def closeEvent(self, event: Any) -> None:  # noqa: D401 - Qt override
         """Detach logging handlers on window close."""
 
-        logging.getLogger().removeHandler(self._log_handler)
-        self._emitter.message.disconnect(self._append_log)
+        root = logging.getLogger()
+        if self._log_handler in root.handlers:
+            root.removeHandler(self._log_handler)
+        if self._logging_attached:
+            self._emitter.message.disconnect(self._append_log)
+            self._logging_attached = False
         super().closeEvent(event)
 
     # ------------------------------------------------------------------
@@ -163,6 +172,9 @@ class FairMainWindow(QtWidgets.QMainWindow):  # type: ignore[misc]
         start = payload.get("start")
         self._status(f"Ingest manuale per provider {provider}")
 
+        if not self._ensure_provider_ready(provider):
+            return
+
         def job() -> Any:
             from fair3.engine.ingest import run_ingest
 
@@ -186,7 +198,21 @@ class FairMainWindow(QtWidgets.QMainWindow):  # type: ignore[misc]
         self._status("Avvio pipeline automatica")
 
         def job() -> Mapping[str, Any]:
-            return self._run_automatic_pipeline(data)
+            return self._execute_pipeline(
+                brokers=tuple(data.get("brokers", ())),
+                start=data.get("start"),
+                generate_reports=bool(data.get("generate_reports", True)),
+                steps=(
+                    "universe",
+                    "ingest",
+                    "etl",
+                    "factors",
+                    "estimates",
+                    "report",
+                ),
+                provider_override=None,
+                symbols=(),
+            )
 
         self._jobs.submit(job, on_success=self._automatic_complete, on_error=self._job_failed)
 
@@ -199,7 +225,51 @@ class FairMainWindow(QtWidgets.QMainWindow):  # type: ignore[misc]
         report_dir = result.get("report_dir")
         if report_dir:
             self._reports_panel.refresh()
+            self._reports_panel.focus_on(Path(report_dir))
             self._status(f"Report disponibili in {report_dir}")
+
+    def _handle_manual_pipeline(self, payload: Mapping[str, Any]) -> None:
+        steps = tuple(payload.get("steps", ()))
+        if not steps:
+            self._status("Seleziona almeno un passaggio della pipeline manuale")
+            return
+
+        provider = payload.get("provider")
+        symbols = tuple(payload.get("symbols", ()))
+        brokers = tuple(payload.get("brokers", ()))
+        if not brokers:
+            brokers = self._brokers_panel.selected_brokers()
+        start = payload.get("start")
+        generate_reports = bool(payload.get("generate_reports", "report" in steps))
+
+        if "ingest" in steps and provider and not self._ensure_provider_ready(provider):
+            return
+
+        self._status("Avvio pipeline manuale personalizzata")
+
+        def job() -> Mapping[str, Any]:
+            return self._execute_pipeline(
+                brokers=brokers,
+                start=start,
+                generate_reports=generate_reports,
+                steps=steps,
+                provider_override=provider,
+                symbols=symbols,
+            )
+
+        self._jobs.submit(job, on_success=self._manual_pipeline_complete, on_error=self._job_failed)
+
+    def _manual_pipeline_complete(self, result: Mapping[str, Any]) -> None:
+        errors = result.get("errors", [])
+        if errors:
+            self._status(f"Pipeline manuale completata con {len(errors)} avvisi")
+        else:
+            self._status("Pipeline manuale completata")
+        report_dir = result.get("report_dir")
+        if report_dir:
+            self._reports_panel.refresh()
+            self._reports_panel.focus_on(Path(report_dir))
+            self._status(f"Report generati in {report_dir}")
 
     # ------------------------------------------------------------------
     def _handle_test_provider(self, provider: str) -> None:
@@ -217,39 +287,59 @@ class FairMainWindow(QtWidgets.QMainWindow):  # type: ignore[misc]
         self._status(f"Errore: {exc}")
 
     def _get_secret(self, env: str) -> str | None:
-        return get_secret(service=env.lower(), username="default")
+        return get_api_key(env)
 
     # ------------------------------------------------------------------
-    def _run_automatic_pipeline(self, payload: Mapping[str, Any]) -> Mapping[str, Any]:
-        brokers = tuple(payload.get("brokers", ()))
-        start = payload.get("start")
-        generate_reports = bool(payload.get("generate_reports", True))
+    def _ensure_provider_ready(self, provider: str) -> bool:
+        provider = provider.lower().strip()
+        if provider == "yahoo":
+            try:  # pragma: no cover - optional dependency guard
+                import yfinance  # type: ignore[import-not-found]
+            except ImportError:
+                self._append_log(
+                    "yfinance non è installato. Esegui: pip install yfinance oppure pip install .[data]",
+                )
+                self._status("Dipendenza mancante per Yahoo Finance")
+                return False
+        return True
+
+    def _execute_pipeline(
+        self,
+        *,
+        brokers: Iterable[str],
+        start: Any,
+        generate_reports: bool,
+        steps: Iterable[str],
+        provider_override: str | None,
+        symbols: Iterable[str],
+    ) -> Mapping[str, Any]:
+        brokers = tuple(brokers)
+        steps = tuple(steps)
         summary: dict[str, Any] = {"errors": []}
-        report_dir = create_run_dir(self._report_root)
+        report_dir = run_dir(self._report_root)
         summary["report_dir"] = str(report_dir)
 
+        universe = None
         try:
             from fair3.engine.universe import run_universe_pipeline
 
-            key = self._get_secret("OPENFIGI_API_KEY")
-            universe = run_universe_pipeline(
-                brokers=brokers or None,
-                output_dir=self._configuration.get(
-                    "universe_root", Path("data") / "clean" / "universe"
-                ),
-                openfigi_api_key=key,
-            )
-            summary["universe"] = {
-                "brokers": universe.brokers,
-                "providers_path": str(universe.providers_path),
-            }
+            if "universe" in steps:
+                key = self._get_secret("OPENFIGI_API_KEY")
+                universe = run_universe_pipeline(
+                    brokers=brokers or None,
+                    output_dir=self._configuration.get(
+                        "universe_root", Path("data") / "clean" / "universe"
+                    ),
+                    openfigi_api_key=key,
+                )
+                summary["universe"] = {
+                    "brokers": universe.brokers,
+                    "providers_path": str(universe.providers_path),
+                }
         except Exception as exc:  # pragma: no cover - orchestration safety
-            LOG.exception("Universe pipeline failed", exc_info=exc)
-            summary["errors"].append(f"universe: {exc}")
-            universe = None
-        else:
-            universe = universe
-
+            if "universe" in steps:
+                LOG.exception("Universe pipeline failed", exc_info=exc)
+                summary["errors"].append(f"universe: {exc}")
         providers: set[str] = set()
         if universe is not None:
             try:
@@ -257,62 +347,74 @@ class FairMainWindow(QtWidgets.QMainWindow):  # type: ignore[misc]
                 providers.update(provider_frame["primary_source"].dropna().unique())
             except Exception as exc:  # pragma: no cover - graceful degradation
                 LOG.warning("Unable to read provider selection: %s", exc)
-        if not providers:
+        if provider_override:
+            providers = {provider_override}
+        if "ingest" in steps and not providers:
             providers.update({"alphavantage_fx", "tiingo", "fred"})
 
         ingest_results: dict[str, str] = {}
-        for provider in sorted(providers):
+        if "ingest" in steps:
+            for provider in sorted(providers):
+                if not self._ensure_provider_ready(provider):
+                    summary["errors"].append(f"ingest:{provider}: dipendenza mancante")
+                    continue
+                try:
+                    from fair3.engine.ingest import run_ingest
+
+                    artifact = run_ingest(
+                        provider,
+                        start=start,
+                        symbols=tuple(symbols) or None,
+                        progress=False,
+                    )
+                    ingest_results[provider] = str(artifact.path)
+                except Exception as exc:  # pragma: no cover - network errors etc.
+                    LOG.warning("Ingest failed for %s: %s", provider, exc)
+                    summary["errors"].append(f"ingest:{provider}: {exc}")
+            if ingest_results:
+                summary["ingest"] = ingest_results
+
+        if "etl" in steps:
             try:
-                from fair3.engine.ingest import run_ingest
+                from fair3.engine.etl.make_tr_panel import TRPanelBuilder
 
-                artifact = run_ingest(provider, start=start, progress=False)
-                ingest_results[provider] = str(artifact.path)
-            except Exception as exc:  # pragma: no cover - network errors etc.
-                LOG.warning("Ingest failed for %s: %s", provider, exc)
-                summary["errors"].append(f"ingest:{provider}: {exc}")
-        if ingest_results:
-            summary["ingest"] = ingest_results
+                panel = TRPanelBuilder().build(trace=False)
+                summary["etl"] = str(panel.panel_path)
+            except Exception as exc:  # pragma: no cover - missing data
+                LOG.warning("ETL failed: %s", exc)
+                summary["errors"].append(f"etl: {exc}")
 
-        try:
-            from fair3.engine.etl.make_tr_panel import TRPanelBuilder
-
-            panel = TRPanelBuilder().build(trace=False)
-            summary["etl"] = str(panel.panel_path)
-        except Exception as exc:  # pragma: no cover - missing data
-            LOG.warning("ETL failed: %s", exc)
-            summary["errors"].append(f"etl: {exc}")
-
-        try:
-            from fair3.engine.factors import run_factor_pipeline
-
-            factors = run_factor_pipeline(validate=False)
-            summary["factors"] = str(factors.factors_path)
-        except Exception as exc:  # pragma: no cover - dependent on ETL
-            LOG.warning("Factor pipeline failed: %s", exc)
-            summary["errors"].append(f"factors: {exc}")
-
-        try:
-            from fair3.engine.estimates import run_estimate_pipeline
-
-            estimates = run_estimate_pipeline(validate=False)
-            summary["estimates"] = str(estimates.mu_path)
-        except Exception as exc:  # pragma: no cover
-            LOG.warning("Estimate pipeline failed: %s", exc)
-            summary["errors"].append(f"estimates: {exc}")
-
-        if generate_reports:
+        if "factors" in steps:
             try:
-                months = pd.date_range(end=pd.Timestamp.today(), periods=12, freq="M")
+                from fair3.engine.factors import run_factor_pipeline
+
+                factors = run_factor_pipeline(validate=False)
+                summary["factors"] = str(factors.factors_path)
+            except Exception as exc:  # pragma: no cover - dependent on ETL
+                LOG.warning("Factor pipeline failed: %s", exc)
+                summary["errors"].append(f"factors: {exc}")
+
+        if "estimates" in steps:
+            try:
+                from fair3.engine.estimates import run_estimate_pipeline
+
+                estimates = run_estimate_pipeline()
+                summary["estimates"] = str(estimates.mu_path)
+            except Exception as exc:  # pragma: no cover
+                LOG.warning("Estimate pipeline failed: %s", exc)
+                summary["errors"].append(f"estimates: {exc}")
+
+        if generate_reports and "report" in steps:
+            try:
+                months = pd.date_range(end=pd.Timestamp.today(), periods=12, freq="ME")
                 inputs = self._synthetic_report_inputs(months)
                 artifacts = generate_monthly_report(
                     inputs,
                     period_label=months[-1].strftime("%Y-%m"),
                     output_dir=report_dir,
                 )
-                summary["report"] = {
-                    "html": str(artifacts.report_html),
-                    "pdf": str(getattr(artifacts, "report_pdf", "")),
-                }
+                pdf_path = getattr(artifacts, "report_pdf", None)
+                summary["report"] = {"pdf": str(pdf_path) if pdf_path else ""}
             except Exception as exc:  # pragma: no cover
                 LOG.warning("Report generation failed: %s", exc)
                 summary["errors"].append(f"report: {exc}")

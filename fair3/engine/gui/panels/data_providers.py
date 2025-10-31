@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date as _date
 from typing import Iterable
 
 from fair3.engine.ingest import available_sources
@@ -44,7 +45,9 @@ class DataProvidersPanel(QtWidgets.QWidget):  # type: ignore[misc]
     def _emit_request(self) -> None:
         source = self._source.currentText()
         symbols = tuple(self._parse_symbols(self._symbols.text()))
-        start = self._start.date().toPyDate()
+        qdate = self._start.date()
+        # PySide6: QDate.toPython() compat; fallback manuale per versioni senza toPython.
+        start = qdate.toPython() if hasattr(qdate, "toPython") else _date(qdate.year(), qdate.month(), qdate.day())
         self.ingestRequested.emit(source, symbols, start)
 
     @staticmethod

@@ -1,11 +1,16 @@
 """Infrastructure helpers for FAIR-III (paths, secrets, persistence)."""
 
-from .paths import create_run_dir
-from .secrets import get_secret, is_backend_available, set_secret
+from .paths import DEFAULT_ARTIFACT_ROOT, DEFAULT_LOG_ROOT, DEFAULT_REPORT_ROOT, run_dir
+from .secrets import apply_api_keys, get_api_key, is_backend_available, load_api_keys, save_api_keys
 
 __all__ = [
-    "create_run_dir",
-    "get_secret",
+    "DEFAULT_ARTIFACT_ROOT",
+    "DEFAULT_LOG_ROOT",
+    "DEFAULT_REPORT_ROOT",
+    "apply_api_keys",
+    "get_api_key",
     "is_backend_available",
-    "set_secret",
+    "load_api_keys",
+    "run_dir",
+    "save_api_keys",
 ]

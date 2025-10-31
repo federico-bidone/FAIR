@@ -20,7 +20,7 @@ artifacts/
 ```
 
 La GUI crea automaticamente cartelle `YYYY-MM-DD_HHMM` tramite
-`fair3.engine.infra.paths.create_run_dir` ogni volta che viene eseguita la pipeline
+`fair3.engine.infra.paths.run_dir` ogni volta che viene eseguita la pipeline
 automatica.
 
 ## Report mensili
