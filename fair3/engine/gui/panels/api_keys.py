@@ -70,6 +70,9 @@ class APIKeysPanel(QtWidgets.QWidget):  # type: ignore[misc]
             line.setPlaceholderText(field.description)
             line.setToolTip(field.description)
             row_layout.addWidget(line)
+            clear_btn = QtWidgets.QPushButton("Cancella")
+            clear_btn.clicked.connect(partial(self._clear_value, field.env))
+            row_layout.addWidget(clear_btn)
             test_btn = QtWidgets.QPushButton("Test")
             test_btn.clicked.connect(lambda _=False, src=field.source: self.testRequested.emit(src))
             row_layout.addWidget(test_btn)
@@ -142,6 +145,16 @@ class APIKeysPanel(QtWidgets.QWidget):  # type: ignore[misc]
 
     def _mark_modified(self, env: str, _: str) -> None:
         self._modified.add(env)
+
+    def _clear_value(self, env: str) -> None:
+        widget = self._fields.get(env)
+        if widget is None:
+            return
+        widget.clear()
+        self._modified.add(env)
+        label = self._mask_labels.get(env)
+        if label is not None:
+            label.setText("—")
 
     @staticmethod
     def _mask(value: str | None) -> str:
