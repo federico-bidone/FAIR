@@ -1,0 +1,10 @@
+# API keys for FAIR-III data providers.
+#
+# La GUI salva le credenziali direttamente nel keyring; questo file rimane a
+# scopo documentativo o per ambienti non interattivi.
+# Le chiavi vuote vengono ignorate e non sovrascrivono le variabili d'ambiente.
+ALPHAVANTAGE_API_KEY: ""
+TIINGO_API_KEY: ""
+EODHD_API_TOKEN: ""
+FRED_API_KEY: ""
+OPENFIGI_API_KEY: ""
